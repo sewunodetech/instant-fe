@@ -1,0 +1,57 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Icon } from "@/components/icon";
+
+const tabs = [
+  { href: "/", label: "Home", icon: "home" },
+  { href: "/campaigns", label: "Campaigns", icon: "local_fire_department" },
+  { href: "/snap", label: "Snap", icon: "photo_camera", shutter: true },
+  { href: "/rewards", label: "Rewards", icon: "emoji_events" },
+  { href: "/profile", label: "Profile", icon: "person" },
+];
+
+export function BottomNav() {
+  const pathname = usePathname();
+
+  return (
+    <nav className="fixed inset-x-0 bottom-0 z-50 mx-auto max-w-[430px] bg-surface/85 pb-safe shadow-[0_-4px_24px_rgba(0,0,0,0.06)] backdrop-blur-xl">
+      <div className="relative flex h-20 items-center justify-around px-space-xs">
+        {tabs.map((tab) => {
+          const active =
+            tab.href === "/" ? pathname === "/" : pathname.startsWith(tab.href);
+
+          if (tab.shutter) {
+            return (
+              <div key={tab.href} className="relative -top-5 flex flex-col items-center">
+                <Link
+                  href={tab.href}
+                  aria-label={tab.label}
+                  className="flex h-14 w-14 items-center justify-center rounded-full bg-secondary-container text-on-secondary shadow-shutter ring-4 ring-surface transition-transform active:scale-95"
+                >
+                  <Icon name={tab.icon} className="text-[28px]" />
+                </Link>
+                <span className="mt-1 text-label-sm text-on-surface-variant">{tab.label}</span>
+              </div>
+            );
+          }
+
+          return (
+            <Link
+              key={tab.href}
+              href={tab.href}
+              aria-current={active ? "page" : undefined}
+              className={`flex min-h-12 min-w-14 flex-col items-center justify-center gap-0.5 transition-colors ${
+                active ? "text-secondary" : "text-on-surface-variant hover:text-on-surface"
+              }`}
+            >
+              <Icon name={tab.icon} filled={active} className="text-[24px]" />
+              <span className="text-label-sm">{tab.label}</span>
+            </Link>
+          );
+        })}
+      </div>
+    </nav>
+  );
+}
