@@ -56,7 +56,10 @@ export type Snap = {
 };
 
 export const currentUser = {
+  name: "Maya",
+  handle: "maya_beachlife",
   avatar: "/mock/avatar-me.jpg",
+  wallet: { network: "Base", address: "0x4a9...8e21" },
   usdcBalance: 42.5,
   hasUnread: true,
   streakDays: 5,
@@ -334,3 +337,24 @@ export const EST_PAYOUT_PER_VOTE_USDC = 3.2;
 export function votesFor(usdc: number) {
   return usdc >= 10 ? Math.floor(usdc * 1.2) : Math.floor(usdc);
 }
+
+export type RewardLine = {
+  label: string;
+  note?: string;
+  icon: string;
+  tone: "primary" | "secondary" | "tertiary" | "neutral";
+  amountUsdc: number;
+  /** Rendered with a leading "+" as a bonus on top of the base prize. */
+  bonus?: boolean;
+};
+
+export const pendingReward = {
+  campaignId: "golden-hour",
+  place: 1,
+  lines: [
+    { label: "Base Creator 1st Prize", icon: "military_tech", tone: "primary", amountUsdc: 70 },
+    { label: "Community Early-Bird Bonus", icon: "speed", tone: "secondary", amountUsdc: 5, bonus: true },
+    { label: "5-Day Streak Multiplier (+10%)", icon: "local_fire_department", tone: "tertiary", amountUsdc: 5, bonus: true },
+    { label: "Network Gas Fee", note: "Sponsored by Base", icon: "local_gas_station", tone: "neutral", amountUsdc: 0 },
+  ] satisfies RewardLine[],
+};

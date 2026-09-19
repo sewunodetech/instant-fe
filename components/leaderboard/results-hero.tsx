@@ -1,46 +1,18 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useState, type CSSProperties } from "react";
+import { useEffect } from "react";
+import { ConfettiLayer, prefersReducedMotion, useConfetti } from "@/components/confetti";
 import { Icon } from "@/components/icon";
 import { BackButton } from "@/components/layout/back-button";
 import type { Campaign } from "@/lib/mock-data";
 
-const confettiColors = ["#FFE000", "#106DF4", "#71FB96", "#FF6B8B", "#FFBE0B"];
-
-type Particle = { id: number; style: CSSProperties };
-
-function makeBurst(seed: number): Particle[] {
-  return Array.from({ length: 24 }, (_, i) => {
-    const size = Math.floor(Math.random() * 8) + 6;
-    const angle = Math.random() * Math.PI * 2;
-    const velocity = Math.random() * 120 + 50;
-    return {
-      id: seed * 100 + i,
-      style: {
-        width: size,
-        height: size * 0.8,
-        backgroundColor: confettiColors[Math.floor(Math.random() * confettiColors.length)],
-        "--dx": `${Math.cos(angle) * velocity}px`,
-        "--dy": `${Math.sin(angle) * velocity + 40}px`,
-        "--rot": `${Math.random() * 360}deg`,
-      } as CSSProperties,
-    };
-  });
-}
-
 export function ResultsHero({ campaign }: { campaign: Campaign }) {
   const ended = !campaign.live;
-  const [particles, setParticles] = useState<Particle[]>([]);
-
-  const burst = useCallback(() => {
-    const seed = Date.now();
-    setParticles((p) => [...p, ...makeBurst(seed)]);
-    setTimeout(() => setParticles((p) => p.filter((x) => x.id < seed * 100)), 1050);
-  }, []);
+  const { particles, burst } = useConfetti();
 
   useEffect(() => {
-    if (!ended || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!ended || prefersReducedMotion()) return;
     const t = setTimeout(burst, 400);
     return () => clearTimeout(t);
   }, [ended, burst]);
@@ -107,15 +79,7 @@ export function ResultsHero({ campaign }: { campaign: Campaign }) {
             : `${campaign.votesCast.toLocaleString("en")} votes cast so far. Rankings update live until the campaign closes.`}
         </p>
 
-        <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-          {particles.map((p) => (
-            <span
-              key={p.id}
-              className="absolute top-[40%] left-1/2 animate-confetti rounded-sm"
-              style={p.style}
-            />
-          ))}
-        </div>
+        <ConfettiLayer particles={particles} />
       </section>
     </>
   );
