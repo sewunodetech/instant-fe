@@ -67,8 +67,8 @@ export const activeCampaigns: Campaign[] = [
       handle: "maya_beachlife",
       verified: true,
       snapImage: "/mock/snap-summer-beach.jpg",
-      votes: 342,
-      estUsdc: 84,
+      votes: 1420,
+      estUsdc: 80,
     },
     topVoterAvatars: ["/mock/avatar-voter-1.jpg", "/mock/avatar-voter-2.jpg"],
     otherVoters: 48,
@@ -141,9 +141,106 @@ export const activeCampaigns: Campaign[] = [
   },
 ];
 
+export const pastCampaigns: Campaign[] = [
+  {
+    id: "golden-hour",
+    tag: "#GoldenHour",
+    poolUsdc: 250,
+    daysLeft: 0,
+    dot: "muted",
+    kind: "Community Drop",
+    description: "Chase the light. Snap the warmest, glowiest golden-hour moment of your week.",
+    heroImage: "/mock/leaderboard/snap-1.jpg",
+    heroAlt: "A surfer walking along the beach at sunset",
+    live: false,
+    creators: 1500,
+    votesCast: 6840,
+    leader: {
+      handle: "maya_beachlife",
+      verified: true,
+      snapImage: "/mock/leaderboard/snap-1.jpg",
+      votes: 1420,
+      estUsdc: 80,
+    },
+    topVoterAvatars: ["/mock/leaderboard/voter-1.jpg", "/mock/leaderboard/voter-2.jpg"],
+    otherVoters: 64,
+  },
+];
+
 export function getCampaign(id: string) {
-  return activeCampaigns.find((c) => c.id === id);
+  return [...activeCampaigns, ...pastCampaigns].find((c) => c.id === id);
 }
+
+export type Creator = {
+  rank: number;
+  handle: string;
+  verified?: boolean;
+  avatar?: string;
+  snapImage: string;
+  votes: number;
+  payoutUsdc: number;
+  tagline?: string;
+};
+
+export type RewardedVoter = {
+  rank: number;
+  handle: string;
+  avatar: string;
+  note: string;
+  dividendUsdc: number;
+};
+
+export type Leaderboard = {
+  creators: Creator[];
+  voters: RewardedVoter[];
+  voterDividend: { count: number; eachUsdc: number };
+};
+
+const L = "/mock/leaderboard";
+
+// Every campaign shares one mock leaderboard for now.
+const sharedLeaderboard: Leaderboard = {
+  creators: [
+    {
+      rank: 1,
+      handle: "maya_beachlife",
+      verified: true,
+      avatar: `${L}/avatar-1.jpg`,
+      snapImage: `${L}/snap-1.jpg`,
+      votes: 1420,
+      payoutUsdc: 80,
+      tagline: "Chasing golden sunsets & tide pools",
+    },
+    { rank: 2, handle: "alex_skater", avatar: `${L}/avatar-2.jpg`, snapImage: `${L}/snap-2.jpg`, votes: 982, payoutUsdc: 50 },
+    { rank: 3, handle: "sarah_sun", avatar: `${L}/avatar-3.jpg`, snapImage: `${L}/snap-3.jpg`, votes: 740, payoutUsdc: 30 },
+    { rank: 4, handle: "kai_vibes", verified: true, snapImage: `${L}/snap-4.jpg`, votes: 612, payoutUsdc: 18 },
+    { rank: 5, handle: "lucas_travels", snapImage: `${L}/snap-5.jpg`, votes: 540, payoutUsdc: 14 },
+    { rank: 6, handle: "elena_glow", verified: true, snapImage: `${L}/snap-6.jpg`, votes: 488, payoutUsdc: 12 },
+    { rank: 7, handle: "matcha_breeze", snapImage: `${L}/snap-7.jpg`, votes: 410, payoutUsdc: 10 },
+    { rank: 8, handle: "dan_ocean", snapImage: `${L}/snap-8.jpg`, votes: 365, payoutUsdc: 8 },
+    { rank: 9, handle: "chloe_petals", snapImage: `${L}/snap-9.jpg`, votes: 312, payoutUsdc: 6 },
+    { rank: 10, handle: "trio_nomad", snapImage: `${L}/snap-10.jpg`, votes: 289, payoutUsdc: 4 },
+  ],
+  voters: [
+    { rank: 1, handle: "curator_pro", avatar: `${L}/voter-1.jpg`, note: "Predicted #1 Winner early", dividendUsdc: 4.45 },
+    { rank: 2, handle: "summer_scout", avatar: `${L}/voter-2.jpg`, note: "Predicted #1 & #2", dividendUsdc: 4.45 },
+    { rank: 3, handle: "zoe_superfan", avatar: `${L}/voter-3.jpg`, note: "Cast 45 active votes", dividendUsdc: 4.45 },
+  ],
+  voterDividend: { count: 10, eachUsdc: 4.45 },
+};
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- id will select real data once the API exists
+export function getLeaderboard(campaignId: string): Leaderboard {
+  return sharedLeaderboard;
+}
+
+export const upcomingCampaign = {
+  id: "sunset-chasers",
+  tag: "#SunsetChasers",
+  poolUsdc: 300,
+  theme: "Golden Hour Theme",
+  startsIn: "2h 14m",
+};
 
 export const feedSnaps: Snap[] = [
   {
@@ -152,7 +249,7 @@ export const feedSnaps: Snap[] = [
     imageAlt: "A young woman laughing with an iced matcha latte at a sunlit Parisian sidewalk cafe",
     campaign: { tag: "#SummerVibes", poolUsdc: 250, icon: "stars" },
     rank: 1,
-    votes: 342,
+    votes: 1420,
     comments: 18,
     creator: { handle: "maya_beachlife", initial: "M", verified: true, online: true },
     postedAgo: "2h ago",
