@@ -7,7 +7,12 @@ export type Campaign = {
   daysLeft: number;
   dot: "live" | "blue" | "green" | "muted";
   kind: string;
+  /** One-line pitch shown on discovery cards. */
+  tagline: string;
   description: string;
+  cover: string;
+  badge?: "New" | "Top Pool";
+  trending?: boolean;
   heroImage: string;
   heroAlt: string;
   live: boolean;
@@ -67,6 +72,9 @@ export const activeCampaigns: Campaign[] = [
     daysLeft: 5,
     dot: "live",
     kind: "Community Drop",
+    tagline: "Show us your golden-hour patio or beach hangout crew!",
+    cover: "/mock/campaigns/summer-vibes.jpg",
+    trending: true,
     description:
       "Capture your best summer moments! Grab an iced drink, hang out with friends, and snap authentic sunshine vibes.",
     heroImage: "/mock/campaign-summer-hero.jpg",
@@ -91,11 +99,14 @@ export const activeCampaigns: Campaign[] = [
     daysLeft: 3,
     dot: "blue",
     kind: "Community Drop",
+    tagline: "Metro aesthetic, crosswalks & city rhythm",
+    cover: "/mock/campaigns/city-life.jpg",
+    badge: "New",
     description: "Street corners, rooftops, late-night trains. Show us the city the way only you see it.",
-    heroImage: "/mock/avatar-me.jpg",
-    heroAlt: "A young woman smiling with her phone at a busy street market",
+    heroImage: "/mock/campaigns/city-life.jpg",
+    heroAlt: "Friends crossing a busy neon-lit city street",
     live: true,
-    creators: 640,
+    creators: 843,
     votesCast: 2100,
     leader: {
       handle: "urban.kai",
@@ -113,11 +124,13 @@ export const activeCampaigns: Campaign[] = [
     daysLeft: 7,
     dot: "green",
     kind: "Community Drop",
+    tagline: "Snap the bite before your first savor",
+    cover: "/mock/campaigns/foodie-moment.jpg",
     description: "That first bite, that perfect plate. Snap the food moment you couldn't not share.",
-    heroImage: "/mock/snap-summer-cafe.jpg",
-    heroAlt: "Friends sharing drinks and pastries at a Parisian cafe",
+    heroImage: "/mock/campaigns/foodie-moment.jpg",
+    heroAlt: "A colorful poke bowl on a cafe table",
     live: true,
-    creators: 410,
+    creators: 672,
     votesCast: 1300,
     leader: {
       handle: "chef.lina",
@@ -135,11 +148,15 @@ export const activeCampaigns: Campaign[] = [
     daysLeft: 10,
     dot: "muted",
     kind: "Sponsored",
+    tagline: "Unfiltered duo memories & spontaneous giggles",
+    cover: "/mock/campaigns/best-friends.jpg",
+    badge: "Top Pool",
+    trending: true,
     description: "Tag your ride-or-die. Snap a moment together that proves it.",
     heroImage: "/mock/snap-best-friends.jpg",
     heroAlt: "Two best friends smiling in a golden-hour selfie on a seaside boardwalk",
     live: true,
-    creators: 890,
+    creators: 1400,
     votesCast: 3600,
     leader: {
       handle: "elena_glow",
@@ -160,6 +177,8 @@ export const pastCampaigns: Campaign[] = [
     daysLeft: 0,
     dot: "muted",
     kind: "Community Drop",
+    tagline: "Chase the light for the warmest glow of the week",
+    cover: "/mock/leaderboard/snap-1.jpg",
     description: "Chase the light. Snap the warmest, glowiest golden-hour moment of your week.",
     heroImage: "/mock/leaderboard/snap-1.jpg",
     heroAlt: "A surfer walking along the beach at sunset",
