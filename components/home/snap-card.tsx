@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import { Icon } from "@/components/icon";
 import type { Snap } from "@/lib/mock-data";
@@ -69,6 +70,11 @@ export function SnapCard({ snap, priority }: { snap: Snap; priority?: boolean })
           priority={priority}
           sizes="(max-width: 430px) 100vw, 406px"
           className="object-cover select-none"
+        />
+        <Link
+          href={`/snaps/${snap.id}`}
+          aria-label={`Open snap by @${snap.creator.handle}`}
+          className="absolute inset-0"
         />
 
         <div className="pointer-events-none absolute inset-x-3 top-3 flex items-center justify-between">

@@ -28,11 +28,21 @@ export type Snap = {
   id: string;
   image: string;
   imageAlt: string;
+  campaignId: string;
   campaign: { tag: string; poolUsdc: number; icon: string };
+  caption: string;
+  location?: string;
   rank: number;
   votes: number;
   comments: number;
-  creator: { handle: string; initial: string; verified?: boolean; online?: boolean };
+  creator: {
+    handle: string;
+    name: string;
+    initial: string;
+    avatar?: string;
+    verified?: boolean;
+    online?: boolean;
+  };
   postedAgo: string;
   liveShutter?: boolean;
   featured?: boolean;
@@ -42,6 +52,7 @@ export type Snap = {
 
 export const currentUser = {
   avatar: "/mock/avatar-me.jpg",
+  usdcBalance: 42.5,
   hasUnread: true,
   streakDays: 5,
   streakBonusPct: 10,
@@ -247,11 +258,21 @@ export const feedSnaps: Snap[] = [
     id: "snap-1",
     image: "/mock/snap-summer-cafe.jpg",
     imageAlt: "A young woman laughing with an iced matcha latte at a sunlit Parisian sidewalk cafe",
+    campaignId: "summer-vibes",
+    caption: "Sunny patio laughter with besties! Matcha latte + iced tea = pure summer ☀️🌴 #SummerVibes #GoldenHour",
+    location: "Venice Beach, CA",
     campaign: { tag: "#SummerVibes", poolUsdc: 250, icon: "stars" },
     rank: 1,
     votes: 1420,
     comments: 18,
-    creator: { handle: "maya_beachlife", initial: "M", verified: true, online: true },
+    creator: {
+      handle: "maya_beachlife",
+      name: "Maya",
+      initial: "M",
+      avatar: "/mock/leaderboard/avatar-1.jpg",
+      verified: true,
+      online: true,
+    },
     postedAgo: "2h ago",
     liveShutter: true,
     featured: true,
@@ -261,11 +282,36 @@ export const feedSnaps: Snap[] = [
     id: "snap-2",
     image: "/mock/snap-best-friends.jpg",
     imageAlt: "Two best friends smiling in a golden-hour selfie on a seaside boardwalk",
+    campaignId: "best-friends",
+    caption: "Boardwalk sunsets with my forever person 🧡 #BestFriends",
+    location: "Santa Monica Pier, CA",
     campaign: { tag: "#BestFriends", poolUsdc: 300, icon: "group" },
     rank: 4,
     votes: 198,
     comments: 7,
-    creator: { handle: "elena_glow", initial: "E" },
+    creator: { handle: "elena_glow", name: "Elena", initial: "E" },
     postedAgo: "45m ago",
   },
 ];
+
+export function getSnap(id: string) {
+  return feedSnaps.find((s) => s.id === id);
+}
+
+export type VoteTier = { usdc: number; votes: number; bonusPct?: number };
+
+export const voteTiers: VoteTier[] = [
+  { usdc: 1, votes: 1 },
+  { usdc: 5, votes: 5 },
+  { usdc: 10, votes: 12, bonusPct: 20 },
+];
+
+/** Share of the prize pool that goes to voters of winning snaps. */
+export const VOTER_POOL_SHARE = 0.3;
+/** Mock projection until the backend returns a real estimate. */
+export const EST_PAYOUT_PER_VOTE_USDC = 3.2;
+
+/** Votes earned for a USDC amount: 20% bonus from 10 USDC up. */
+export function votesFor(usdc: number) {
+  return usdc >= 10 ? Math.floor(usdc * 1.2) : Math.floor(usdc);
+}

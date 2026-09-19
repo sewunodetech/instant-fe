@@ -20,7 +20,7 @@ export function BottomNav() {
       <div className="relative flex h-20 items-center justify-around px-space-xs">
         {tabs.map((tab) => {
           const active =
-            tab.href === "/" ? pathname === "/" : pathname.startsWith(tab.href);
+            pathname === tab.href || (tab.href !== "/" && pathname.startsWith(`${tab.href}/`));
 
           if (tab.shutter) {
             return (
