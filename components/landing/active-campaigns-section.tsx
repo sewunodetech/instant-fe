@@ -1,135 +1,118 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Icon } from "@/components/icon";
+import { ArrowUpRight, MapPin, Timer, Users } from "lucide-react";
+import { BorderBeam } from "@/components/ui/border-beam";
+import { cn } from "@/lib/utils";
+import { FadeIn, Parallax, Stagger, StaggerItem } from "@/components/landing/motion-primitives";
+import { APP_ENTRY_HREF, campaigns } from "@/components/landing/content";
 
-type CampaignCard = {
-  tag: string;
-  image: string;
-  imageAlt: string;
-  dotClass: string;
-  poolLabel: string;
-  poolClass: string;
-  location: string;
-  creators: string;
-  daysLeft: string;
-  title: string;
-  body: string;
-  voterShare: string;
-  ctaClass: string;
-};
-
-const campaigns: CampaignCard[] = [
-  {
-    tag: "#SummerVibes",
-    image: "/mock/campaigns/summer-vibes.jpg",
-    imageAlt: "#SummerVibes friends",
-    dotClass: "bg-emerald-400 animate-pulse",
-    poolLabel: "250 USDC Pool",
-    poolClass: "bg-primary-container text-on-primary-fixed",
-    location: "📍 Malibu Beach Cafe",
-    creators: "1.2k creators",
-    daysLeft: "5 Days Left",
-    title: "Sunshine, Iced Drinks & Laughter",
-    body: "Snap raw moments with friends outdoors enjoying the summer sun. Zero filters permitted.",
-    voterShare: "~$38 USDC",
-    ctaClass: "bg-primary-container hover:bg-primary-fixed text-on-primary-fixed hover:shadow-pop-yellow",
-  },
-  {
-    tag: "#CityLife",
-    image: "/mock/campaigns/city-life.jpg",
-    imageAlt: "#CityLife creator",
-    dotClass: "bg-secondary-container",
-    poolLabel: "150 USDC Pool",
-    poolClass: "bg-secondary-fixed text-on-secondary-fixed",
-    location: "📍 Downtown Market",
-    creators: "843 creators",
-    daysLeft: "3 Days Left",
-    title: "Street Corner Discoveries",
-    body: "Unplanned city strolls, street food spots, and authentic candid city bustle.",
-    voterShare: "~$22 USDC",
-    ctaClass: "bg-surface-container-low hover:bg-slate-200 text-slate-900",
-  },
-  {
-    tag: "#CampusVibes",
-    image: "/mock/campaigns/best-friends.jpg",
-    imageAlt: "#CampusVibes friends",
-    dotClass: "bg-emerald-500",
-    poolLabel: "300 USDC Pool",
-    poolClass: "bg-primary-container text-on-primary-fixed",
-    location: "📍 University Quad",
-    creators: "1.4k creators",
-    daysLeft: "7 Days Left",
-    title: "Between Classes & Golden Hour",
-    body: "Post-lecture walks and sunset laughs with your favorite study buddy.",
-    voterShare: "~$45 USDC",
-    ctaClass: "bg-surface-container-low hover:bg-slate-200 text-slate-900",
-  },
-];
+/** Staggered scroll drift; the middle card leads so the row feels layered. */
+const cardDrift = [50, 90, 30];
 
 export function ActiveCampaignsSection() {
   return (
-    <section id="campaigns" className="border-b border-slate-200/60 bg-surface py-24">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="reveal-item mb-14 flex flex-col justify-between gap-6 md:flex-row md:items-end">
-          <div>
-            <span className="mb-3 inline-block rounded-full bg-primary-container px-3.5 py-1.5 text-xs font-extrabold tracking-wider text-on-primary-fixed uppercase shadow-soft">
-              Live Drop Vaults
-            </span>
-            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">Active Campaigns &amp; Drops</h2>
-            <p className="mt-2 text-sm font-medium text-slate-600 sm:text-base">
-              Participate in current timed challenges or vote to take a share of the community pool.
+    <section id="campaigns" className="scroll-mt-24 bg-surface-container-low/40 px-4 py-24 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl">
+        <FadeIn className="mb-14 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+          <div className="max-w-xl">
+            <p className="text-body-sm font-bold tracking-wider text-secondary uppercase">Live drop vaults</p>
+            <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-balance sm:text-5xl">
+              Active campaigns &amp; drops
+            </h2>
+            <p className="mt-4 text-base text-pretty text-on-surface-variant sm:text-lg">
+              Join a timed challenge or vote to take a share of the community pool.
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <button className="rounded-full bg-secondary px-4 py-2 text-xs font-bold text-white shadow-soft transition-all active:scale-95">
-              All Drops
-            </button>
-            <button className="rounded-full border border-slate-200/80 bg-surface-container-lowest px-4 py-2 text-xs font-bold text-slate-600 transition-all hover:bg-surface-container-low active:scale-95">
-              Ending Soon ⏳
-            </button>
-          </div>
-        </div>
+          <Link
+            href={APP_ENTRY_HREF}
+            className="group inline-flex items-center gap-1.5 self-start rounded-full border border-black/10 bg-surface-container-lowest px-5 py-2.5 text-body-sm font-bold shadow-soft transition-all hover:-translate-y-0.5 md:self-auto"
+          >
+            Browse all drops
+            <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" strokeWidth={2.4} aria-hidden />
+          </Link>
+        </FadeIn>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          {campaigns.map((c) => (
-            <article
-              key={c.tag}
-              className="reveal-item interactive-card group flex flex-col justify-between rounded-3xl border border-slate-200/80 bg-surface-container-lowest p-3.5 shadow-card transition-all hover:shadow-card-hover"
-            >
-              <div className="space-y-3">
-                <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-slate-100">
-                  <Image src={c.image} alt={c.imageAlt} fill sizes="(max-width: 768px) 100vw, 360px" className="object-cover transition-transform duration-500 group-hover:scale-105" />
-                  <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 rounded-full bg-slate-900/80 px-3 py-1 text-xs font-bold text-white backdrop-blur-md">
-                    <span className={`h-2 w-2 rounded-full ${c.dotClass}`} />
-                    <span>{c.tag}</span>
-                  </div>
-                  <div className={`absolute top-2.5 right-2.5 rounded-full px-2.5 py-1 text-xs font-extrabold shadow-sm ${c.poolClass}`}>{c.poolLabel}</div>
-                  <div className="absolute bottom-2.5 left-2.5 rounded-full bg-black/60 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur-md">{c.location}</div>
-                </div>
-                <div className="space-y-1 px-1">
-                  <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
-                    <span className="flex items-center gap-1 font-bold text-slate-900">
-                      <Icon name="group" className="text-[16px] text-secondary-container" /> {c.creators}
+        <Stagger className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          {campaigns.map((campaign, i) => (
+            <StaggerItem key={campaign.tag}>
+             <Parallax distance={cardDrift[i] ?? 40} className="h-full">
+              <article className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-black/5 bg-surface-container-lowest p-3 shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:shadow-card-hover">
+                {campaign.featured && (
+                  <BorderBeam
+                    size={90}
+                    duration={7}
+                    colorFrom="#f0b90b"
+                    colorTo="#106df4"
+                    className="opacity-80"
+                  />
+                )}
+
+                <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-surface-container">
+                  <Image
+                    src={campaign.image}
+                    alt={campaign.imageAlt}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 360px"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-x-3 top-3 flex items-center justify-between">
+                    <span className="flex items-center gap-1.5 rounded-full bg-on-surface/70 px-3 py-1 text-body-sm font-bold text-surface backdrop-blur-md">
+                      <span className="size-2 rounded-full bg-tertiary" />
+                      {campaign.tag}
                     </span>
-                    <span className="flex items-center gap-1 font-bold text-amber-600">
-                      <Icon name="timer" className="text-[15px]" /> {c.daysLeft}
+                    <span
+                      className={cn(
+                        "rounded-full px-2.5 py-1 text-body-sm font-extrabold shadow-sm",
+                        campaign.featured
+                          ? "bg-primary-container text-on-primary-fixed"
+                          : "bg-secondary-fixed text-on-secondary-fixed",
+                      )}
+                    >
+                      {campaign.pool}
                     </span>
                   </div>
-                  <h3 className="text-base font-extrabold text-slate-900">{c.title}</h3>
-                  <p className="text-xs leading-relaxed font-medium text-slate-500">{c.body}</p>
+                  <span className="absolute bottom-3 left-3 flex items-center gap-1 rounded-full bg-on-surface/70 px-2.5 py-1 text-[11px] font-bold text-surface backdrop-blur-md">
+                    <MapPin className="size-3" strokeWidth={2.4} aria-hidden />
+                    {campaign.location}
+                  </span>
                 </div>
-              </div>
-              <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-4">
-                <div className="text-[11px] font-medium text-slate-600">
-                  Top voter share: <strong className="text-emerald-600">{c.voterShare}</strong>
+
+                <div className="flex flex-1 flex-col px-2 pt-4">
+                  <div className="flex items-center justify-between text-body-sm font-semibold">
+                    <span className="flex items-center gap-1.5 text-on-surface">
+                      <Users className="size-4 text-secondary" strokeWidth={2.2} aria-hidden />
+                      {campaign.creators}
+                    </span>
+                    <span className="flex items-center gap-1.5 text-bnb-dim">
+                      <Timer className="size-4" strokeWidth={2.2} aria-hidden />
+                      {campaign.daysLeft}
+                    </span>
+                  </div>
+                  <h3 className="mt-2 text-lg font-extrabold tracking-tight text-on-surface">{campaign.title}</h3>
+                  <p className="mt-1.5 text-body-sm leading-relaxed text-on-surface-variant">{campaign.body}</p>
+
+                  <div className="mt-auto flex items-center justify-between border-t border-black/5 pt-4">
+                    <p className="text-[11px] font-medium text-on-surface-variant">
+                      Top voter share <span className="font-bold text-tertiary">{campaign.voterShare}</span>
+                    </p>
+                    <Link
+                      href={APP_ENTRY_HREF}
+                      className={cn(
+                        "rounded-full px-4 py-2 text-body-sm font-bold transition-transform hover:scale-[1.03] active:scale-95",
+                        campaign.featured
+                          ? "bg-on-surface text-surface"
+                          : "bg-surface-container text-on-surface hover:bg-surface-container-high",
+                      )}
+                    >
+                      Join
+                    </Link>
+                  </div>
                 </div>
-                <Link href="/home" className={`badge-shimmer rounded-full px-4 py-2 text-xs font-extrabold shadow-sm transition-all active:scale-95 ${c.ctaClass}`}>
-                  Join Campaign
-                </Link>
-              </div>
-            </article>
+              </article>
+             </Parallax>
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
       </div>
     </section>
   );

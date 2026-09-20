@@ -1,100 +1,51 @@
-import { Icon } from "@/components/icon";
+import { CheckCircle2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { FadeIn, Parallax, Stagger, StaggerItem } from "@/components/landing/motion-primitives";
+import { steps } from "@/components/landing/content";
 
-type Step = {
-  step: string;
-  icon: string;
-  title: string;
-  body: string;
-  footerIcon?: string;
-  footerDot?: boolean;
-  footerLabel: string;
-  footerIconClass?: string;
-  iconBg: string;
-};
-
-const steps: Step[] = [
-  {
-    step: "Step 01",
-    icon: "bolt",
-    title: "Join The Campaign",
-    body: "Explore active drops like #SummerVibes or #CampusVibes. Free to enter for everyone, backed by verified USDC vaults on BNB Chain.",
-    footerDot: true,
-    footerLabel: "Instant Free Entry",
-    iconBg: "bg-primary-container text-on-primary-fixed",
-  },
-  {
-    step: "Step 02",
-    icon: "photo_camera",
-    title: "2-Minute Shutter Window",
-    body: "Live camera captures only. Hardware timestamps lock out gallery uploads, photoshopped images, and AI deepfakes forever.",
-    footerIcon: "lock",
-    footerIconClass: "text-secondary-container",
-    footerLabel: "Zero Gallery Imports",
-    iconBg: "bg-secondary-container text-white",
-  },
-  {
-    step: "Step 03",
-    icon: "how_to_vote",
-    title: "Community Micro-Vote",
-    body: "Back favorite moments with 1-tap gasless USDC voting pills. Your vote power renews daily with active streak bonuses.",
-    footerIcon: "electric_bolt",
-    footerIconClass: "text-emerald-600",
-    footerLabel: "0.00 Gas Sponsored",
-    iconBg: "bg-primary-container text-on-primary-fixed",
-  },
-  {
-    step: "Step 04",
-    icon: "savings",
-    title: "Win & Split USDC Pools",
-    body: "Winners take 60% of the vault while community voters split 40%. Smart contracts disburse funds directly to your BNB Chain wallet.",
-    footerIcon: "trophy",
-    footerIconClass: "text-amber-500",
-    footerLabel: "60% Creator / 40% Voter",
-    iconBg: "bg-emerald-500 text-white",
-  },
-];
+/** Alternating scroll drift so the four cards don't move in lockstep. */
+const cardDrift = [70, 30, 55, 20];
 
 export function HowItWorksSection() {
   return (
-    <section id="how-it-works" className="border-b border-slate-200/60 bg-surface-container-lowest py-24">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="reveal-item mx-auto mb-16 max-w-3xl text-center">
-          <span className="mb-3 inline-block rounded-full bg-primary-container px-3.5 py-1.5 text-xs font-extrabold tracking-wider text-on-primary-fixed uppercase shadow-soft">
-            Simple, Fair &amp; Gasless
-          </span>
-          <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">How instant.fun Works</h2>
-          <p className="mt-3 text-base font-medium text-slate-600 sm:text-lg">
-            Experience the same transparent 4-step loop as after opening the mobile app.
+    <section id="how-it-works" className="scroll-mt-24 bg-surface px-4 py-24 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl">
+        <FadeIn className="mx-auto mb-14 max-w-2xl text-center">
+          <p className="text-body-sm font-bold tracking-wider text-secondary uppercase">
+            Simple, fair &amp; gasless
           </p>
-        </div>
+          <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-balance sm:text-5xl">
+            Four steps from moment to reward
+          </h2>
+          <p className="mx-auto mt-4 max-w-lg text-base text-pretty text-on-surface-variant sm:text-lg">
+            The same transparent loop you get the moment you open the app.
+          </p>
+        </FadeIn>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {steps.map((s) => (
-            <div
-              key={s.step}
-              className="reveal-item interactive-card group flex flex-col justify-between rounded-3xl border border-slate-200/80 bg-surface p-6 shadow-soft transition-all hover:shadow-card"
-            >
-              <div>
-                <div className="mb-4 flex items-center justify-between">
-                  <span className="text-xs font-extrabold tracking-wider text-slate-400 uppercase">{s.step}</span>
-                  <div className={`flex h-10 w-10 items-center justify-center rounded-2xl font-black transition-transform duration-300 group-hover:scale-110 ${s.iconBg}`}>
-                    <Icon name={s.icon} className="text-[22px]" />
+        <Stagger className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {steps.map((step, i) => (
+            <StaggerItem key={step.title} className={cn(i === 0 && "md:col-span-2 lg:col-span-1")}>
+              <Parallax distance={cardDrift[i] ?? 40} className="h-full">
+                <article className="group relative flex h-full flex-col justify-between overflow-hidden rounded-3xl border border-black/5 bg-surface-container-lowest p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-card">
+                  <div>
+                    <div className="mb-5 flex items-center justify-between">
+                      <span className="text-body-sm font-extrabold text-on-surface-variant/50">0{i + 1}</span>
+                      <div className="flex size-11 items-center justify-center rounded-2xl bg-primary-container/70 text-on-primary-fixed transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+                        <step.icon className="size-5" strokeWidth={2.2} aria-hidden />
+                      </div>
+                    </div>
+                    <h3 className="text-lg font-extrabold tracking-tight text-on-surface">{step.title}</h3>
+                    <p className="mt-2 text-body-md leading-relaxed text-on-surface-variant">{step.body}</p>
                   </div>
-                </div>
-                <h3 className="mb-2 text-lg font-extrabold text-slate-900">{s.title}</h3>
-                <p className="text-xs leading-relaxed font-medium text-slate-600 sm:text-sm">{s.body}</p>
-              </div>
-              <div className="mt-5 flex items-center gap-1.5 border-t border-slate-200/60 pt-3 text-[11px] font-bold text-slate-500">
-                {s.footerDot ? (
-                  <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
-                ) : (
-                  <Icon name={s.footerIcon!} className={`text-[14px] ${s.footerIconClass}`} />
-                )}
-                <span>{s.footerLabel}</span>
-              </div>
-            </div>
+                  <div className="mt-6 flex items-center gap-1.5 border-t border-black/5 pt-4 text-body-sm font-bold text-tertiary">
+                    <CheckCircle2 className="size-4" strokeWidth={2.4} aria-hidden />
+                    {step.tag}
+                  </div>
+                </article>
+              </Parallax>
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
       </div>
     </section>
   );

@@ -5,6 +5,7 @@ import { HowItWorksSection } from "@/components/landing/how-it-works-section";
 import { LandingFooter } from "@/components/landing/landing-footer";
 import { LandingHero } from "@/components/landing/landing-hero";
 import { LandingNav } from "@/components/landing/landing-nav";
+import { StatsSection } from "@/components/landing/stats-section";
 
 export default function LandingPage() {
   return (
@@ -12,6 +13,7 @@ export default function LandingPage() {
       <LandingNav />
       <main>
         <LandingHero />
+        <StatsSection />
         <HowItWorksSection />
         <ActiveCampaignsSection />
         <FairRewardsSection />

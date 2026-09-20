@@ -22,7 +22,7 @@ export function CountdownTimer() {
   }, []);
 
   return (
-    <span className="font-mono font-extrabold text-slate-700 tick-pulse" suppressHydrationWarning>
+    <span className="font-mono font-extrabold tabular-nums text-on-surface" suppressHydrationWarning>
       {format(seconds)}
     </span>
   );

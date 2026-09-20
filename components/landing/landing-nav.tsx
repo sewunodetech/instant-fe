@@ -1,56 +1,93 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { Icon } from "@/components/icon";
-
-const navLinks = [
-  { href: "#feed-preview", icon: "home", label: "Home Feed" },
-  { href: "#campaigns", icon: "local_fire_department", label: "Active Drops" },
-  { href: "#rewards", icon: "emoji_events", label: "Leaderboard" },
-  { href: "#rewards", icon: "savings", label: "Rewards Pool" },
-  { href: "#how-it-works", icon: "help_outline", label: "How It Works" },
-];
+import { useState } from "react";
+import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
+import { ArrowRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { APP_ENTRY_HREF, navLinks } from "@/components/landing/content";
 
 export function LandingNav() {
+  const { scrollY } = useScroll();
+  const [scrolled, setScrolled] = useState(false);
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    setScrolled(latest > 24);
+  });
+
   return (
-    <header className="pointer-events-none fixed inset-x-0 top-4 z-50 flex justify-center px-4 sm:px-6">
-      <div className="pointer-events-auto flex w-full max-w-6xl items-center justify-between rounded-full border border-slate-200/80 bg-surface-container-lowest/90 px-4 py-2.5 shadow-card backdrop-blur-xl transition-all sm:px-6">
-        <Link href="/" aria-label="instant.fun home" className="group flex shrink-0 items-center gap-2">
+    <motion.header
+      initial={{ y: -80, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      className="pointer-events-none fixed inset-x-0 top-3 z-50 flex justify-center px-4 sm:top-4 sm:px-6"
+    >
+      <nav
+        className={cn(
+          "pointer-events-auto flex w-full max-w-5xl items-center justify-between rounded-full px-3 py-2 transition-all duration-300 sm:px-4",
+          scrolled
+            ? "border border-black/5 bg-surface-container-lowest/80 shadow-soft backdrop-blur-xl"
+            : "border border-transparent bg-transparent",
+        )}
+      >
+        <Link
+          href="/"
+          aria-label="instant.fun home"
+          className="group flex shrink-0 items-center rounded-full px-2 py-1 outline-none focus-visible:ring-2 focus-visible:ring-secondary/50"
+        >
           <Image
             src="/brand/logo.png"
             alt="instant.fun"
             width={120}
             height={32}
             priority
-            className="h-8 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+            className="h-7 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
           />
         </Link>
 
-        <nav className="hidden items-center gap-6 text-[13px] font-bold text-slate-600 md:flex">
-          {navLinks.map((item) => (
+        <div className="hidden items-center gap-1 md:flex">
+          {navLinks.map(({ href, icon: Icon, label }) => (
             <a
-              key={item.label}
-              href={item.href}
-              className="flex items-center gap-1.5 transition-colors duration-200 hover:text-secondary"
+              key={label}
+              href={href}
+              className="flex items-center gap-1.5 rounded-full px-3.5 py-2 text-[13px] font-semibold text-on-surface-variant transition-colors hover:bg-surface-container hover:text-on-surface"
             >
-              <Icon name={item.icon} className="text-[18px]" />
-              {item.label}
+              <Icon className="size-4" strokeWidth={2.2} aria-hidden />
+              {label}
             </a>
           ))}
-        </nav>
+        </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <AnimatePresence>
+            {scrolled && (
+              <motion.span
+                initial={{ opacity: 0, scale: 0.9, width: 0 }}
+                animate={{ opacity: 1, scale: 1, width: "auto" }}
+                exit={{ opacity: 0, scale: 0.9, width: 0 }}
+                transition={{ duration: 0.25 }}
+                className="hidden items-center gap-1.5 overflow-hidden rounded-full bg-bnb/10 px-3 py-1.5 text-[11px] font-bold whitespace-nowrap text-bnb-dim sm:flex"
+              >
+                <span className="size-1.5 rounded-full bg-bnb" />
+                BNB Chain
+              </motion.span>
+            )}
+          </AnimatePresence>
+
           <Link
-            href="/home"
-            className="badge-shimmer group flex items-center gap-2 rounded-full bg-primary-container px-4 py-2 text-xs font-bold text-on-primary-fixed shadow-sm transition-all duration-200 hover:bg-primary-fixed hover:shadow-pop-yellow active:scale-95"
+            href={APP_ENTRY_HREF}
+            className="group flex items-center gap-1.5 rounded-full bg-on-surface px-4 py-2 text-[13px] font-bold text-surface transition-transform duration-200 hover:-translate-y-0.5 active:scale-95"
           >
-            <span className="hidden sm:inline">Launch App</span>
-            <Icon
-              name="arrow_forward"
-              className="text-[16px] transition-transform duration-200 group-hover:translate-x-0.5"
+            Launch App
+            <ArrowRight
+              className="size-4 transition-transform duration-200 group-hover:translate-x-0.5"
+              strokeWidth={2.4}
+              aria-hidden
             />
           </Link>
         </div>
-      </div>
-    </header>
+      </nav>
+    </motion.header>
   );
 }
