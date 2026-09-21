@@ -87,15 +87,16 @@ export function LandingHero() {
 
         {/* Copy — anchored to the top */}
         <div className="relative z-10 flex flex-col items-center">
-          {/* Label + big number headline */}
+          {/* Label — what instant.fun is, in one line */}
           <motion.p
             {...heroItem(0.1)}
             className="mt-6 text-base font-semibold text-on-surface-variant sm:text-lg"
           >
-            Daily Prize Pools ·{" "}
-            <span className="text-secondary">Earn up to $100 per winning snap</span>
+            Snap live, get voted, win{" "}
+            <span className="text-secondary">real USDC</span> — on BNB Chain
           </motion.p>
 
+          {/* Big number — total rewards paid to creators */}
           <motion.h1
             {...heroItem(0.15)}
             className="mt-2 flex items-center justify-center text-6xl font-extrabold tracking-tight text-on-surface drop-shadow-sm sm:text-7xl lg:text-8xl"
@@ -104,6 +105,13 @@ export function LandingHero() {
             <span className="text-on-surface/40">$</span>
             <NumberTicker value={1000000} className="text-on-surface" />
           </motion.h1>
+
+          <motion.p
+            {...heroItem(0.22)}
+            className="mt-3 text-body-sm font-medium tracking-wide text-on-surface-variant/90 uppercase"
+          >
+            Paid out to creators &amp; voters
+          </motion.p>
 
           {/* CTA + chevron */}
           <motion.div {...heroItem(0.3)} className="mt-7 flex flex-col items-center">

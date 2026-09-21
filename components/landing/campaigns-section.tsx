@@ -1,31 +1,40 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, MapPin, Timer, Users } from "lucide-react";
-import { BorderBeam } from "@/components/ui/border-beam";
 import { cn } from "@/lib/utils";
-import { FadeIn, Parallax, Stagger, StaggerItem } from "@/components/landing/motion-primitives";
+import { FadeIn, Stagger, StaggerItem } from "@/components/landing/motion-primitives";
+import { DoodleField } from "@/components/landing/pixel-doodles";
 import { APP_ENTRY_HREF, campaigns } from "@/components/landing/content";
 
-/** Staggered scroll drift; the middle card leads so the row feels layered. */
-const cardDrift = [50, 90, 30];
-
-export function ActiveCampaignsSection() {
+export function CampaignsSection() {
   return (
-    <section id="campaigns" className="scroll-mt-24 bg-surface-container-low/40 px-4 py-24 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-6xl">
+    <section
+      id="campaigns"
+      className="relative scroll-mt-24 overflow-hidden bg-surface-container-low/50 px-4 py-24 sm:px-6 lg:px-8"
+    >
+      <DoodleField
+        items={[
+          { name: "heart", className: "left-[5%] top-[16%]", size: 40, rotate: -10, duration: 6.5 },
+          { name: "controller", className: "right-[6%] top-[12%]", size: 42, rotate: 12, duration: 7, delay: 0.6 },
+          { name: "star", className: "right-[9%] bottom-[14%]", size: 38, rotate: -6, duration: 6, delay: 1.1 },
+        ]}
+        className="hidden md:block"
+      />
+
+      <div className="relative z-10 mx-auto max-w-6xl">
         <FadeIn className="mb-14 flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div className="max-w-xl">
-            <p className="text-body-sm font-bold tracking-wider text-secondary uppercase">Live drop vaults</p>
-            <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-balance sm:text-5xl">
-              Active campaigns &amp; drops
+            <h2 className="text-3xl font-extrabold tracking-tight text-balance text-on-surface sm:text-5xl">
+              Live drops you can join now
             </h2>
             <p className="mt-4 text-base text-pretty text-on-surface-variant sm:text-lg">
-              Join a timed challenge or vote to take a share of the community pool.
+              Each campaign has a real USDC prize pool. Enter free, snap live, and if the
+              community crowns your moment — the pool is yours.
             </p>
           </div>
           <Link
             href={APP_ENTRY_HREF}
-            className="group inline-flex items-center gap-1.5 self-start rounded-full border border-black/10 bg-surface-container-lowest px-5 py-2.5 text-body-sm font-bold shadow-soft transition-all hover:-translate-y-0.5 md:self-auto"
+            className="group inline-flex items-center gap-1.5 self-start rounded-full border-2 border-on-surface/10 bg-surface-container-lowest px-5 py-2.5 text-body-sm font-bold shadow-soft transition-all hover:-translate-y-0.5 md:self-auto"
           >
             Browse all drops
             <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" strokeWidth={2.4} aria-hidden />
@@ -33,18 +42,18 @@ export function ActiveCampaignsSection() {
         </FadeIn>
 
         <Stagger className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          {campaigns.map((campaign, i) => (
-            <StaggerItem key={campaign.tag}>
-             <Parallax distance={cardDrift[i] ?? 40} className="h-full">
-              <article className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-black/5 bg-surface-container-lowest p-3 shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:shadow-card-hover">
+          {campaigns.map((campaign) => (
+            <StaggerItem key={campaign.tag} className="h-full">
+              <article
+                className={cn(
+                  "group relative flex h-full flex-col overflow-hidden rounded-3xl border-2 bg-surface-container-lowest p-3 shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:shadow-card-hover",
+                  campaign.featured ? "border-bnb" : "border-on-surface/10",
+                )}
+              >
                 {campaign.featured && (
-                  <BorderBeam
-                    size={90}
-                    duration={7}
-                    colorFrom="#f0b90b"
-                    colorTo="#106df4"
-                    className="opacity-80"
-                  />
+                  <span className="absolute -top-px left-1/2 z-10 -translate-x-1/2 rounded-b-xl bg-bnb px-3 py-0.5 text-[10px] font-black tracking-wide text-on-primary-fixed uppercase">
+                    Featured drop
+                  </span>
                 )}
 
                 <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-surface-container">
@@ -60,14 +69,7 @@ export function ActiveCampaignsSection() {
                       <span className="size-2 rounded-full bg-tertiary" />
                       {campaign.tag}
                     </span>
-                    <span
-                      className={cn(
-                        "rounded-full px-2.5 py-1 text-body-sm font-extrabold shadow-sm",
-                        campaign.featured
-                          ? "bg-primary-container text-on-primary-fixed"
-                          : "bg-secondary-fixed text-on-secondary-fixed",
-                      )}
-                    >
+                    <span className="rounded-full bg-bnb px-2.5 py-1 text-body-sm font-black text-on-primary-fixed shadow-sm">
                       {campaign.pool}
                     </span>
                   </div>
@@ -109,7 +111,6 @@ export function ActiveCampaignsSection() {
                   </div>
                 </div>
               </article>
-             </Parallax>
             </StaggerItem>
           ))}
         </Stagger>

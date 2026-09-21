@@ -1,11 +1,10 @@
-import { ActiveCampaignsSection } from "@/components/landing/active-campaigns-section";
-import { FairRewardsSection } from "@/components/landing/fair-rewards-section";
-import { FinalCtaSection } from "@/components/landing/final-cta-section";
+import { CampaignsSection } from "@/components/landing/campaigns-section";
+import { CommunitySection } from "@/components/landing/community-section";
 import { HowItWorksSection } from "@/components/landing/how-it-works-section";
 import { LandingFooter } from "@/components/landing/landing-footer";
 import { LandingHero } from "@/components/landing/landing-hero";
 import { LandingNav } from "@/components/landing/landing-nav";
-import { StatsSection } from "@/components/landing/stats-section";
+import { LeaderboardSection } from "@/components/landing/leaderboard-section";
 
 export default function LandingPage() {
   return (
@@ -13,11 +12,10 @@ export default function LandingPage() {
       <LandingNav />
       <main>
         <LandingHero />
-        <StatsSection />
         <HowItWorksSection />
-        <ActiveCampaignsSection />
-        <FairRewardsSection />
-        <FinalCtaSection />
+        <CampaignsSection />
+        <LeaderboardSection />
+        <CommunitySection />
       </main>
       <LandingFooter />
     </>

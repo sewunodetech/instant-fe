@@ -5,20 +5,7 @@
  */
 
 import type { LucideIcon } from "lucide-react";
-import {
-  Camera,
-  Coins,
-  Flame,
-  HelpCircle,
-  Home,
-  Lock,
-  Sparkles,
-  Timer,
-  Trophy,
-  Users,
-  Vote,
-  Zap,
-} from "lucide-react";
+import { Camera, Coins, Flame, Home, Trophy, Users, Vote, Zap } from "lucide-react";
 
 /** Where the "Launch App" CTA and campaign CTAs send the visitor. */
 export const APP_ENTRY_HREF = "/home";
@@ -30,24 +17,9 @@ export type NavLink = {
 };
 
 export const navLinks: NavLink[] = [
-  { href: "#how-it-works", icon: HelpCircle, label: "How it works" },
+  { href: "#how-it-works", icon: Zap, label: "How it works" },
   { href: "#campaigns", icon: Flame, label: "Live drops" },
-  { href: "#rewards", icon: Trophy, label: "Rewards" },
-];
-
-export type Stat = {
-  label: string;
-  value: number;
-  prefix?: string;
-  suffix?: string;
-  decimals?: number;
-};
-
-export const stats: Stat[] = [
-  { label: "USDC paid to creators", value: 128000, prefix: "$", suffix: "+" },
-  { label: "Verified creators", value: 42000, suffix: "+" },
-  { label: "Live campaigns", value: 36 },
-  { label: "Gas paid by you", value: 0, prefix: "$" },
+  { href: "#winners", icon: Trophy, label: "Winners" },
 ];
 
 export type Step = {
@@ -60,27 +32,27 @@ export type Step = {
 export const steps: Step[] = [
   {
     icon: Zap,
-    title: "Join a campaign",
-    body: "Explore live drops like #SummerVibes or #CampusVibes. Free to enter, backed by verified USDC vaults on BNB Chain.",
-    tag: "Instant free entry",
+    title: "Join a live campaign",
+    body: "Pick a live drop like #SummerVibes or #CampusVibes. Free to enter, backed by a real USDC prize pool on BNB Chain.",
+    tag: "Free to enter",
   },
   {
     icon: Camera,
-    title: "2-minute shutter window",
-    body: "Live camera captures only. Hardware timestamps lock out gallery uploads, edited photos, and AI deepfakes.",
-    tag: "Zero gallery imports",
+    title: "Snap in the 2-minute window",
+    body: "Live camera only. Hardware timestamps lock out gallery uploads, edits, and AI fakes — every entry is a real moment.",
+    tag: "No gallery, no edits",
   },
   {
     icon: Vote,
-    title: "Community micro-vote",
-    body: "Back your favorite moments with one-tap gasless USDC votes. Your vote power renews daily with streak bonuses.",
-    tag: "$0.00 gas, sponsored",
+    title: "The community votes",
+    body: "Everyone backs their favorite snaps with one-tap gasless USDC votes. The most-loved moments rise to the top.",
+    tag: "$0 gas, sponsored",
   },
   {
     icon: Coins,
-    title: "Win & split the pool",
-    body: "Winners take 60% of the vault while voters split 40%. Smart contracts settle straight to your BNB Chain wallet.",
-    tag: "60% creator · 40% voter",
+    title: "Winners take the pool",
+    body: "When the campaign ends, top creators take 60% of the prize pool and the voters who backed them split 40% — settled on-chain instantly.",
+    tag: "60% creators · 40% voters",
   },
 ];
 
@@ -146,6 +118,7 @@ export type Rank = {
   amount: string;
 };
 
+/** Recent campaign winners (creators who won their drop's prize pool). */
 export const leaderboard: Rank[] = [
   {
     place: 1,
@@ -170,6 +143,19 @@ export const leaderboard: Rank[] = [
   },
 ];
 
+export type CommunityLink = {
+  label: string;
+  handle: string;
+  href: string;
+  theme: string;
+};
+
+export const communityLinks: CommunityLink[] = [
+  { label: "Discord", handle: "Join the arena chat", href: "#", theme: "bg-[#5865F2]" },
+  { label: "X / Twitter", handle: "@instantfun", href: "#", theme: "bg-[#1c1b1b]" },
+  { label: "Telegram", handle: "instant.fun community", href: "#", theme: "bg-[#229ED9]" },
+];
+
 export type FooterLink = { label: string; href: string };
 
 export const footerLinks: FooterLink[] = [
@@ -186,17 +172,3 @@ export const footerTabIcons: { icon: LucideIcon; title: string }[] = [
   { icon: Trophy, title: "Rewards" },
   { icon: Users, title: "Community" },
 ];
-
-/** Icons re-exported for sections that need a couple of extras. */
-export const icons = {
-  Sparkles,
-  Timer,
-  Lock,
-  Trophy,
-  Zap,
-  Coins,
-  Users,
-  Flame,
-  Camera,
-  Vote,
-};

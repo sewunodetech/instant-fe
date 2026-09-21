@@ -42,7 +42,7 @@ export function LandingNav() {
             width={120}
             height={32}
             priority
-            className="h-8 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+            className="h-7 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
           />
         </Link>
 
