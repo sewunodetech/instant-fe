@@ -9,22 +9,21 @@ datasource db {
 
 model User {
   id            String   @id @default(uuid())
-  walletAddress String   @unique @db.VarChar(42)
+  privyId       String?  @unique @db.VarChar(100)
+  walletAddress String?  @unique @db.VarChar(42)
   username      String?  @unique @db.VarChar(30)
   displayName   String?  @db.VarChar(100)
   avatarUrl     String?
-  nonce         String   @default(uuid()) @db.VarChar(64)
-  nonceExpiresAt DateTime @default(now())
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   posts        Post[]
   votes        Vote[]
-  backings     Backing[]
-  rewards      Reward[]
+  donations    Donation[]
   transactions Transaction[]
 
   @@index([walletAddress])
+  @@index([privyId])
 }
 
 model Campaign {
@@ -37,16 +36,12 @@ model Campaign {
   status          CampaignStatus @default(DRAFT)
   startsAt        DateTime?
   endsAt          DateTime?
-  aiGenerationId  String?  @unique
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  posts    Post[]
-  backings Backing[]
-  results  CampaignResult[]
-  rewards  Reward[]
+  posts        Post[]
+  donations    Donation[]
   transactions Transaction[]
-  aiGeneration AICampaignGeneration? @relation(fields: [aiGenerationId], references: [id], onDelete: SetNull)
 
   @@index([status])
   @@index([startsAt])
@@ -60,21 +55,21 @@ model Post {
   imageUrl      String
   caption       String?  @db.VarChar(500)
   voteCount     Int      @default(0)
-  backerCount   Int      @default(0)
-  backingAmount Decimal  @default(0) @db.Decimal(20, 8)
+  donationCount Int      @default(0)
+  donationAmount Decimal  @default(0) @db.Decimal(20, 8)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  votes    Vote[]
-  backings Backing[]
+  campaign  Campaign   @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  votes     Vote[]
+  donations Donation[]
 
   @@unique([campaignId, userId, id])
   @@index([campaignId])
   @@index([userId])
   @@index([voteCount])
-  @@index([backingAmount])
+  @@index([donationAmount])
 }
 
 model Vote {
@@ -91,14 +86,14 @@ model Vote {
   @@index([userId])
 }
 
-model Backing {
+model Donation {
   id              String        @id @default(uuid())
   campaignId      String
   postId          String
   userId          String
   amount          Decimal       @db.Decimal(20, 8)
   token           String        @default("USDC") @db.VarChar(10)
-  status          BackingStatus @default(PENDING)
+  status          DonationStatus @default(PENDING)
   txHash          String?       @unique @db.VarChar(66)
   blockNumber     BigInt?
   createdAt       DateTime      @default(now())
@@ -112,47 +107,6 @@ model Backing {
   @@index([postId])
   @@index([userId])
   @@index([txHash])
-  @@index([status])
-}
-
-model CampaignResult {
-  id          String   @id @default(uuid())
-  campaignId  String
-  postId      String
-  rank        Int
-  voteCount   Int      @default(0)
-  backerCount Int      @default(0)
-  backingAmount Decimal @default(0) @db.Decimal(20, 8)
-  viralityScore Decimal @default(0) @db.Decimal(10, 4)
-  createdAt   DateTime @default(now())
-
-  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-
-  @@unique([campaignId, postId])
-  @@index([campaignId])
-  @@index([rank])
-}
-
-model Reward {
-  id         String     @id @default(uuid())
-  campaignId String
-  userId     String
-  postId     String?
-  type       RewardType
-  amount     Decimal    @db.Decimal(20, 8)
-  token      String     @default("USDC") @db.VarChar(10)
-  multiplier Decimal?   @db.Decimal(10, 4)
-  status     RewardStatus @default(PENDING)
-  txHash     String?    @unique @db.VarChar(66)
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-
-  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([campaignId])
-  @@index([userId])
-  @@index([type])
   @@index([status])
 }
 
@@ -181,48 +135,21 @@ model Transaction {
   @@index([status])
 }
 
-model AICampaignGeneration {
-  id            String   @id @default(uuid())
-  prompt        String
-  trendContext  Json?
-  model         String
-  generatedData Json
-  createdAt     DateTime @default(now())
-
-  campaign Campaign?
-
-  @@index([createdAt])
-}
-
 enum CampaignStatus {
   DRAFT
   ACTIVE
   ENDED
 }
 
-enum BackingStatus {
+enum DonationStatus {
   PENDING
   CONFIRMED
-  FAILED
-  REFUNDED
-}
-
-enum RewardType {
-  CREATOR_REWARD
-  BACKER_REWARD
-}
-
-enum RewardStatus {
-  PENDING
-  DISTRIBUTED
   FAILED
 }
 
 enum TransactionType {
-  BACKING
-  REWARD
+  DONATION
   CAMPAIGN_CREATION
-  SETTLEMENT
 }
 
 enum TransactionStatus {

@@ -1,8 +1,8 @@
 import { NextRequest } from "next/server";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { handleApiError } from "@/lib/api-response";
-import { BackingService } from "@/lib/services/backing.service";
-import { successResponse } from "@/lib/api-response";
+import { DonationService } from "@/lib/services/donation.service";
+import { successResponse, errorResponse } from "@/lib/api-response";
 
 export async function POST(
   _request: NextRequest,
@@ -10,8 +10,15 @@ export async function POST(
 ) {
   try {
     const user = await getAuthenticatedUser(_request);
-    const { id } = await params;
-    const result = await BackingService.createBackingIntent(user.id, id);
+    const { id: postId } = await params;
+    const body = await _request.json().catch(() => ({}));
+    const { amount } = body as { amount?: number };
+
+    if (!amount || typeof amount !== "number" || amount <= 0) {
+      return errorResponse(400, "A positive donation amount is required");
+    }
+
+    const result = await DonationService.createDonationIntent(user.id, postId, amount);
     return successResponse(result);
   } catch (error) {
     return handleApiError(error);

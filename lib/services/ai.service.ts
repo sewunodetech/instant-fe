@@ -1,24 +1,23 @@
-import { prisma } from "@/lib/prisma";
-import { TrendProviderInterface, TrendData } from "@/lib/interfaces/trend-provider.interface";
 import { HttpError } from "@/lib/api-response";
 
-class MockTrendProvider implements TrendProviderInterface {
+interface TrendData {
+  topics: string[];
+  categories?: string[];
+  hashtags?: string[];
+}
+
+class MockTrendProvider {
   async getCurrentTrends(): Promise<TrendData> {
     return {
       topics: ["OOTD", "streetwear", "rainy season", "campus outfit"],
       categories: ["fashion", "lifestyle"],
       hashtags: ["#ootd", "#streetwear", "#rainyseason"],
-      source: "mock",
     };
   }
 }
 
 export class AIService {
-  private static trendProvider: TrendProviderInterface = new MockTrendProvider();
-
-  static setTrendProvider(provider: TrendProviderInterface) {
-    this.trendProvider = provider;
-  }
+  private static trendProvider = new MockTrendProvider();
 
   static async generateCampaign(prompt?: string) {
     const apiKey = process.env.OPENROUTER_API_KEY;
@@ -72,14 +71,6 @@ Return ONLY valid JSON, no markdown, no explanation.`;
         throw new HttpError(500, "Failed to parse AI response");
       }
 
-      await prisma.aICampaignGeneration.create({
-        data: {
-          prompt: prompt || "Generate a fun social media campaign",
-          model,
-          generatedData,
-        },
-      });
-
       return generatedData;
     } catch (error) {
       if (error instanceof HttpError) throw error;
@@ -121,16 +112,6 @@ Return ONLY valid JSON, no markdown, no explanation.`;
     ];
 
     const selected = mockCampaigns[Math.floor(Math.random() * mockCampaigns.length)];
-
-      await prisma.aICampaignGeneration.create({
-        data: {
-          prompt: prompt || `Generate campaign for topics: ${topics.join(", ")}`,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          trendContext: trendingTopics as any,
-          model: "mock",
-          generatedData: selected,
-        },
-      });
 
     return selected;
   }
