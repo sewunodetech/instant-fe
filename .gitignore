@@ -41,3 +41,5 @@ yarn-error.log*
 next-env.d.ts
 
 /stitch_instant.fun_social_campaign_platform
+
+/lib/generated/prisma
