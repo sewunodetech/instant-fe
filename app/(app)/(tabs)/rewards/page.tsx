@@ -32,7 +32,7 @@ export default function RewardsPage() {
     <div className="flex flex-col gap-space-md px-space-md pb-4">
       <div className="flex items-center justify-between pt-space-xs">
         <Link
-          href="/"
+          href="/home"
           aria-label="Close"
           className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container text-on-surface-variant transition-transform hover:bg-surface-container-high active:scale-95"
         >

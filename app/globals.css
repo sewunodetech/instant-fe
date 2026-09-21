@@ -1,8 +1,12 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
 
 /* Design tokens — see stitch_instant.fun_social_campaign_platform/instant_fun/DESIGN.md */
 @theme {
   --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-pixel: var(--font-pixel), ui-monospace, monospace;
 
   --color-surface: #fcf9f8;
   --color-surface-dim: #dcd9d9;
@@ -49,6 +53,11 @@
   --color-on-error: #ffffff;
   --color-error-container: #ffdad6;
   --color-on-error-container: #93000a;
+
+  /* BNB Chain accent (landing branding) */
+  --color-bnb: #f0b90b;
+  --color-bnb-dim: #d4a309;
+  --color-on-bnb: #1a1600;
 
   --spacing-space-xs: 0.25rem;
   --spacing-space-sm: 0.5rem;
@@ -108,6 +117,14 @@
   --shadow-card: 0 4px 20px rgba(17, 17, 17, 0.06);
   --shadow-shutter: 0 8px 24px rgba(40, 120, 255, 0.32);
 
+  /* Landing (marketing) shadow tokens */
+  --shadow-soft: 0 2px 14px rgba(0, 0, 0, 0.04);
+  --shadow-elevated: 0 20px 40px -12px rgba(15, 23, 42, 0.12);
+  --shadow-pop-yellow: 0 8px 24px rgba(255, 224, 0, 0.35);
+  --shadow-pop-blue: 0 8px 24px rgba(16, 109, 244, 0.28);
+  --shadow-glow-amber: 0 0 25px -4px rgba(255, 224, 0, 0.5);
+  --shadow-card-hover: 0 18px 36px -8px rgba(16, 109, 244, 0.14), 0 4px 12px rgba(0, 0, 0, 0.03);
+
   --animate-confetti: confetti 1s cubic-bezier(0.2, 0.7, 0.4, 1) forwards;
   @keyframes confetti {
     from { transform: translate(-50%, -50%) rotate(0deg); opacity: 1; }
@@ -121,6 +138,38 @@
   @keyframes pulse-glow {
     0%, 100% { transform: scale(1); opacity: 0.9; }
     50% { transform: scale(1.05); opacity: 1; }
+  }
+
+  /* ---- Magic UI component animations (shimmer-button, aurora-text, marquee) ---- */
+  --animate-shimmer-slide: shimmer-slide var(--speed) ease-in-out infinite alternate;
+  --animate-spin-around: spin-around calc(var(--speed) * 2) infinite linear;
+  --animate-aurora: aurora 8s ease-in-out infinite alternate;
+  --animate-marquee: marquee var(--duration) infinite linear;
+  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
+
+  @keyframes shimmer-slide {
+    to { transform: translate(calc(100cqw - 100%), 0); }
+  }
+  @keyframes spin-around {
+    0% { transform: translateZ(0) rotate(0); }
+    15%, 35% { transform: translateZ(0) rotate(90deg); }
+    65%, 85% { transform: translateZ(0) rotate(270deg); }
+    100% { transform: translateZ(0) rotate(360deg); }
+  }
+  @keyframes aurora {
+    0% { background-position: 0% 50%; transform: rotate(-5deg) scale(0.9); }
+    25% { background-position: 50% 100%; transform: rotate(5deg) scale(1.1); }
+    50% { background-position: 100% 50%; transform: rotate(-3deg) scale(0.95); }
+    75% { background-position: 50% 0%; transform: rotate(3deg) scale(1.05); }
+    100% { background-position: 0% 50%; transform: rotate(-5deg) scale(0.9); }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(calc(-100% - var(--gap))); }
+  }
+  @keyframes marquee-vertical {
+    from { transform: translateY(0); }
+    to { transform: translateY(calc(-100% - var(--gap))); }
   }
 }
 
