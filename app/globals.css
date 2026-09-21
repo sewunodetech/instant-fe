@@ -6,6 +6,7 @@
 /* Design tokens — see stitch_instant.fun_social_campaign_platform/instant_fun/DESIGN.md */
 @theme {
   --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-pixel: var(--font-pixel), ui-monospace, monospace;
 
   --color-surface: #fcf9f8;
   --color-surface-dim: #dcd9d9;

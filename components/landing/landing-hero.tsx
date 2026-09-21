@@ -93,17 +93,17 @@ export function LandingHero() {
             className="mt-6 text-base font-semibold text-on-surface-variant sm:text-lg"
           >
             Snap live, get voted, win{" "}
-            <span className="text-secondary">real USDC</span> — on BNB Chain
+            <span className="text-secondary">real USDC</span> on BNB Chain
           </motion.p>
 
           {/* Big number — total rewards paid to creators */}
           <motion.h1
             {...heroItem(0.15)}
-            className="mt-2 flex items-center justify-center text-6xl font-extrabold tracking-tight text-on-surface drop-shadow-sm sm:text-7xl lg:text-8xl"
+            className="mt-2 flex items-center justify-center gap-1 font-pixel text-4xl tracking-tight text-on-surface drop-shadow-sm sm:gap-1.5 sm:text-5xl lg:text-6xl"
             style={{ lineHeight: 1 }}
           >
-            <span className="text-on-surface/40">$</span>
-            <NumberTicker value={1000000} className="text-on-surface" />
+            <span className="text-[0.7em] text-on-surface/40">$</span>
+            <NumberTicker value={1000000} className="font-pixel text-on-surface" />
           </motion.h1>
 
           <motion.p
