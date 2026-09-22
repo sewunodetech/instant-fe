@@ -1,12 +1,19 @@
 import { prisma } from "@/lib/prisma";
-import { BackingStatus, Prisma } from "@/lib/generated/prisma";
+import { DonationStatus, Prisma } from "@/lib/generated/prisma";
 import { HttpError } from "@/lib/api-response";
 import { BlockchainService } from "./blockchain.service";
 
 type TxClient = Prisma.TransactionClient;
 
-export class BackingService {
-  static async createBackingIntent(userId: string, postId: string) {
+export class DonationService {
+  static async createDonationIntent(userId: string, postId: string, amount: number) {
+    if (amount <= 0) {
+      throw new HttpError(400, "Donation amount must be greater than 0");
+    }
+    if (amount > 10000) {
+      throw new HttpError(400, "Donation amount cannot exceed 10,000");
+    }
+
     const post = await prisma.post.findUnique({
       where: { id: postId },
       include: { campaign: true },
@@ -15,57 +22,55 @@ export class BackingService {
     if (post.campaign.status !== "ACTIVE")
       throw new HttpError(400, "Campaign is not active");
 
-    const existingBacking = await prisma.backing.findFirst({
-      where: { userId, postId, status: BackingStatus.CONFIRMED },
-    });
-    if (existingBacking)
-      throw new HttpError(409, "Already backed this post");
-
     const chainId = parseInt(process.env.CHAIN_ID || "97");
-    const transaction = await BlockchainService.prepareBackingTransaction({
+    const transaction = await BlockchainService.prepareDonationTransaction({
       campaignId: post.campaignId,
       postId,
       userId,
-      amount: "1",
+      amount: amount.toString(),
       token: "USDC",
       chainId,
     });
 
-    const backing = await prisma.backing.create({
+    const donation = await prisma.donation.create({
       data: {
         campaignId: post.campaignId,
         postId,
         userId,
-        amount: 1,
+        amount,
         token: "USDC",
-        status: BackingStatus.PENDING,
+        status: DonationStatus.PENDING,
       },
     });
 
-    return { backing, transaction };
+    return { donation, transaction };
   }
 
-  static async confirmBacking(txHash: string, blockNumber: number) {
-    const backing = await prisma.backing.findFirst({
+  static async confirmDonation(txHash: string, blockNumber: number) {
+    const donation = await prisma.donation.findFirst({
       where: { txHash },
     });
-    if (!backing)
-      throw new HttpError(404, "Backing with this txHash not found");
+    if (!donation)
+      throw new HttpError(404, "Donation with this txHash not found");
+
+    if (donation.status === DonationStatus.CONFIRMED) {
+      return donation;
+    }
 
     return prisma.$transaction(async (tx: TxClient) => {
-      const updatedBacking = await tx.backing.update({
-        where: { id: backing.id },
+      const updatedDonation = await tx.donation.update({
+        where: { id: donation.id },
         data: {
-          status: BackingStatus.CONFIRMED,
+          status: DonationStatus.CONFIRMED,
           blockNumber: BigInt(blockNumber),
         },
       });
 
       await tx.post.update({
-        where: { id: backing.postId },
+        where: { id: donation.postId },
         data: {
-          backerCount: { increment: 1 },
-          backingAmount: { increment: backing.amount },
+          donationCount: { increment: 1 },
+          donationAmount: { increment: donation.amount },
         },
       });
 
@@ -73,24 +78,24 @@ export class BackingService {
         data: {
           txHash,
           chainId: parseInt(process.env.CHAIN_ID || "97"),
-          userId: backing.userId,
-          campaignId: backing.campaignId,
-          type: "BACKING",
+          userId: donation.userId,
+          campaignId: donation.campaignId,
+          type: "DONATION",
           status: "CONFIRMED",
-          amount: backing.amount,
-          token: backing.token,
+          amount: donation.amount,
+          token: donation.token,
           blockNumber: BigInt(blockNumber),
         },
       });
 
-      return updatedBacking;
+      return updatedDonation;
     });
   }
 
-  static async getPostBackers(postId: string, page = 1, limit = 20) {
+  static async getPostDonors(postId: string, page = 1, limit = 20) {
     const where = { postId };
-    const [backings, total] = await Promise.all([
-      prisma.backing.findMany({
+    const [donations, total] = await Promise.all([
+      prisma.donation.findMany({
         where,
         orderBy: { createdAt: "desc" },
         skip: (page - 1) * limit,
@@ -101,12 +106,12 @@ export class BackingService {
           },
         },
       }),
-      prisma.backing.count({ where }),
+      prisma.donation.count({ where }),
     ]);
-    return { backings, total };
+    return { donations, total };
   }
 
-  static async getUserBackings(
+  static async getUserDonations(
     walletAddress: string,
     page = 1,
     limit = 20
@@ -114,10 +119,10 @@ export class BackingService {
     const user = await prisma.user.findUnique({
       where: { walletAddress: walletAddress.toLowerCase() },
     });
-    if (!user) return { backings: [], total: 0 };
+    if (!user) return { donations: [], total: 0 };
     const where = { userId: user.id };
-    const [backings, total] = await Promise.all([
-      prisma.backing.findMany({
+    const [donations, total] = await Promise.all([
+      prisma.donation.findMany({
         where,
         orderBy: { createdAt: "desc" },
         skip: (page - 1) * limit,
@@ -127,8 +132,8 @@ export class BackingService {
           campaign: { select: { id: true, title: true } },
         },
       }),
-      prisma.backing.count({ where }),
+      prisma.donation.count({ where }),
     ]);
-    return { backings, total };
+    return { donations, total };
   }
 }

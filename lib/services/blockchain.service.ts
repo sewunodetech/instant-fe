@@ -1,15 +1,15 @@
-import { BlockchainServiceInterface, PrepareBackingTransactionParams, TransactionIntent, BlockchainTransaction, BlockchainEvent } from "@/lib/interfaces/blockchain.interface";
+import { BlockchainServiceInterface, PrepareDonationParams, TransactionIntent, BlockchainTransaction } from "@/lib/interfaces/blockchain.interface";
 
 class MockBlockchainService implements BlockchainServiceInterface {
   private contractAddress = process.env.CAMPAIGN_CONTRACT_ADDRESS || "0x0000000000000000000000000000000000000000";
 
-  async prepareBackingTransaction(
-    params: PrepareBackingTransactionParams
+  async prepareDonationTransaction(
+    params: PrepareDonationParams
   ): Promise<TransactionIntent> {
     return {
       contractAddress: this.contractAddress,
       chainId: params.chainId,
-      method: "back",
+      method: "donate",
       args: [params.campaignId, params.postId],
       value: params.amount,
       token: params.token,
@@ -24,14 +24,6 @@ class MockBlockchainService implements BlockchainServiceInterface {
       chainId: parseInt(process.env.CHAIN_ID || "97"),
     };
   }
-
-  async listenToEvents(
-    callback: (event: BlockchainEvent) => void
-  ): Promise<void> {
-    // Mock - no-op for development
-    console.log("Blockchain event listener started (mock)");
-  }
 }
 
-const blockchainServiceInstance = new MockBlockchainService();
-export const BlockchainService: BlockchainServiceInterface = blockchainServiceInstance;
+export const BlockchainService: BlockchainServiceInterface = new MockBlockchainService();
