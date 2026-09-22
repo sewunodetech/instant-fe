@@ -39,16 +39,19 @@ export function CommunitySection() {
                 <a
                   href={c.href}
                   className={cn(
-                    "group flex items-center justify-between gap-3 rounded-2xl px-5 py-4 text-left text-white shadow-card transition-transform hover:-translate-y-1 active:scale-95",
+                    "group flex items-center gap-3 rounded-2xl px-5 py-4 text-left text-white shadow-card transition-transform hover:-translate-y-1 active:scale-95",
                     c.theme,
                   )}
                 >
-                  <div>
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white/15">
+                    <c.icon className="size-5" aria-hidden />
+                  </span>
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm font-extrabold">{c.label}</p>
-                    <p className="text-[12px] font-medium text-white/80">{c.handle}</p>
+                    <p className="truncate text-[12px] font-medium text-white/80">{c.handle}</p>
                   </div>
                   <ArrowUpRight
-                    className="size-5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    className="size-5 shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                     strokeWidth={2.4}
                     aria-hidden
                   />

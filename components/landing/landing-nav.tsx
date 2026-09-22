@@ -62,7 +62,7 @@ export function LandingNav() {
         <div className="flex items-center gap-2">
           <Link
             href={APP_ENTRY_HREF}
-            className="group flex items-center gap-1.5 rounded-full bg-on-surface px-4 py-2 text-[13px] font-bold text-surface transition-transform duration-200 hover:-translate-y-0.5 active:scale-95"
+            className="group flex items-center gap-1.5 rounded-full bg-secondary px-4 py-2 text-[13px] font-bold text-surface transition-transform duration-200 hover:-translate-y-0.5 active:scale-95"
           >
             Launch App
             <ArrowRight

@@ -92,14 +92,14 @@ export function LandingHero() {
             {...heroItem(0.1)}
             className="mt-6 text-base font-semibold text-on-surface-variant sm:text-lg"
           >
-            Snap live, get voted, win{" "}
-            <span className="text-secondary">real USDC</span> on BNB Chain
+            Snap instanly, win{" "}
+            <span className="text-secondary">USDC</span> <span className="text-primary-container">on BNB Chain</span>
           </motion.p>
 
           {/* Big number — total rewards paid to creators */}
           <motion.h1
             {...heroItem(0.15)}
-            className="mt-2 flex items-center justify-center gap-1 font-pixel text-4xl tracking-tight text-on-surface drop-shadow-sm sm:gap-1.5 sm:text-5xl lg:text-6xl"
+            className="mt-5 flex items-center justify-center gap-1 font-pixel text-4xl tracking-tight text-on-surface drop-shadow-sm sm:gap-1.5 sm:text-5xl lg:text-6xl"
             style={{ lineHeight: 1 }}
           >
             <span className="text-[0.7em] text-on-surface/40">$</span>
@@ -110,7 +110,7 @@ export function LandingHero() {
             {...heroItem(0.22)}
             className="mt-3 text-body-sm font-medium tracking-wide text-on-surface-variant/90 uppercase"
           >
-            Paid out to creators &amp; voters
+            Paid out to creators &amp; supporter
           </motion.p>
 
           {/* CTA + chevron */}
