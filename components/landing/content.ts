@@ -4,8 +4,10 @@
  * section components small, declarative, and easy to maintain.
  */
 
+import type React from "react";
 import type { LucideIcon } from "lucide-react";
 import { Camera, Coins, Flame, Home, Trophy, Users, Vote, Zap } from "lucide-react";
+import { DiscordIcon, TelegramIcon, XIcon } from "@/components/landing/social-icons";
 
 /** Where the "Launch App" CTA and campaign CTAs send the visitor. */
 export const APP_ENTRY_HREF = "/home";
@@ -148,12 +150,14 @@ export type CommunityLink = {
   handle: string;
   href: string;
   theme: string;
+  /** Brand glyph for the link. */
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 };
 
 export const communityLinks: CommunityLink[] = [
-  { label: "Discord", handle: "Join the arena chat", href: "#", theme: "bg-[#5865F2]" },
-  { label: "X / Twitter", handle: "@instantfun", href: "#", theme: "bg-[#1c1b1b]" },
-  { label: "Telegram", handle: "instant.fun community", href: "#", theme: "bg-[#229ED9]" },
+  { label: "Discord", handle: "Join the arena chat", href: "#", theme: "bg-[#5865F2]", icon: DiscordIcon },
+  { label: "X / Twitter", handle: "@instantfun", href: "#", theme: "bg-[#1c1b1b]", icon: XIcon },
+  { label: "Telegram", handle: "instant.fun community", href: "#", theme: "bg-[#229ED9]", icon: TelegramIcon },
 ];
 
 export type FooterLink = { label: string; href: string };
