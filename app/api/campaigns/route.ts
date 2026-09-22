@@ -1,8 +1,28 @@
 import { NextRequest } from "next/server";
 import { getAuthenticatedUser } from "@/lib/auth";
-import { handleApiError } from "@/lib/api-response";
 import { CampaignService } from "@/lib/services/campaign.service";
-import { successResponse, errorResponse } from "@/lib/api-response";
+import { paginatedResponse, successResponse, errorResponse, handleApiError } from "@/lib/api-response";
+import { parsePagination } from "@/lib/pagination";
+import { CampaignStatus } from "@/lib/generated/prisma";
+
+export async function GET(request: NextRequest) {
+  try {
+    const { page, limit } = parsePagination(request.nextUrl.searchParams);
+    const searchParams = request.nextUrl.searchParams;
+    const status = searchParams.get("status") as CampaignStatus | null;
+    const category = searchParams.get("category");
+
+    const { campaigns, total } = await CampaignService.findAll(
+      { status: status || undefined, category: category || undefined },
+      page,
+      limit
+    );
+
+    return paginatedResponse(campaigns, total, page, limit);
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
