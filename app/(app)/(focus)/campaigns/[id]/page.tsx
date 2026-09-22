@@ -30,7 +30,7 @@ export default async function CampaignDetailPage({ params }: PageProps<"/campaig
 
   return (
     <>
-      <PageHeader title="Campaign Detail" backHref="/" actions={<CampaignHeaderActions tag={campaign.tag} />} />
+      <PageHeader title="Campaign Detail" backHref="/home" actions={<CampaignHeaderActions tag={campaign.tag} />} />
 
       <main className="flex flex-1 flex-col gap-space-md px-space-md pt-20 pb-32">
         <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl bg-surface-container-low shadow-md">

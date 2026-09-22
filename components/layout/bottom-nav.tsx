@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { Icon } from "@/components/icon";
 
 const tabs = [
-  { href: "/", label: "Home", icon: "home" },
+  { href: "/home", label: "Home", icon: "home" },
   { href: "/campaigns", label: "Campaigns", icon: "local_fire_department" },
   { href: "/snap", label: "Snap", icon: "photo_camera", shutter: true },
   { href: "/rewards", label: "Rewards", icon: "emoji_events" },
@@ -19,8 +19,7 @@ export function BottomNav() {
     <nav className="fixed inset-x-0 bottom-0 z-50 mx-auto max-w-[430px] bg-surface/85 pb-safe shadow-[0_-4px_24px_rgba(0,0,0,0.06)] backdrop-blur-xl">
       <div className="relative flex h-20 items-center justify-around px-space-xs">
         {tabs.map((tab) => {
-          const active =
-            pathname === tab.href || (tab.href !== "/" && pathname.startsWith(`${tab.href}/`));
+          const active = pathname === tab.href || pathname.startsWith(`${tab.href}/`);
 
           if (tab.shutter) {
             return (

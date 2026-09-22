@@ -7,7 +7,7 @@ export function TopBar() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 mx-auto max-w-[430px] bg-surface/80 pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)] backdrop-blur-xl">
       <div className="flex h-16 items-center justify-between px-margin">
-        <Link href="/" aria-label="instant.fun home">
+        <Link href="/home" aria-label="instant.fun home">
           <Image src="/brand/logo.png" alt="instant.fun" width={120} height={32} priority className="h-8 w-auto" />
         </Link>
         <div className="flex items-center gap-space-xs">
