@@ -10,6 +10,9 @@ export class DonationService {
     if (amount <= 0) {
       throw new HttpError(400, "Donation amount must be greater than 0");
     }
+    if (amount > 10000) {
+      throw new HttpError(400, "Donation amount cannot exceed 10,000");
+    }
 
     const post = await prisma.post.findUnique({
       where: { id: postId },

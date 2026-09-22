@@ -3,6 +3,7 @@ import { CampaignService } from "@/lib/services/campaign.service";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { handleApiError } from "@/lib/api-response";
 import { successResponse, errorResponse } from "@/lib/api-response";
+import { prisma } from "@/lib/prisma";
 
 export async function GET(
   _request: NextRequest,
@@ -23,8 +24,17 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await getAuthenticatedUser(request);
+    const user = await getAuthenticatedUser(request);
     const { id } = await params;
+
+    const campaign = await CampaignService.findById(id);
+    if (!campaign) return errorResponse(404, "Campaign not found");
+
+    const creatorPost = await prisma.post.findFirst({
+      where: { campaignId: id, userId: user.id },
+    });
+    if (!creatorPost) return errorResponse(403, "Not authorized to update this campaign");
+
     const body = await request.json();
     const { title, description, category, rules, maxPostsPerUser, startsAt, endsAt } = body;
 
@@ -32,7 +42,7 @@ export async function PATCH(
       return errorResponse(400, "Title must be between 3 and 200 characters");
     }
 
-    const campaign = await CampaignService.update(id, {
+    const updated = await CampaignService.update(id, {
       ...(title !== undefined && { title }),
       ...(description !== undefined && { description }),
       ...(category !== undefined && { category }),
@@ -42,7 +52,7 @@ export async function PATCH(
       ...(endsAt !== undefined && { endsAt: new Date(endsAt) }),
     });
 
-    return successResponse(campaign);
+    return successResponse(updated);
   } catch (error) {
     return handleApiError(error);
   }
