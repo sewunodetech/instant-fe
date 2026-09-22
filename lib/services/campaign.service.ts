@@ -107,14 +107,14 @@ export class CampaignService {
     return { posts, total };
   }
 
-  static async getCampaignBackings(
+  static async getCampaignDonations(
     campaignId: string,
     page = 1,
     limit = 20
   ) {
     const where = { campaignId };
-    const [backings, total] = await Promise.all([
-      prisma.backing.findMany({
+    const [donations, total] = await Promise.all([
+      prisma.donation.findMany({
         where,
         orderBy: { createdAt: "desc" },
         skip: (page - 1) * limit,
@@ -126,32 +126,9 @@ export class CampaignService {
           post: { select: { id: true, imageUrl: true, caption: true } },
         },
       }),
-      prisma.backing.count({ where }),
+      prisma.donation.count({ where }),
     ]);
-    return { backings, total };
-  }
-
-  static async getCampaignRewards(
-    campaignId: string,
-    page = 1,
-    limit = 20
-  ) {
-    const where = { campaignId };
-    const [rewards, total] = await Promise.all([
-      prisma.reward.findMany({
-        where,
-        orderBy: { createdAt: "desc" },
-        skip: (page - 1) * limit,
-        take: limit,
-        include: {
-          user: {
-            select: { id: true, walletAddress: true, username: true },
-          },
-        },
-      }),
-      prisma.reward.count({ where }),
-    ]);
-    return { rewards, total };
+    return { donations, total };
   }
 
   static async getCampaignTransactions(
@@ -170,13 +147,6 @@ export class CampaignService {
       prisma.transaction.count({ where }),
     ]);
     return { transactions, total };
-  }
-
-  static async getCampaignResults(campaignId: string) {
-    return prisma.campaignResult.findMany({
-      where: { campaignId },
-      orderBy: { rank: "asc" },
-    });
   }
 
   static async getUserCampaigns(

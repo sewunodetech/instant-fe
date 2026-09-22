@@ -1,4 +1,4 @@
-export interface PrepareBackingTransactionParams {
+export interface PrepareDonationParams {
   campaignId: string;
   postId: string;
   userId: string;
@@ -31,7 +31,6 @@ export interface BlockchainEvent {
 }
 
 export interface BlockchainServiceInterface {
-  prepareBackingTransaction(params: PrepareBackingTransactionParams): Promise<TransactionIntent>;
+  prepareDonationTransaction(params: PrepareDonationParams): Promise<TransactionIntent>;
   getTransaction(hash: string): Promise<BlockchainTransaction | null>;
-  listenToEvents(callback: (event: BlockchainEvent) => void): Promise<void>;
 }

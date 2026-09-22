@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     const user = await getAuthenticatedUser(request);
     const { page, limit } = parsePagination(request.nextUrl.searchParams);
     const { campaigns, total } = await CampaignService.getUserCampaigns(
-      user.walletAddress,
+      user.walletAddress || "",
       page,
       limit
     );

@@ -10,8 +10,8 @@ export async function GET(
   try {
     const { id } = await params;
     const { page, limit } = parsePagination(request.nextUrl.searchParams);
-    const { backings, total } = await CampaignService.getCampaignBackings(id, page, limit);
-    return paginatedResponse(backings, total, page, limit);
+    const { donations, total } = await CampaignService.getCampaignDonations(id, page, limit);
+    return paginatedResponse(donations, total, page, limit);
   } catch (error) {
     return handleApiError(error);
   }

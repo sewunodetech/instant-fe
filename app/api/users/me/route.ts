@@ -7,10 +7,11 @@ import { successResponse, errorResponse } from "@/lib/api-response";
 export async function GET(request: NextRequest) {
   try {
     const user = await getAuthenticatedUser(request);
-    const stats = await UserService.getStats(user.walletAddress);
+    const stats = await UserService.getStats(user.walletAddress || "");
 
     return successResponse({
       id: user.id,
+      privyId: user.privyId,
       walletAddress: user.walletAddress,
       username: user.username,
       displayName: user.displayName,
@@ -39,6 +40,7 @@ export async function PATCH(request: NextRequest) {
 
     return successResponse({
       id: updated.id,
+      privyId: updated.privyId,
       walletAddress: updated.walletAddress,
       username: updated.username,
       displayName: updated.displayName,
