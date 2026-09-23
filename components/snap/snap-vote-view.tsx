@@ -26,6 +26,8 @@ function Caption({ text, campaignTag }: { text: string; campaignTag: string }) {
 export function SnapVoteView({ snap, campaign }: { snap: Snap; campaign: Campaign }) {
   const [votes, setVotes] = useState(snap.votes);
   const [balance, setBalance] = useState(currentUser.usdcBalance);
+  const isMockId = snap.id.startsWith("snap-");
+  const postId = isMockId ? undefined : snap.id;
 
   return (
     <div className="flex flex-col gap-space-md lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(300px,380px)] lg:items-start lg:gap-space-lg">
@@ -40,11 +42,18 @@ export function SnapVoteView({ snap, campaign }: { snap: Snap; campaign: Campaig
         <SupportPanel
           creatorName={snap.creator.name}
           balance={balance}
+          postId={postId}
+          onVoted={() => setVotes((n) => n + (postId ? 1 : 0))}
           onSupported={(usdc) => {
             setVotes((n) => n + 1);
             setBalance((b) => b - usdc);
           }}
         />
+        {!postId && (
+          <p className="rounded-2xl bg-surface-container px-3 py-2 text-body-sm text-on-surface-variant">
+            Demo snap — using local preview. Post a snap for live API voting.
+          </p>
+        )}
 
         <div className="flex items-center gap-2">
           <button className="flex flex-1 items-center justify-center gap-2 rounded-full bg-surface-container-lowest px-4 py-3 shadow-sm transition-all hover:bg-surface-container active:scale-95">

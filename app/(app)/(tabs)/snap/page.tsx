@@ -3,10 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "@/components/icon";
 import { BackButton } from "@/components/layout/back-button";
-import { activeCampaigns, currentUser, type Snap } from "@/lib/mock-data";
+import { createPost, listCampaigns, uploadFile } from "@/lib/api-client";
+import { ApiClientError } from "@/lib/api-client";
+import { mapApiCampaign } from "@/lib/mappers";
+import { activeCampaigns, currentUser, type Campaign, type Snap } from "@/lib/mock-data";
 
 const shutterOptions = ["auto", "portrait", "wide"] as const;
 const flashOptions = ["off", "on", "auto"] as const;
@@ -28,26 +31,93 @@ export default function CreateSnapPage() {
 function CreateSnapFlow() {
   const searchParams = useSearchParams();
   const campaignParam = searchParams.get("campaign");
-  const [campaignId, setCampaignId] = useState(() =>
-    campaignParam && activeCampaigns.some((c) => c.id === campaignParam)
-      ? campaignParam
-      : (activeCampaigns[0]?.id ?? ""),
-  );
+  const [campaigns, setCampaigns] = useState<Campaign[]>(activeCampaigns);
+  const [campaignId, setCampaignId] = useState(() => campaignParam ?? activeCampaigns[0]?.id ?? "");
   const [shutter, setShutter] = useState<(typeof shutterOptions)[number]>("auto");
   const [flash, setFlash] = useState<(typeof flashOptions)[number]>("off");
   const [captured, setCaptured] = useState(false);
+  const [capturedUrl, setCapturedUrl] = useState<string | null>(null);
+  const [capturedBlob, setCapturedBlob] = useState<Blob | null>(null);
   const [caption, setCaption] = useState("");
   const [location, setLocation] = useState("");
   const [live, setLive] = useState(true);
   const [posting, setPosting] = useState(false);
   const [done, setDone] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [postedId, setPostedId] = useState<string | null>(null);
+  const [cameraReady, setCameraReady] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  const campaign = useMemo(() => activeCampaigns.find((c) => c.id === campaignId), [campaignId]);
+  useEffect(() => {
+    let cancelled = false;
+    listCampaigns({ status: "ACTIVE", limit: 24 })
+      .then(({ data }) => {
+        if (cancelled || data.length === 0) return;
+        const mapped = data.map((c, i) => mapApiCampaign(c, i));
+        setCampaigns(mapped);
+        setCampaignId((current) => {
+          if (current && mapped.some((c) => c.id === current)) return current;
+          if (campaignParam && mapped.some((c) => c.id === campaignParam)) return campaignParam;
+          return mapped[0]?.id || current;
+        });
+      })
+      .catch(() => {
+        setCampaignId((current) => {
+          if (current && activeCampaigns.some((c) => c.id === current)) return current;
+          if (campaignParam && activeCampaigns.some((c) => c.id === campaignParam)) return campaignParam;
+          return activeCampaigns[0]?.id || current;
+        });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [campaignParam]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || captured) return;
+
+    let stream: MediaStream | null = null;
+    let cancelled = false;
+
+    async function start() {
+      if (!navigator.mediaDevices?.getUserMedia) return;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "environment" },
+          audio: false,
+        });
+        if (cancelled || !videoRef.current) {
+          stream.getTracks().forEach((t) => t.stop());
+          return;
+        }
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+        setCameraReady(true);
+      } catch {
+        setCameraReady(false);
+      }
+    }
+
+    void start();
+    return () => {
+      cancelled = true;
+      stream?.getTracks().forEach((t) => t.stop());
+      setCameraReady(false);
+    };
+  }, [captured]);
+
+  const campaign = useMemo(() => campaigns.find((c) => c.id === campaignId), [campaignId, campaigns]);
   const canPost = Boolean(captured && campaign && !posting && !done);
+
+  const previewImage = captured
+    ? capturedUrl || "/mock/snap-summer-cafe.jpg"
+    : "/mock/onboarding-hero.jpg";
 
   const previewSnap: Snap = {
     id: "preview",
-    image: captured ? "/mock/snap-summer-cafe.jpg" : "/mock/onboarding-hero.jpg",
+    image: previewImage,
     imageAlt: captured ? "Captured snap preview" : "Camera ready",
     campaignId,
     caption: caption || "Your moment...",
@@ -73,24 +143,104 @@ function CreateSnapFlow() {
     featured: false,
   };
 
-  function capture() {
+  function captureFromVideo() {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas || !cameraReady || !video.videoWidth) return false;
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return false;
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    return new Promise<boolean>((resolve) => {
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            resolve(false);
+            return;
+          }
+          const url = URL.createObjectURL(blob);
+          setCapturedBlob(blob);
+          setCapturedUrl((prev) => {
+            if (prev) URL.revokeObjectURL(prev);
+            return url;
+          });
+          resolve(true);
+        },
+        "image/jpeg",
+        0.9
+      );
+    });
+  }
+
+  async function capture() {
     navigator.vibrate?.(20);
+    const ok = await captureFromVideo();
+    if (!ok) {
+      setCapturedBlob(null);
+      setCapturedUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
+    }
+    setError(null);
     setCaptured(true);
+  }
+
+  function pickFileFallback() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      setCapturedBlob(file);
+      setCapturedUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return url;
+      });
+      setError(null);
+      setCaptured(true);
+    };
+    input.click();
   }
 
   function retake() {
     setCaptured(false);
     setDone(false);
+    setError(null);
+    setPostedId(null);
   }
 
-  function post() {
-    if (!canPost) return;
+  async function post() {
+    if (!canPost || !campaign) return;
     setPosting(true);
-    setTimeout(() => {
-      setPosting(false);
+    setError(null);
+    try {
+      let imageUrl = previewImage;
+      if (capturedBlob) {
+        const uploaded = await uploadFile(capturedBlob, "snap.jpg");
+        imageUrl = uploaded.url;
+      } else if (typeof window !== "undefined") {
+        const res = await fetch(previewImage);
+        const blob = await res.blob();
+        const uploaded = await uploadFile(blob, "snap.jpg");
+        imageUrl = uploaded.url;
+      }
+
+      const created = await createPost(campaign.id, imageUrl, caption || undefined);
+      setPostedId(created.id);
       setDone(true);
       navigator.vibrate?.([25, 50, 25]);
-    }, 1100);
+    } catch (err) {
+      if (err instanceof ApiClientError) setError(err.message);
+      else setError("Could not post snap. Please try again.");
+    } finally {
+      setPosting(false);
+    }
   }
 
   return (
@@ -118,7 +268,7 @@ function CreateSnapFlow() {
           </Link>
         </div>
         <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
-          {activeCampaigns.map((c) => {
+          {campaigns.map((c) => {
             const active = c.id === campaignId;
             return (
               <button
@@ -152,20 +302,40 @@ function CreateSnapFlow() {
 
       <section className="relative overflow-hidden rounded-3xl bg-inverse-surface shadow-card">
         <div className="relative aspect-[4/5] max-h-[min(70vh,600px)] w-full">
-          <Image
-            src={previewSnap.image}
-            alt={previewSnap.imageAlt}
-            fill
-            sizes="(max-width: 767px) 100vw, 640px"
-            className={`object-cover transition-all ${captured ? "" : "brightness-90"}`}
-            priority
+          <video
+            ref={videoRef}
+            muted
+            playsInline
+            autoPlay
+            className={`absolute inset-0 h-full w-full object-cover transition-all ${
+              captured || !cameraReady ? "hidden" : "brightness-90"
+            }`}
           />
+          <canvas ref={canvasRef} className="hidden" />
+          {(!cameraReady || captured) && (
+            <Image
+              src={previewImage}
+              alt={previewSnap.imageAlt}
+              fill
+              unoptimized={previewImage.startsWith("blob:")}
+              sizes="(max-width: 767px) 100vw, 640px"
+              className={`object-cover transition-all ${captured ? "" : "brightness-90"}`}
+              priority
+            />
+          )}
           {!captured && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/35 text-white backdrop-blur-[1px]">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/30">
                 <Icon name="photo_camera" className="text-[32px]" />
               </div>
               <p className="text-label-md">Tap shutter for an instant capture</p>
+              <button
+                type="button"
+                onClick={pickFileFallback}
+                className="mt-1 rounded-full bg-white/15 px-4 py-1.5 text-label-sm ring-1 ring-white/30 backdrop-blur-md"
+              >
+                Or pick from gallery
+              </button>
             </div>
           )}
           <div className="pointer-events-none absolute inset-x-3 top-3 flex items-center justify-between">
@@ -305,6 +475,7 @@ function CreateSnapFlow() {
           </div>
           <p className="text-headline-sm">Snap is live</p>
           <p className="text-body-sm text-on-surface-variant">Community can vote free or support you with USDC.</p>
+          {error && <p className="text-body-sm text-error">{error}</p>}
           <div className="mt-1 flex gap-2">
             <Link
               href="/home"
@@ -313,27 +484,34 @@ function CreateSnapFlow() {
               Home
             </Link>
             <Link
-              href={`/campaigns/${campaignId}`}
+              href={postedId ? `/snaps/${postedId}` : `/campaigns/${campaignId}`}
               className="flex h-12 flex-1 items-center justify-center rounded-full bg-secondary text-label-md text-white shadow-sm"
             >
-              View Campaign
+              {postedId ? "View Snap" : "View Campaign"}
             </Link>
           </div>
         </div>
       ) : (
-        <button
-          type="button"
-          onClick={post}
-          disabled={!canPost}
-          className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-primary-container text-headline-sm text-on-primary-fixed shadow-shutter transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {posting ? (
-            <Icon name="progress_activity" className="animate-spin text-[24px]" />
-          ) : (
-            <Icon name="bolt" className="text-[24px]" />
+        <>
+          {error && (
+            <p className="rounded-2xl bg-error/10 px-4 py-3 text-body-sm text-error" role="alert">
+              {error}
+            </p>
           )}
-          <span>{posting ? "Posting..." : captured ? "Post to Campaign" : "Capture first"}</span>
-        </button>
+          <button
+            type="button"
+            onClick={post}
+            disabled={!canPost}
+            className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-primary-container text-headline-sm text-on-primary-fixed shadow-shutter transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {posting ? (
+              <Icon name="progress_activity" className="animate-spin text-[24px]" />
+            ) : (
+              <Icon name="bolt" className="text-[24px]" />
+            )}
+            <span>{posting ? "Posting..." : captured ? "Post to Campaign" : "Capture first"}</span>
+          </button>
+        </>
       )}
     </div>
   );

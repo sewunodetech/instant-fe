@@ -8,19 +8,35 @@ import { HowItWorks } from "@/components/campaign/how-it-works";
 import { LeaderboardTeaser } from "@/components/campaign/leaderboard-teaser";
 import { PageHeader } from "@/components/layout/page-header";
 import { compactNumber } from "@/lib/format";
-import { activeCampaigns, getCampaign } from "@/lib/mock-data";
-
-export function generateStaticParams() {
-  return activeCampaigns.map((c) => ({ id: c.id }));
-}
+import { getCampaign } from "@/lib/mock-data";
+import { mapApiCampaign } from "@/lib/mappers";
+import { CampaignService } from "@/lib/services/campaign.service";
 
 export async function generateMetadata({ params }: PageProps<"/campaigns/[id]">) {
-  const campaign = getCampaign((await params).id);
-  return { title: campaign ? `${campaign.tag} · instant.fun` : "Campaign · instant.fun" };
+  const id = (await params).id;
+  const mock = getCampaign(id);
+  if (mock) return { title: `${mock.tag} · instant.fun` };
+  try {
+    const campaign = await CampaignService.findById(id);
+    if (campaign) return { title: `${campaign.title} · instant.fun` };
+  } catch {
+    // ignore
+  }
+  return { title: "Campaign · instant.fun" };
 }
 
 export default async function CampaignDetailPage({ params }: PageProps<"/campaigns/[id]">) {
-  const campaign = getCampaign((await params).id);
+  const id = (await params).id;
+
+  let campaign = getCampaign(id);
+  if (!campaign) {
+    try {
+      const api = await CampaignService.findById(id);
+      if (api) campaign = mapApiCampaign(api, 0);
+    } catch {
+      // fall through
+    }
+  }
   if (!campaign) notFound();
 
   const stats = [
