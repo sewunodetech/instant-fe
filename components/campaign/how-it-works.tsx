@@ -21,7 +21,7 @@ const steps = [
     iconBg: "bg-tertiary-fixed text-on-tertiary-fixed",
     stepColor: "text-tertiary",
     title: "Get Voted",
-    body: "Users vote with micro-USDC. Top creator + voters win together!",
+    body: "Community votes free — optional USDC support goes to you.",
   },
 ];
 

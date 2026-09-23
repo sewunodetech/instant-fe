@@ -6,8 +6,121 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/providers/auth-provider";
 import { Icon } from "@/components/icon";
+import { AppleIcon, DiscordIcon, GoogleIcon, XIcon } from "@/components/auth/provider-icons";
 
 const USERNAME_RE = /^[a-z0-9_]{3,30}$/;
+
+const socials = [
+  { id: "google", label: "Google", Icon: GoogleIcon },
+  { id: "apple", label: "Apple", Icon: AppleIcon },
+  { id: "discord", label: "Discord", Icon: DiscordIcon },
+  { id: "twitter", label: "X", Icon: XIcon },
+] as const;
+
+function Sparkles() {
+  return (
+    <svg
+      aria-hidden
+      className="absolute -top-3 -right-3 h-6 w-6 rotate-12 text-primary-fixed drop-shadow-sm"
+      fill="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z" />
+    </svg>
+  );
+}
+
+function AccentUnderline() {
+  return (
+    <svg
+      aria-hidden
+      className="absolute -bottom-2 left-0 h-3 w-full text-secondary-container opacity-80"
+      fill="none"
+      preserveAspectRatio="none"
+      viewBox="0 0 100 12"
+    >
+      <path d="M2 8.5C30 2 70 2 98 9.5" stroke="currentColor" strokeLinecap="round" strokeWidth="3.5" />
+    </svg>
+  );
+}
+
+function BrandChip({
+  icon,
+  label,
+  className,
+  filled,
+}: {
+  icon: string;
+  label: string;
+  className?: string;
+  filled?: boolean;
+}) {
+  return (
+    <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-surface-container-low px-3 py-2 shadow-sm ring-1 ring-surface-container">
+      <Icon name={icon} filled={filled} className={`text-[18px] ${className ?? ""}`} />
+      <span className="text-label-sm">{label}</span>
+    </span>
+  );
+}
+
+function PrimaryButton({
+  children,
+  onClick,
+  disabled,
+  icon,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  disabled?: boolean;
+  icon?: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="flex h-[52px] w-full items-center justify-center gap-2.5 rounded-full bg-primary-container text-label-lg text-on-primary-container shadow-pop-yellow transition-all hover:bg-primary-fixed hover:shadow-glow-amber active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60"
+    >
+      {icon}
+      {children}
+    </button>
+  );
+}
+
+function SecondaryButton({
+  children,
+  onClick,
+  disabled,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="flex h-[52px] w-full items-center justify-center gap-2.5 rounded-full border border-outline-variant/60 bg-surface-container-lowest text-label-lg text-on-surface shadow-soft transition-all hover:bg-surface-container hover:shadow-card active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60"
+    >
+      {children}
+    </button>
+  );
+}
+
+function Spinner({ label }: { label: string }) {
+  return (
+    <div className="flex flex-1 flex-col items-center justify-center gap-4">
+      <div className="relative">
+        <div className="h-12 w-12 animate-spin rounded-full border-[3px] border-primary-container border-t-on-primary-container/70" />
+        <span className="absolute inset-0 flex items-center justify-center">
+          <Icon name="bolt" filled className="text-[18px] text-on-primary-container" />
+        </span>
+      </div>
+      <p className="text-label-md text-on-surface-variant">{label}</p>
+    </div>
+  );
+}
 
 function LoginContent() {
   const router = useRouter();
@@ -29,7 +142,9 @@ function LoginContent() {
     }
   }, [ready, authenticated, needsProfile, isSyncing, router, nextPath]);
 
-  const openLogin = (methods?: { loginMethods?: ("email" | "google" | "apple" | "discord" | "twitter" | "wallet")[] }) => {
+  const openLogin = (methods?: {
+    loginMethods?: ("email" | "google" | "apple" | "discord" | "twitter" | "wallet")[];
+  }) => {
     setFormError(null);
     login(methods);
   };
@@ -63,21 +178,55 @@ function LoginContent() {
   if (ready && authenticated && needsProfile) {
     return (
       <main className="flex flex-1 flex-col px-space-md pb-10">
-        <div className="mt-6 flex flex-col items-center px-space-xs text-center">
-          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary-container/40 text-primary">
-            <Icon name="person_add" className="text-[26px]" />
+        <div className="mt-4 flex flex-col items-center px-space-xs text-center">
+          <div className="relative mb-4 inline-flex items-center justify-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-secondary-container text-on-secondary shadow-pop-blue">
+              <Icon name="person_add" className="text-[28px]" />
+            </div>
+            <Sparkles />
           </div>
-          <h1 className="text-headline-lg-mobile">Claim your handle</h1>
+          <h1 className="text-headline-lg-mobile">
+            Claim your{" "}
+            <span className="relative -rotate-1 rounded-2xl bg-primary-container px-2.5 py-0.5 font-extrabold text-on-primary-container shadow-sm">
+              handle
+            </span>
+          </h1>
           <p className="mt-space-sm max-w-[280px] leading-relaxed text-on-surface-variant">
             Pick a unique username so the community can find and tag you.
           </p>
         </div>
 
-        <form onSubmit={completeProfile} className="mt-8 flex flex-col gap-space-sm">
+        <form onSubmit={completeProfile} className="mt-7 flex flex-col gap-space-sm" noValidate>
+          <div className="mb-1 flex items-center justify-center gap-3 rounded-3xl border border-outline-variant/50 bg-surface-container-lowest/80 p-3 shadow-soft">
+            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary-container to-primary-fixed-dim text-headline-sm font-extrabold text-on-primary-fixed ring-[3px] ring-primary-container/40">
+              {(username || displayName)
+                ? (username || displayName)
+                    .split(/[\s_]+/)
+                    .filter(Boolean)
+                    .slice(0, 2)
+                    .map((p) => p[0]?.toUpperCase())
+                    .join("")
+                : (
+                  <span className="material-symbols-outlined text-[24px]">person</span>
+                )}
+            </span>
+            <div className="min-w-0 flex-1 text-left">
+              <p className="truncate text-label-lg">{displayName || username || "Your handle"}</p>
+              <p className="truncate text-body-sm text-on-surface-variant">
+                {username ? `@${username}` : "@username will appear here"}
+              </p>
+            </div>
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-tertiary-container text-on-tertiary-container">
+              <Icon name="check" filled className="text-[16px]" />
+            </span>
+          </div>
+
           <label className="flex flex-col gap-1.5 text-left">
             <span className="text-label-sm text-on-surface-variant">Username</span>
-            <div className="flex h-12 items-center gap-2 rounded-2xl border border-outline-variant bg-surface-container-lowest px-4 focus-within:border-secondary focus-within:ring-2 focus-within:ring-secondary/20">
-              <span className="text-body-md text-on-surface-variant">@</span>
+            <div className="flex h-[52px] items-center gap-2 rounded-2xl border border-outline-variant/60 bg-surface-container-lowest px-4 shadow-soft transition-all focus-within:border-secondary focus-within:ring-[3px] focus-within:ring-secondary/15">
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-container text-label-sm text-on-surface-variant">
+                @
+              </span>
               <input
                 value={username}
                 onChange={(e) => setUsername(e.target.value.replace(/\s/g, ""))}
@@ -85,36 +234,52 @@ function LoginContent() {
                 autoCorrect="off"
                 spellCheck={false}
                 placeholder="your_handle"
-                className="h-full w-full bg-transparent text-body-md outline-none placeholder:text-on-surface-variant/50"
+                maxLength={30}
+                className="h-full w-full bg-transparent text-body-md font-medium outline-none placeholder:text-on-surface-variant/45"
               />
+              <span
+                className={`text-label-sm tabular-nums transition-colors ${
+                  username.length >= 30 ? "text-error" : "text-on-surface-variant/60"
+                }`}
+              >
+                {username.length}/30
+              </span>
             </div>
           </label>
 
           <label className="flex flex-col gap-1.5 text-left">
             <span className="text-label-sm text-on-surface-variant">Display name (optional)</span>
-            <div className="flex h-12 items-center rounded-2xl border border-outline-variant bg-surface-container-lowest px-4 focus-within:border-secondary focus-within:ring-2 focus-within:ring-secondary/20">
+            <div className="flex h-[52px] items-center rounded-2xl border border-outline-variant/60 bg-surface-container-lowest px-4 shadow-soft transition-all focus-within:border-secondary focus-within:ring-[3px] focus-within:ring-secondary/15">
               <input
                 value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
+                onChange={(e) => setDisplayName(e.target.value.slice(0, 100))}
                 placeholder="How you appear on snaps"
-                className="h-full w-full bg-transparent text-body-md outline-none placeholder:text-on-surface-variant/50"
+                className="h-full w-full bg-transparent text-body-md font-medium outline-none placeholder:text-on-surface-variant/45"
               />
             </div>
           </label>
 
           {(formError || error) && (
-            <p className="text-body-sm text-error" role="alert">
-              {formError || error}
-            </p>
+            <div
+              role="alert"
+              className="flex items-start gap-2 rounded-2xl bg-error-container px-3.5 py-2.5 text-body-sm text-on-error-container"
+            >
+              <Icon name="error" className="mt-0.5 shrink-0 text-[18px]" />
+              <span>{formError || error}</span>
+            </div>
           )}
 
           <button
             type="submit"
             disabled={saving || submitted}
-            className="mt-2 flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-primary-container text-label-lg text-on-primary-container shadow-card transition-all hover:bg-primary-fixed active:scale-[0.98] disabled:opacity-60"
+            className="mt-1 flex h-[52px] w-full items-center justify-center gap-2.5 rounded-full bg-primary-container text-label-lg text-on-primary-container shadow-pop-yellow transition-all hover:bg-primary-fixed hover:shadow-glow-amber active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60"
           >
+            {saving ? (
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-on-primary-container/30 border-t-on-primary-container" />
+            ) : (
+              <Icon name="arrow_forward" className="text-[20px]" />
+            )}
             {saving ? "Saving…" : "Continue"}
-            {!saving && <Icon name="arrow_forward" className="text-[20px]" />}
           </button>
         </form>
       </main>
@@ -122,123 +287,151 @@ function LoginContent() {
   }
 
   if (ready && authenticated && !needsProfile) {
-    return (
-      <main className="flex flex-1 flex-col items-center justify-center gap-3">
-        <div className="h-10 w-10 animate-spin rounded-full border-[3px] border-primary-container border-t-transparent" />
-        <p className="text-label-md text-on-surface-variant">Taking you in…</p>
-      </main>
-    );
+    return <Spinner label="Taking you in…" />;
   }
 
   return (
-    <main className="flex flex-1 flex-col px-space-md pb-10">
-      <div className="mt-8 flex flex-col items-center px-space-xs text-center">
+    <main className="flex flex-1 flex-col px-space-md pb-8">
+      <div className="mt-3 flex flex-col items-center px-space-xs text-center">
         <div className="relative mb-space-sm inline-flex items-center justify-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-container/40 text-primary">
-            <Icon name="bolt" filled className="text-[26px]" />
+          <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-primary-container text-on-primary-container shadow-pop-yellow">
+            <Icon name="bolt" filled className="text-[28px]" />
           </div>
+          <Sparkles />
         </div>
-        <h1 className="max-w-[300px] text-headline-lg-mobile leading-tight">
+
+        <h1 className="max-w-[320px] text-headline-xl-mobile leading-tight">
           Snap. Join.{" "}
-          <span className="-rotate-1 rounded-2xl bg-primary-container px-2.5 py-0.5 font-extrabold text-on-primary-container shadow-sm">
-            Get Voted.
+          <span className="relative mt-1 inline-block">
+            <span className="relative z-10 inline-block -rotate-1 rounded-2xl bg-primary-container px-3 py-0.5 font-extrabold text-on-primary-container shadow-sm">
+              Get Voted.
+            </span>
+            <AccentUnderline />
           </span>
         </h1>
-        <p className="mt-space-sm max-w-[280px] leading-relaxed text-on-surface-variant">
-          Sign in or create an account with email, social, or your wallet — one tap and you&apos;re in.
+
+        <p className="mt-space-sm max-w-[290px] leading-relaxed text-on-surface-variant">
+          Sign in or create an account with email, social, or your wallet — one tap and you&apos;re
+          in.
         </p>
       </div>
 
-      <div className="mt-8 flex flex-col gap-space-sm">
-        <button
-          type="button"
+      <ul className="no-scrollbar -mx-space-md mt-5 flex items-center justify-center gap-2 overflow-x-auto px-space-md">
+        <BrandChip icon="bolt" label="Instant Camera" className="text-secondary-container" />
+        <BrandChip icon="favorite" label="Community Votes" className="text-error" filled />
+        <BrandChip icon="emoji_events" label="USDC Rewards" className="text-tertiary" filled />
+      </ul>
+
+      <div className="mt-7 flex flex-col gap-space-sm">
+        <PrimaryButton
           onClick={() => openLogin({ loginMethods: ["email"] })}
           disabled={!ready}
-          className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-primary-container text-label-lg text-on-primary-container shadow-card transition-all hover:bg-primary-fixed active:scale-[0.98] disabled:opacity-60"
+          icon={<Icon name="mail" className="text-[20px]" />}
         >
-          <Icon name="mail" className="text-[20px]" />
           Continue with email
-        </button>
+        </PrimaryButton>
 
-        <button
-          type="button"
-          onClick={() => openLogin({ loginMethods: ["google"] })}
-          disabled={!ready}
-          className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full border border-outline-variant bg-surface-container-lowest text-label-lg text-on-surface shadow-sm transition-all hover:bg-surface-container active:scale-[0.98] disabled:opacity-60"
-        >
-          <svg aria-hidden className="h-5 w-5" viewBox="0 0 24 24">
-            <path
-              fill="#4285F4"
-              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"
-            />
-            <path
-              fill="#34A853"
-              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-            />
-            <path
-              fill="#FBBC05"
-              d="M5.84 14.09A6.7 6.7 0 0 1 5.5 12c0-.73.13-1.43.34-2.09V7.07H2.18A11 11 0 0 0 1 12c0 1.78.43 3.46 1.18 4.93l2.85-2.22.81-.62z"
-            />
-            <path
-              fill="#EA4335"
-              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-            />
-          </svg>
-          Continue with Google
-        </button>
+        <div className="grid grid-cols-4 gap-2.5">
+          {socials.map(({ id, label, Icon: Brand }) => (
+            <button
+              key={id}
+              type="button"
+              aria-label={`Continue with ${label}`}
+              title={label}
+              onClick={() => openLogin({ loginMethods: [id] })}
+              disabled={!ready}
+              className="flex h-[52px] w-full items-center justify-center rounded-2xl border border-outline-variant/60 bg-surface-container-lowest shadow-soft transition-all hover:bg-surface-container hover:shadow-card active:scale-95 disabled:pointer-events-none disabled:opacity-60"
+            >
+              <Brand className="h-5 w-5" />
+            </button>
+          ))}
+        </div>
 
-        <button
-          type="button"
+        <SecondaryButton
           onClick={() => openLogin({ loginMethods: ["wallet"] })}
           disabled={!ready}
-          className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full border border-outline-variant bg-surface-container-lowest text-label-lg text-on-surface shadow-sm transition-all hover:bg-surface-container active:scale-[0.98] disabled:opacity-60"
         >
-          <Icon name="account_balance_wallet" className="text-[20px]" />
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-secondary-container/10 text-secondary">
+            <Icon name="account_balance_wallet" className="text-[18px]" />
+          </span>
           Continue with wallet
-        </button>
+        </SecondaryButton>
 
         <button
           type="button"
           onClick={() => openLogin()}
           disabled={!ready}
-          className="flex h-11 w-full items-center justify-center text-label-md text-secondary hover:underline disabled:opacity-60"
+          className="mx-auto mt-1 flex h-10 items-center gap-1.5 px-3 text-label-md text-secondary transition-colors hover:text-secondary-container disabled:opacity-60"
         >
           More options
+          <Icon name="expand_more" className="text-[18px]" />
         </button>
       </div>
 
       {(error || formError) && (
-        <p className="mt-4 text-center text-body-sm text-error" role="alert">
-          {error || formError}
-        </p>
+        <div
+          role="alert"
+          className="mt-4 flex items-start gap-2 rounded-2xl bg-error-container px-3.5 py-2.5 text-body-sm text-on-error-container"
+        >
+          <Icon name="error" className="mt-0.5 shrink-0 text-[18px]" />
+          <span>{error || formError}</span>
+        </div>
       )}
 
-      <p className="mt-auto pt-8 text-center text-body-sm leading-relaxed text-on-surface-variant">
-        By continuing you agree to our{" "}
-        <span className="text-on-surface underline decoration-outline-variant">Terms</span> &{" "}
-        <span className="text-on-surface underline decoration-outline-variant">Privacy Policy</span>.
-      </p>
+      <div className="mt-auto flex items-center justify-center gap-1.5 pt-8 text-body-sm text-on-surface-variant">
+        <Icon name="shield" className="text-[16px] text-tertiary" />
+        <span>
+          Secured by{" "}
+          <span className="font-bold text-on-surface">Privy</span> · Terms & Privacy
+        </span>
+      </div>
     </main>
   );
 }
 
 export default function LoginPage() {
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-[430px] flex-col bg-surface">
-      <header className="flex h-16 items-center px-space-md pt-safe">
-        <Link href="/" aria-label="instant.fun home">
-          <Image src="/brand/logo.png" alt="instant.fun" width={120} height={32} priority className="h-8 w-auto" />
+    <div className="relative mx-auto flex min-h-dvh w-full max-w-none flex-col overflow-hidden bg-surface sm:max-w-xl lg:max-w-2xl xl:max-w-3xl">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute top-0 left-1/2 h-56 w-[120%] -translate-x-1/2 rounded-full bg-primary-container/25 blur-3xl"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute right-0 bottom-10 h-40 w-40 rounded-full bg-secondary-container/15 blur-3xl"
+      />
+
+      <header className="relative z-10 flex h-16 items-center justify-between px-space-md pt-safe">
+        <Link href="/" aria-label="instant.fun home" className="transition-opacity hover:opacity-80">
+          <Image
+            src="/brand/logo.png"
+            alt="instant.fun"
+            width={120}
+            height={32}
+            priority
+            className="h-8 w-auto"
+          />
+        </Link>
+        <Link
+          href="/"
+          className="flex h-9 items-center gap-1 rounded-full bg-surface-container-lowest/80 px-3 text-label-sm text-on-surface-variant shadow-soft ring-1 ring-surface-container transition-colors hover:bg-surface-container"
+        >
+          <Icon name="arrow_back" className="text-[16px]" />
+          Home
         </Link>
       </header>
-      <Suspense
-        fallback={
-          <div className="flex flex-1 items-center justify-center">
-            <div className="h-10 w-10 animate-spin rounded-full border-[3px] border-primary-container border-t-transparent" />
-          </div>
-        }
-      >
-        <LoginContent />
-      </Suspense>
+
+      <div className="relative z-10 flex flex-1 flex-col">
+        <Suspense
+          fallback={
+            <div className="flex flex-1 items-center justify-center">
+              <div className="h-10 w-10 animate-spin rounded-full border-[3px] border-primary-container border-t-transparent" />
+            </div>
+          }
+        >
+          <LoginContent />
+        </Suspense>
+      </div>
     </div>
   );
 }

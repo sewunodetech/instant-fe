@@ -6,21 +6,29 @@ import { useState } from "react";
 import { Icon } from "@/components/icon";
 import type { Snap } from "@/lib/mock-data";
 
-const boostOptions = [5, 10];
+const supportOptions = [1, 5, 10];
 
 export function SnapCard({ snap, priority }: { snap: Snap; priority?: boolean }) {
   const [voted, setVoted] = useState(false);
   const [votes, setVotes] = useState(snap.votes);
-  const [boost, setBoost] = useState<number | null>(null);
+  const [support, setSupport] = useState<number | null>(null);
+  const [supported, setSupported] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  const amount = boost ?? 1;
   const isTop = snap.rank === 1;
 
   function vote() {
     if (voted) return;
     setVoted(true);
-    setVotes((v) => v + amount);
+    setVotes((v) => v + 1);
+    navigator.vibrate?.([25, 50, 25]);
+  }
+
+  function sendSupport() {
+    if (supported || !support) return;
+    setSupported(true);
+    setVoted(true);
+    setVotes((v) => v + 1);
     navigator.vibrate?.([25, 50, 25]);
   }
 
@@ -38,9 +46,42 @@ export function SnapCard({ snap, priority }: { snap: Snap; priority?: boolean })
             : "bg-secondary-fixed text-on-secondary-fixed-variant shadow-sm hover:bg-secondary-fixed-dim"
       }`}
     >
-      <Icon name={voted ? "check_circle" : "bolt"} filled={voted} className="text-[18px]" />
-      <span className="text-label-lg whitespace-nowrap">{voted ? "Voted!" : `Vote ${amount} USDC`}</span>
+      <Icon name={voted ? "check_circle" : "how_to_vote"} filled={voted} className="text-[18px]" />
+      <span className="text-label-lg whitespace-nowrap">{voted ? "Voted!" : "Vote"}</span>
     </button>
+  );
+
+  const supportRow = (
+    <div className="flex items-center gap-1.5">
+      {!supported &&
+        supportOptions.map((b) => (
+          <button
+            key={b}
+            aria-pressed={support === b}
+            aria-label={`Support ${b} USDC`}
+            onClick={() => setSupport((cur) => (cur === b ? null : b))}
+            className={`h-9 rounded-full px-2.5 text-label-sm transition-transform active:scale-95 ${
+              support === b
+                ? "bg-primary-container text-on-primary-fixed shadow-sm"
+                : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
+            }`}
+          >
+            +{b}
+          </button>
+        ))}
+      <button
+        onClick={sendSupport}
+        disabled={!support || supported}
+        className={`flex h-9 items-center gap-1 rounded-full px-3 text-label-sm transition-transform active:scale-95 disabled:opacity-50 ${
+          supported
+            ? "bg-tertiary-container text-on-tertiary-container"
+            : "bg-primary-container text-on-primary-fixed shadow-sm"
+        }`}
+      >
+        <Icon name={supported ? "favorite" : "volunteer_activism"} filled={supported} className="text-[16px]" />
+        {supported ? `Sent ${support}` : support ? `Send ${support}` : "Support"}
+      </button>
+    </div>
   );
 
   const actions = (
@@ -68,7 +109,7 @@ export function SnapCard({ snap, priority }: { snap: Snap; priority?: boolean })
           alt={snap.imageAlt}
           fill
           priority={priority}
-          sizes="(max-width: 430px) 100vw, 406px"
+          sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw"
           className="object-cover select-none"
         />
         <Link
@@ -95,6 +136,7 @@ export function SnapCard({ snap, priority }: { snap: Snap; priority?: boolean })
               isTop ? "bg-primary-container text-on-primary-fixed" : "bg-surface-container-high text-on-surface"
             }`}
           >
+            <Icon name="leaderboard" className="text-[13px]" />
             <span>#{snap.rank}</span>
             <span className="text-[10px] tabular-nums opacity-75">{votes} votes</span>
           </div>
@@ -136,49 +178,22 @@ export function SnapCard({ snap, priority }: { snap: Snap; priority?: boolean })
         </div>
       </div>
 
-      {snap.featured ? (
-        <div className="flex flex-col gap-2.5 px-1 pt-1 pb-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              {voteButton}
-              {!voted &&
-                boostOptions.map((b) => (
-                  <button
-                    key={b}
-                    aria-pressed={boost === b}
-                    onClick={() => setBoost((cur) => (cur === b ? null : b))}
-                    className={`h-9 rounded-full px-2.5 text-label-sm transition-transform active:scale-95 ${
-                      boost === b
-                        ? "bg-secondary text-on-secondary"
-                        : "bg-secondary-fixed text-on-secondary-fixed hover:opacity-90"
-                    }`}
-                  >
-                    +{b}
-                  </button>
-                ))}
-            </div>
-            {actions}
+      <div className="flex flex-col gap-2.5 px-1 pt-1 pb-2">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            {voteButton}
+            {supportRow}
           </div>
-          <div className="flex items-center justify-between rounded-xl bg-surface-container-low p-2 text-body-sm text-on-surface-variant">
-            <div className="flex items-center gap-1.5">
-              <Icon name="savings" className="text-[16px] text-tertiary" />
-              <span>Top voters split 30% pool (~${snap.voterPoolUsdc} USDC)</span>
-            </div>
-            <span className="text-[12px] font-bold text-secondary tabular-nums">{votes} Votes</span>
-          </div>
+          {actions}
         </div>
-      ) : (
-        <div className="flex items-center justify-between px-1 pt-1 pb-2">
-          {voteButton}
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1.5 text-label-sm text-on-surface-variant">
-              <Icon name={voted ? "favorite" : "favorite_border"} filled={voted} className="text-[20px]" />
-              <span className="tabular-nums">{votes}</span>
-            </div>
-            {actions}
+        <div className="flex items-center justify-between rounded-xl bg-surface-container-low p-2 text-body-sm text-on-surface-variant">
+          <div className="flex items-center gap-1.5">
+            <Icon name="volunteer_activism" className="text-[16px] text-primary" />
+            <span>Free vote · Support goes 100% to @{snap.creator.handle}</span>
           </div>
+          <span className="text-[12px] font-bold text-secondary tabular-nums">{votes} Votes</span>
         </div>
-      )}
+      </div>
     </article>
   );
 }

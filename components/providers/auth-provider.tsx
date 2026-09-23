@@ -56,8 +56,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       config={{
         loginMethods: ["email", "google", "apple", "discord", "twitter", "wallet"],
         appearance: {
+          theme: "light",
           accentColor: "#106df4",
-          walletChainType: "ethereum-or-solana",
+          logo: "/brand/logo.png",
+          landingHeader: "Welcome to instant.fun",
+          loginMessage: "Snap. Join. Get Voted.",
+          showWalletLoginFirst: false,
+          walletChainType: "ethereum-and-solana",
         },
         embeddedWallets: {
           ethereum: {
@@ -117,7 +122,14 @@ function AuthStateProvider({ children }: { children: ReactNode }) {
       void refreshUser();
     },
     onError: (code) => {
-      setError(typeof code === "string" ? code : "Login failed");
+      const pretty =
+        typeof code === "string"
+          ? code
+              .replace(/_/g, " ")
+              .toLowerCase()
+              .replace(/\b\w/g, (c) => c.toUpperCase())
+          : "Login failed";
+      setError(pretty);
     },
   });
 

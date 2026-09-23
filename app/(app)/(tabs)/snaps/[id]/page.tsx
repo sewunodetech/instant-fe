@@ -21,7 +21,7 @@ export default async function SnapVotePage({ params }: PageProps<"/snaps/[id]">)
   if (!snap || !campaign) notFound();
 
   return (
-    <div className="flex flex-col gap-space-md px-space-md pt-2 pb-4">
+    <div className="flex flex-col gap-space-md px-space-md pt-2 pb-4 sm:px-0">
       <div className="flex items-center justify-between">
         <BackButton />
         <Link

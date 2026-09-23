@@ -11,8 +11,8 @@ type Props = {
 
 export function PageHeader({ title, actions, backHref }: Props) {
   return (
-    <header className="fixed inset-x-0 top-0 z-50 mx-auto max-w-[430px] bg-surface/80 pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)] backdrop-blur-xl">
-      <div className="flex h-16 items-center justify-between px-space-md">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-surface-container/60 bg-surface/85 pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)] backdrop-blur-xl">
+      <div className="app-shell mx-auto flex h-16 items-center justify-between px-space-md sm:px-4 lg:px-6">
         <div className="flex min-w-0 items-center gap-space-xs">
           <BackButton fallbackHref={backHref} />
           <h1 className="truncate pl-1 text-headline-sm tracking-tight">{title}</h1>

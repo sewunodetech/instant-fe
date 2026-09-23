@@ -281,7 +281,7 @@ export const feedSnaps: Snap[] = [
     image: "/mock/snap-summer-cafe.jpg",
     imageAlt: "A young woman laughing with an iced matcha latte at a sunlit Parisian sidewalk cafe",
     campaignId: "summer-vibes",
-    caption: "Sunny patio laughter with besties! Matcha latte + iced tea = pure summer ☀️🌴 #SummerVibes #GoldenHour",
+    caption: "Sunny patio laughter with besties! Matcha latte + iced tea = pure summer #SummerVibes #GoldenHour",
     location: "Venice Beach, CA",
     campaign: { tag: "#SummerVibes", poolUsdc: 250, icon: "stars" },
     rank: 1,
@@ -337,6 +337,219 @@ export const EST_PAYOUT_PER_VOTE_USDC = 3.2;
 export function votesFor(usdc: number) {
   return usdc >= 10 ? Math.floor(usdc * 1.2) : Math.floor(usdc);
 }
+
+export type ActivityKind = "vote" | "support" | "comment" | "follow" | "reward" | "campaign";
+
+export type ActivityItem = {
+  id: string;
+  kind: ActivityKind;
+  title: string;
+  detail: string;
+  timeAgo: string;
+  amountUsdc?: number;
+  snapId?: string;
+  campaignId?: string;
+  avatar?: string;
+  handle?: string;
+  unread?: boolean;
+};
+
+export const activityFeed: ActivityItem[] = [
+  {
+    id: "a1",
+    kind: "reward",
+    title: "Reward claimable",
+    detail: "You placed 1st in #GoldenHour",
+    timeAgo: "2h ago",
+    amountUsdc: 80,
+    campaignId: "golden-hour",
+    unread: true,
+  },
+  {
+    id: "a2",
+    kind: "support",
+    title: "You supported @elena_glow",
+    detail: "#BestFriends · 5 USDC",
+    timeAgo: "5h ago",
+    amountUsdc: 5,
+    snapId: "snap-2",
+    handle: "elena_glow",
+    avatar: "/mock/leaderboard/avatar-3.jpg",
+    unread: true,
+  },
+  {
+    id: "a3",
+    kind: "vote",
+    title: "Your snap got a free vote",
+    detail: "@zoe_superfan voted on #SummerVibes",
+    timeAgo: "8h ago",
+    snapId: "snap-1",
+    handle: "zoe_superfan",
+    avatar: "/mock/leaderboard/voter-3.jpg",
+  },
+  {
+    id: "a4",
+    kind: "campaign",
+    title: "Campaign ending soon",
+    detail: "#CityLife ends in 3 days",
+    timeAgo: "1d ago",
+    campaignId: "city-life",
+  },
+  {
+    id: "a5",
+    kind: "comment",
+    title: "New comment on your snap",
+    detail: "@alex_skater: “this light is unreal”",
+    timeAgo: "1d ago",
+    snapId: "snap-1",
+    handle: "alex_skater",
+    avatar: "/mock/leaderboard/avatar-2.jpg",
+  },
+  {
+    id: "a6",
+    kind: "follow",
+    title: "New follower",
+    detail: "@matcha_breeze started following you",
+    timeAgo: "2d ago",
+    handle: "matcha_breeze",
+    avatar: "/mock/leaderboard/avatar-2.jpg",
+  },
+  {
+    id: "a7",
+    kind: "support",
+    title: "You received support",
+    detail: "@summer_scout sent 10 USDC",
+    timeAgo: "3d ago",
+    amountUsdc: 10,
+    snapId: "snap-1",
+    handle: "summer_scout",
+    avatar: "/mock/leaderboard/avatar-3.jpg",
+  },
+];
+
+export type TxKind = "in" | "out" | "reward" | "deposit";
+
+export type WalletTx = {
+  id: string;
+  kind: TxKind;
+  label: string;
+  note?: string;
+  amountUsdc: number;
+  timeAgo: string;
+  status: "confirmed" | "pending";
+};
+
+export const walletTxs: WalletTx[] = [
+  { id: "t1", kind: "reward", label: "Reward · #GoldenHour", note: "1st place claim", amountUsdc: 80, timeAgo: "2h ago", status: "confirmed" },
+  { id: "t2", kind: "out", label: "Support · @elena_glow", note: "#BestFriends", amountUsdc: -5, timeAgo: "5h ago", status: "confirmed" },
+  { id: "t3", kind: "in", label: "Support from @summer_scout", note: "#SummerVibes", amountUsdc: 10, timeAgo: "3d ago", status: "confirmed" },
+  { id: "t4", kind: "deposit", label: "Wallet top-up", note: "Base · USDC", amountUsdc: 50, timeAgo: "1w ago", status: "confirmed" },
+  { id: "t5", kind: "out", label: "Support · @urban.kai", note: "#CityLife", amountUsdc: -2, timeAgo: "1w ago", status: "confirmed" },
+];
+
+export const profileStats = {
+  snaps: 48,
+  followers: "2.4k",
+  following: 312,
+  totalEarnedUsdc: 412.5,
+  winRate: "18%",
+  bestRank: 1,
+};
+
+export const profileSnaps: Snap[] = [
+  {
+    id: "p1",
+    image: "/mock/snap-summer-cafe.jpg",
+    imageAlt: "Woman laughing with iced matcha at a sunlit cafe",
+    campaignId: "summer-vibes",
+    caption: "Golden hour patio with the crew #SummerVibes",
+    campaign: { tag: "#SummerVibes", poolUsdc: 250, icon: "stars" },
+    rank: 1,
+    votes: 1420,
+    comments: 18,
+    creator: { handle: "maya_beachlife", name: "Maya", initial: "M", verified: true },
+    postedAgo: "2h ago",
+    featured: true,
+  },
+  {
+    id: "p2",
+    image: "/mock/campaign-summer-hero.jpg",
+    imageAlt: "Friends at a beachfront cafe",
+    campaignId: "summer-vibes",
+    caption: "Iced drinks only #SummerVibes",
+    campaign: { tag: "#SummerVibes", poolUsdc: 250, icon: "stars" },
+    rank: 3,
+    votes: 860,
+    comments: 12,
+    creator: { handle: "maya_beachlife", name: "Maya", initial: "M", verified: true },
+    postedAgo: "2d ago",
+  },
+  {
+    id: "p3",
+    image: "/mock/snap-best-friends.jpg",
+    imageAlt: "Two friends golden-hour selfie",
+    campaignId: "best-friends",
+    caption: "Ride or die #BestFriends",
+    campaign: { tag: "#BestFriends", poolUsdc: 300, icon: "group" },
+    rank: 2,
+    votes: 640,
+    comments: 9,
+    creator: { handle: "maya_beachlife", name: "Maya", initial: "M", verified: true },
+    postedAgo: "5d ago",
+  },
+  {
+    id: "p4",
+    image: "/mock/campaigns/city-life.jpg",
+    imageAlt: "Neon city street crossing",
+    campaignId: "city-life",
+    caption: "City rhythm after dark #CityLife",
+    campaign: { tag: "#CityLife", poolUsdc: 150, icon: "location_city" },
+    rank: 5,
+    votes: 312,
+    comments: 4,
+    creator: { handle: "maya_beachlife", name: "Maya", initial: "M", verified: true },
+    postedAgo: "1w ago",
+  },
+  {
+    id: "p5",
+    image: "/mock/campaigns/foodie-moment.jpg",
+    imageAlt: "Colorful poke bowl",
+    campaignId: "foodie-moment",
+    caption: "First bite energy #FoodieMoment",
+    campaign: { tag: "#FoodieMoment", poolUsdc: 100, icon: "restaurant" },
+    rank: 4,
+    votes: 288,
+    comments: 6,
+    creator: { handle: "maya_beachlife", name: "Maya", initial: "M", verified: true },
+    postedAgo: "1w ago",
+  },
+  {
+    id: "p6",
+    image: "/mock/leaderboard/snap-1.jpg",
+    imageAlt: "Surfer at sunset",
+    campaignId: "golden-hour",
+    caption: "Chasing the light #GoldenHour",
+    campaign: { tag: "#GoldenHour", poolUsdc: 250, icon: "wb_twilight" },
+    rank: 1,
+    votes: 1420,
+    comments: 22,
+    creator: { handle: "maya_beachlife", name: "Maya", initial: "M", verified: true },
+    postedAgo: "2w ago",
+  },
+];
+
+export function getSnapsByCampaign(campaignId: string) {
+  return [...profileSnaps, ...feedSnaps].filter((s) => s.campaignId === campaignId);
+}
+
+export type SupportTier = { usdc: number; label: string };
+
+export const supportTiers: SupportTier[] = [
+  { usdc: 1, label: "Coffee" },
+  { usdc: 5, label: "High five" },
+  { usdc: 10, label: "Superfan" },
+  { usdc: 25, label: "MVP" },
+];
 
 export type RewardLine = {
   label: string;

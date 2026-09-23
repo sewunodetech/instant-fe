@@ -16,13 +16,14 @@ export function FeaturedCampaignCard({ campaign }: { campaign: Campaign }) {
   return (
     <article className="relative overflow-hidden rounded-3xl bg-surface-container-lowest p-4 shadow-card transition-shadow hover:shadow-[0_8px_26px_rgba(17,17,17,0.09)]">
       <div className="relative h-56 w-full overflow-hidden rounded-[18px] bg-surface-container-high">
-        <Image src={campaign.cover} alt="" fill priority sizes="(max-width: 430px) 100vw, 366px" className="object-cover" />
+        <Image src={campaign.cover} alt="" fill priority sizes="(max-width: 767px) 100vw, 720px" className="object-cover" />
         <span className="absolute top-3 left-3 flex items-center gap-1 rounded-full bg-primary-container px-3 py-1.5 text-label-md shadow-md">
           <Icon name="tag" className="text-[16px]" />
           {campaign.tag.slice(1)}
         </span>
         <span className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-surface-container-lowest/90 px-3 py-1.5 text-label-sm shadow-md backdrop-blur-md">
-          🏆 {campaign.poolUsdc} USDC <span className="font-medium text-on-surface-variant">Pool</span>
+          <Icon name="emoji_events" className="text-[15px] text-primary" />
+          {campaign.poolUsdc} USDC <span className="font-medium text-on-surface-variant">Pool</span>
         </span>
         <div className="absolute inset-x-0 bottom-0 flex h-16 items-end bg-gradient-to-t from-black/60 to-transparent p-3">
           <span className="flex items-center gap-2 text-label-sm text-white drop-shadow-sm">
@@ -108,9 +109,15 @@ export function CampaignRowCard({ campaign }: { campaign: Campaign }) {
           </div>
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 text-body-sm text-on-surface-variant">
-              <span>👥 {compactNumber(campaign.creators)}</span>
+              <span className="flex items-center gap-1">
+                <Icon name="group" className="text-[15px]" />
+                {compactNumber(campaign.creators)}
+              </span>
               <span>•</span>
-              <span>⏳ {campaign.daysLeft}d left</span>
+              <span className="flex items-center gap-1">
+                <Icon name="hourglass_top" className="text-[15px]" />
+                {campaign.daysLeft}d left
+              </span>
             </div>
             <Link
               href={`/snap?campaign=${campaign.id}`}

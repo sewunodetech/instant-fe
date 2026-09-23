@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Icon } from "@/components/icon";
 import { CampaignDiscovery } from "@/components/discovery/campaign-discovery";
 import { activeCampaigns } from "@/lib/mock-data";
 
-export const metadata: Metadata = { title: "Campaigns · instant.fun" };
+export const metadata: Metadata = { title: "Explore · instant.fun" };
 
 function CrownDoodle() {
   return (
@@ -26,16 +27,23 @@ function CrownDoodle() {
 
 export default function CampaignsPage() {
   return (
-    <div className="flex flex-col gap-4 px-space-md pb-4">
+    <div className="flex flex-col gap-4 px-space-md pb-4 sm:px-0">
       <div className="pt-3">
         <div className="flex items-center justify-between">
-          <h1 className="text-headline-lg-mobile">Campaigns</h1>
+          <h1 className="text-headline-lg-mobile">Explore</h1>
           <span className="flex items-center gap-1 rounded-full bg-surface-container px-3 py-1.5 shadow-sm">
             <Icon name="verified" className="text-[18px] text-secondary" />
-            <span className="text-label-sm text-on-surface-variant">Active Pools</span>
+            <span className="text-label-sm text-on-surface-variant">Live Challenges</span>
           </span>
         </div>
-        <p className="mt-1 text-on-surface-variant">Pick a campaign, create content, and start earning!</p>
+        <p className="mt-1 text-on-surface-variant">Pick a challenge, post a snap, earn support!</p>
+        <Link
+          href="/create"
+          className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-full bg-primary-container text-label-md text-on-primary-fixed shadow-sm transition-transform active:scale-95"
+        >
+          <Icon name="add" className="text-[18px]" />
+          Create campaign
+        </Link>
       </div>
 
       <CampaignDiscovery campaigns={activeCampaigns} />
