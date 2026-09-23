@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Icon } from "@/components/icon";
+import { Sparkles } from "lucide-react";
 import { CampaignStories } from "@/components/home/campaign-stories";
 import { FeedFilters } from "@/components/home/feed-filters";
 import { JoinSnapBanner } from "@/components/home/join-snap-banner";
@@ -59,7 +59,7 @@ export default function HomePage() {
 
         <div className="flex flex-col items-center justify-center gap-2 py-6 text-center">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container text-on-surface-variant">
-            <Icon name="auto_awesome" className="text-[20px]" />
+            <Sparkles size={20} />
           </div>
           <p className="text-headline-sm">You&apos;re completely caught up!</p>
           <p className="max-w-[260px] text-body-sm text-on-surface-variant">

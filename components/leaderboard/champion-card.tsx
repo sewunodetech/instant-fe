@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Icon } from "@/components/icon";
+import { Award, ChevronRight, Gift, Heart, Medal } from "lucide-react";
 import type { Creator, Leaderboard } from "@/lib/mock-data";
 
 type Props = {
@@ -14,11 +14,11 @@ export function ChampionCard({ champion, dividend, ended }: Props) {
     <section className="relative w-full overflow-hidden rounded-3xl bg-surface-container-lowest p-space-md shadow-card">
       <div className="mb-space-sm flex items-center justify-between">
         <span className="flex items-center gap-1.5 rounded-full bg-primary-container px-3 py-1 text-label-sm text-on-primary-container">
-          <Icon name="workspace_premium" filled className="text-[16px]" />
+          <Award size={16} fill="currentColor" />
           {ended ? "#1 Champion" : "#1 Leading"}
         </span>
         <span className="flex items-center gap-1 rounded-full bg-surface-container-high px-2.5 py-1 text-label-sm tabular-nums">
-          <Icon name="favorite" filled className="text-[15px] text-error" />
+          <Heart size={15} fill="currentColor" className="text-error" />
           {champion.votes.toLocaleString("en")} votes
         </span>
       </div>
@@ -54,7 +54,7 @@ export function ChampionCard({ champion, dividend, ended }: Props) {
                 +{champion.payoutUsdc.toFixed(2)} USDC
               </span>
             </div>
-            <Icon name="military_tech" filled className="text-[28px] text-primary" />
+            <Medal size={28} fill="currentColor" className="text-primary" />
           </div>
         </div>
       </div>
@@ -65,7 +65,7 @@ export function ChampionCard({ champion, dividend, ended }: Props) {
       >
         <div className="flex items-center gap-2">
           <div className="flex h-7 w-7 items-center justify-center rounded-full bg-secondary-fixed text-secondary">
-            <Icon name="redeem" className="text-[16px]" />
+            <Gift size={16} />
           </div>
           <div>
             <span className="block text-label-sm leading-tight">
@@ -78,7 +78,7 @@ export function ChampionCard({ champion, dividend, ended }: Props) {
             </span>
           </div>
         </div>
-        <Icon name="chevron_right" className="text-[18px] text-secondary" />
+        <ChevronRight size={18} className="text-secondary" />
       </Link>
     </section>
   );

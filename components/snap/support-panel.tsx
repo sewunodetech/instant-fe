@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Icon } from "@/components/icon";
+import { CircleCheck, HandHeart, Loader2, ShieldCheck, Sparkles, Vote } from "lucide-react";
 import { ApiClientError, votePost, backPost } from "@/lib/api-client";
 import { supportTiers, type SupportTier } from "@/lib/mock-data";
 
@@ -99,12 +99,12 @@ export function SupportPanel({
     <section className="flex w-full flex-col gap-4 rounded-3xl bg-surface-container-lowest p-space-md shadow-card">
       <div className="flex items-start gap-3">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-fixed text-on-primary-fixed">
-          <Icon name="how_to_vote" className="text-[22px]" />
+          <Vote size={22} />
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
             <h2 className="text-headline-sm font-extrabold tracking-tight">Vote &amp; Support</h2>
-            <Icon name="auto_awesome" className="text-[18px] text-secondary-container" />
+            <Sparkles size={18} className="text-secondary-container" />
           </div>
           <p className="mt-0.5 text-body-sm text-on-surface-variant">
             Vote free once · optional USDC support goes 100% to {creatorName}.
@@ -123,7 +123,7 @@ export function SupportPanel({
             : "bg-secondary-container text-on-secondary shadow-shutter hover:bg-secondary"
         }`}
       >
-        <Icon name={voted ? "check_circle" : "how_to_vote"} filled className="text-[22px]" />
+        {voted ? <CircleCheck size={22} fill="currentColor" /> : <Vote size={22} />}
         <span className="font-bold tracking-tight">
           {voting ? "Submitting..." : voted ? "Vote counted — free" : "Vote free"}
         </span>
@@ -162,10 +162,10 @@ export function SupportPanel({
                   <span className={`text-label-lg ${active ? "font-extrabold text-secondary" : ""}`}>
                     {tier.usdc} USDC
                   </span>
-                  <Icon
-                    name="check_circle"
-                    filled
-                    className={`text-[18px] text-secondary transition-opacity ${active ? "opacity-100" : "opacity-0"}`}
+                  <CircleCheck
+                    size={18}
+                    fill="currentColor"
+                    className={`text-secondary transition-opacity ${active ? "opacity-100" : "opacity-0"}`}
                   />
                 </span>
                 <span
@@ -213,7 +213,7 @@ export function SupportPanel({
       <div className="flex items-center justify-between rounded-2xl bg-surface-container-low p-3">
         <div className="flex items-center gap-2">
           <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary-container/50 text-on-primary-container">
-            <Icon name="volunteer_activism" className="text-[16px]" />
+            <HandHeart size={16} />
           </div>
           <div className="flex flex-col">
             <span className="text-label-sm">Creator receives</span>
@@ -237,12 +237,12 @@ export function SupportPanel({
               : "bg-primary-container text-on-primary-fixed shadow-shutter hover:brightness-105"
           } ${status === "confirming" ? "opacity-90" : ""}`}
         >
-          {status === "idle" && <Icon name="volunteer_activism" className="text-[22px]" />}
-          {status === "confirming" && <Icon name="progress_activity" className="animate-spin text-[22px]" />}
+          {status === "idle" && <HandHeart size={22} />}
+          {status === "confirming" && <Loader2 size={22} className="animate-spin" />}
           <span className="font-bold tracking-tight">{supportLabel}</span>
         </button>
         <p className="flex items-center justify-center gap-2 text-center text-body-sm text-on-surface-variant">
-          <Icon name="verified_user" className="text-[14px] text-secondary" />
+          <ShieldCheck size={14} className="text-secondary" />
           Instant on Base · Balance:{" "}
           <span className={`font-bold tabular-nums ${insufficient ? "text-error" : "text-on-surface"}`}>
             {usd(balance)} USDC

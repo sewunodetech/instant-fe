@@ -3,7 +3,20 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { Icon } from "@/components/icon";
+import {
+  Aperture,
+  Bookmark,
+  CircleCheck,
+  Clock,
+  HandHeart,
+  Heart,
+  MessageCircle,
+  Share2,
+  Trophy,
+  Vote,
+  BadgeCheck,
+} from "lucide-react";
+import { LucideIcon } from "@/components/lucide-icon";
 import type { Snap } from "@/lib/mock-data";
 
 const supportOptions = [1, 5, 10];
@@ -75,7 +88,7 @@ export function SnapCard({
             : "bg-secondary-fixed text-on-secondary-fixed-variant shadow-sm hover:bg-secondary-fixed-dim"
       }`}
     >
-      <Icon name={voted ? "check_circle" : "how_to_vote"} filled={voted} className="text-[18px]" />
+      {voted ? <CircleCheck size={18} fill="currentColor" /> : <Vote size={18} />}
       <span className="text-label-lg whitespace-nowrap">
         {pending && !supported ? "..." : voted ? "Voted!" : "Vote"}
       </span>
@@ -109,7 +122,7 @@ export function SnapCard({
             : "bg-primary-container text-on-primary-fixed shadow-sm"
         }`}
       >
-        <Icon name={supported ? "favorite" : "volunteer_activism"} filled={supported} className="text-[16px]" />
+        {supported ? <Heart size={16} fill="currentColor" /> : <HandHeart size={16} />}
         {supported ? `Sent ${support}` : support ? `Send ${support}` : "Support"}
       </button>
     </div>
@@ -118,7 +131,7 @@ export function SnapCard({
   const actions = (
     <div className="flex items-center gap-2">
       <button className="flex items-center gap-1 p-1 text-on-surface-variant hover:text-on-surface">
-        <Icon name="mode_comment" className="text-[22px]" />
+        <MessageCircle size={22} />
         <span className="text-label-sm tabular-nums">{snap.comments}</span>
       </button>
       <button
@@ -127,7 +140,7 @@ export function SnapCard({
         onClick={() => setSaved((s) => !s)}
         className="p-1 text-on-surface-variant hover:text-on-surface"
       >
-        <Icon name={saved ? "bookmark" : "bookmark_border"} filled={saved} className="text-[22px]" />
+        <Bookmark size={22} fill={saved ? "currentColor" : "none"} />
       </button>
     </div>
   );
@@ -151,10 +164,11 @@ export function SnapCard({
 
         <div className="pointer-events-none absolute inset-x-3 top-3 flex items-center justify-between">
           <div className="flex items-center gap-1.5 rounded-full bg-inverse-surface/75 px-3 py-1.5 text-inverse-on-surface shadow-xs backdrop-blur-md">
-            <Icon
+            <LucideIcon
               name={snap.campaign.icon}
+              size={15}
               filled={isTop}
-              className={`text-[15px] ${isTop ? "text-primary-container" : "text-secondary-fixed"}`}
+              className={isTop ? "text-primary-container" : "text-secondary-fixed"}
             />
             <span className="text-label-sm whitespace-nowrap">{snap.campaign.tag}</span>
             <span className="text-xs text-white/40">•</span>
@@ -167,7 +181,7 @@ export function SnapCard({
               isTop ? "bg-primary-container text-on-primary-fixed" : "bg-surface-container-high text-on-surface"
             }`}
           >
-            <Icon name="leaderboard" className="text-[13px]" />
+            <Trophy size={13} />
             <span>#{snap.rank}</span>
             <span className="text-[10px] tabular-nums opacity-75">{votes} votes</span>
           </div>
@@ -191,11 +205,11 @@ export function SnapCard({
               <div className="flex items-center gap-1">
                 <span className="text-label-md leading-tight">@{snap.creator.handle}</span>
                 {snap.creator.verified && (
-                  <Icon name="verified" filled className="text-[14px] text-secondary-container" />
+                  <BadgeCheck size={14} fill="currentColor" className="text-secondary-container" />
                 )}
               </div>
               <div className="flex items-center gap-1 text-[11px] text-inverse-on-surface/80">
-                <Icon name={snap.liveShutter ? "shutter_speed" : "schedule"} className="text-[11px]" />
+                {snap.liveShutter ? <Aperture size={11} /> : <Clock size={11} />}
                 <span>{snap.liveShutter ? `Live Shutter • ${snap.postedAgo}` : snap.postedAgo}</span>
               </div>
             </div>
@@ -204,7 +218,7 @@ export function SnapCard({
             aria-label="Share"
             className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full bg-inverse-surface/80 text-inverse-on-surface shadow-sm backdrop-blur-md transition-all hover:bg-inverse-surface active:scale-95"
           >
-            <Icon name="share" className="text-[20px]" />
+            <Share2 size={20} />
           </button>
         </div>
       </div>
@@ -219,7 +233,7 @@ export function SnapCard({
         </div>
         <div className="flex items-center justify-between rounded-xl bg-surface-container-low p-2 text-body-sm text-on-surface-variant">
           <div className="flex items-center gap-1.5">
-            <Icon name="volunteer_activism" className="text-[16px] text-primary" />
+            <HandHeart size={16} className="text-primary" />
             <span>Free vote · Support goes 100% to @{snap.creator.handle}</span>
           </div>
           <span className="text-[12px] font-bold text-secondary tabular-nums">{votes} Votes</span>

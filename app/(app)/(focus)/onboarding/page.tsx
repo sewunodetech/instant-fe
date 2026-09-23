@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { Icon } from "@/components/icon";
+import { ArrowRight, Coffee, CircleDollarSign, Heart, MapPin, Smile, Sparkles, Zap } from "lucide-react";
+import { LucideIcon } from "@/components/lucide-icon";
 import { compactNumber } from "@/lib/format";
 import { activeCampaigns } from "@/lib/mock-data";
 
@@ -26,7 +27,7 @@ export default function OnboardingPage() {
         <div className="mt-2 flex flex-col items-center px-space-xs text-center">
           <div className="relative mb-space-sm inline-flex items-center justify-center">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-container/40 text-primary">
-              <Icon name="auto_awesome" filled className="text-[24px]" />
+              <Sparkles size={24} fill="currentColor" />
             </div>
             <svg aria-hidden className="absolute -top-3 -right-3 h-6 w-6 rotate-12 text-primary-fixed drop-shadow-sm" fill="currentColor" viewBox="0 0 24 24">
               <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z" />
@@ -51,11 +52,11 @@ export default function OnboardingPage() {
         {/* Decorative sample snap */}
         <div aria-hidden className="relative my-space-lg flex w-full items-center justify-center select-none">
           <div className="absolute -top-3 left-4 z-20 flex -rotate-6 animate-pulse items-center gap-1 rounded-full bg-surface-container-lowest px-3 py-1.5 shadow-[0_4px_20px_rgba(17,17,17,0.08)]">
-            <Icon name="bolt" className="text-[18px] text-secondary" />
+            <Zap size={18} className="text-secondary" />
             <span className="text-label-sm">Trending Snap</span>
           </div>
           <div className="absolute -top-4 right-5 z-20 flex rotate-12 items-center gap-1 rounded-full bg-tertiary-container px-3 py-1.5 text-label-md text-on-tertiary-container shadow-md">
-            <Icon name="monetization_on" filled className="text-[16px]" />
+            <CircleDollarSign size={16} fill="currentColor" />
             +50 USDC
           </div>
 
@@ -67,11 +68,11 @@ export default function OnboardingPage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
                 <div className="absolute inset-x-2.5 bottom-2.5 flex items-center justify-between">
                   <span className="flex items-center gap-1.5 rounded-full bg-black/40 px-2.5 py-1 text-label-sm text-white backdrop-blur-md">
-                    <Icon name="location_on" filled className="text-[15px] text-primary-container" />
+                    <MapPin size={15} fill="currentColor" className="text-primary-container" />
                     Salt &amp; Sea Cafe
                   </span>
                   <span className="flex items-center gap-1 rounded-full bg-black/40 px-2.5 py-1 text-label-sm text-white backdrop-blur-md">
-                    <Icon name="favorite" filled className="text-[15px] text-error" />
+                    <Heart size={15} fill="currentColor" className="text-error" />
                     1.8k
                   </span>
                 </div>
@@ -90,11 +91,11 @@ export default function OnboardingPage() {
               </div>
             </div>
             <div className="absolute -bottom-3 -left-2 z-20 flex -rotate-12 items-center gap-1 rounded-2xl bg-surface-container-lowest px-2.5 py-1.5 shadow-sm">
-              <Icon name="auto_awesome" filled className="text-[16px] text-secondary" />
+              <Sparkles size={16} fill="currentColor" className="text-secondary" />
               <span className="text-label-sm">Voted by 840+</span>
             </div>
             <div className="absolute right-4 -bottom-2 z-20 rotate-6 rounded-full bg-primary-container p-2 text-on-primary-container shadow-md">
-              <Icon name="sentiment_very_satisfied" filled className="block text-[20px]" />
+              <Smile size={20} fill="currentColor" className="block" />
             </div>
           </div>
         </div>
@@ -102,7 +103,7 @@ export default function OnboardingPage() {
         <ul className="no-scrollbar -mx-space-md my-space-sm flex items-center gap-2 overflow-x-auto px-space-md">
           {features.map((f) => (
             <li key={f.label} className="flex shrink-0 items-center gap-1.5 rounded-full bg-surface-container-low px-3 py-2 shadow-sm">
-              <Icon name={f.icon} filled={f.filled} className={`text-[18px] ${f.className}`} />
+              <LucideIcon name={f.icon} size={18} filled={f.filled} className={f.className} />
               <span className="text-label-sm">{f.label}</span>
             </li>
           ))}
@@ -114,7 +115,7 @@ export default function OnboardingPage() {
             className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-primary-container text-label-lg text-on-primary-container shadow-card transition-all hover:bg-primary-fixed active:scale-[0.98]"
           >
             Get Started
-            <Icon name="arrow_forward" className="text-[20px]" />
+            <ArrowRight size={20} />
           </Link>
           <p className="flex items-center justify-center gap-1.5 py-1">
             <span className="text-on-surface-variant">Already have an account?</span>
@@ -141,7 +142,7 @@ export default function OnboardingPage() {
             </div>
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-secondary/10 text-secondary">
-                <Icon name="local_cafe" className="text-[24px]" />
+                <Coffee size={24} />
               </div>
               <div className="flex min-w-0 flex-1 flex-col">
                 <span className="truncate text-label-lg">{live.tag}</span>

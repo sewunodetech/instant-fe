@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { Icon } from "@/components/icon";
+import { BadgeCheck, Clock, Flame, Heart } from "lucide-react";
 import type { Snap } from "@/lib/mock-data";
 
 type Props = {
@@ -27,7 +27,7 @@ export function SnapHero({ snap, votes, timeLeft }: Props) {
 
       <div className="pointer-events-none absolute inset-x-3 top-3 flex items-center justify-between">
         <div className="inline-flex items-center gap-1.5 rounded-full bg-surface-container-lowest/90 px-3 py-1.5 shadow-sm backdrop-blur-md">
-          <Icon name="local_fire_department" filled className="text-[18px] text-amber-500" />
+          <Flame size={18} fill="currentColor" className="text-amber-500" />
           <span className="text-label-md font-extrabold tracking-tight tabular-nums">
             {votes.toLocaleString("en")} votes
           </span>
@@ -37,7 +37,7 @@ export function SnapHero({ snap, votes, timeLeft }: Props) {
           </span>
         </div>
         <div className="inline-flex items-center gap-1 rounded-full bg-inverse-surface/75 px-2.5 py-1 text-inverse-on-surface backdrop-blur-md">
-          <Icon name="schedule" className="text-[14px]" />
+          <Clock size={14} />
           <span className="text-label-sm">{timeLeft}</span>
         </div>
       </div>
@@ -63,7 +63,7 @@ export function SnapHero({ snap, votes, timeLeft }: Props) {
             <div className="flex items-center gap-1">
               <span className="text-label-lg text-white drop-shadow-sm">@{snap.creator.handle}</span>
               {snap.creator.verified && (
-                <Icon name="verified" filled className="text-[16px] text-secondary-container" />
+                <BadgeCheck size={16} fill="currentColor" className="text-secondary-container" />
               )}
             </div>
             <span className="text-label-sm text-white/80">
@@ -80,7 +80,7 @@ export function SnapHero({ snap, votes, timeLeft }: Props) {
             liked ? "bg-white/40" : "bg-white/20"
           }`}
         >
-          <Icon name="favorite" filled={liked} className={`text-[20px] ${liked ? "text-rose-500" : ""}`} />
+          <Heart size={20} fill={liked ? "currentColor" : "none"} className={liked ? "text-rose-500" : ""} />
         </button>
       </div>
     </div>

@@ -33,12 +33,6 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={cn("h-full", "antialiased", jakarta.variable, "font-sans", geist.variable, pressStart.variable)}>
-      <head>
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block"
-        />
-      </head>
       <body className="min-h-full bg-surface font-sans text-body-md text-on-surface selection:bg-primary-container">
         <AuthProvider>{children}</AuthProvider>
       </body>

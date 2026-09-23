@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
-import { Icon } from "@/components/icon";
+import { Flame, Hourglass } from "lucide-react";
 
 const filters = [
   { id: "hot", label: "For You" },
@@ -29,8 +28,8 @@ export function FeedFilters() {
                 : "bg-surface-container-lowest text-on-surface-variant shadow-xs hover:bg-surface-container"
             }`}
           >
-            {f.id === "hot" && <Icon name="whatshot" className="text-[16px]" />}
-            {f.id === "ending" && <Icon name="hourglass_top" className="text-[16px]" />}
+            {f.id === "hot" && <Flame size={16} />}
+            {f.id === "ending" && <Hourglass size={16} />}
             {f.label}
           </button>
         );

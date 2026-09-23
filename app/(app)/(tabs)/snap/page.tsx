@@ -4,7 +4,23 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { Icon } from "@/components/icon";
+import {
+  Aperture,
+  Camera,
+  Check,
+  ChevronRight,
+  CircleCheck,
+  Clock,
+  Compass,
+  Flame,
+  Loader2,
+  MapPin,
+  RefreshCw,
+  Tag,
+  Video,
+  Zap,
+  ZapOff,
+} from "lucide-react";
 import { BackButton } from "@/components/layout/back-button";
 import { createPost, listCampaigns, uploadFile } from "@/lib/api-client";
 import { ApiClientError } from "@/lib/api-client";
@@ -256,7 +272,7 @@ function CreateSnapFlow() {
           aria-label="Browse campaigns"
           className="flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container"
         >
-          <Icon name="explore" className="text-[22px]" />
+          <Compass size={22} />
         </Link>
       </div>
 
@@ -264,7 +280,7 @@ function CreateSnapFlow() {
         <div className="mb-space-sm flex items-center justify-between">
           <h2 className="text-label-lg">Campaign</h2>
           <Link href="/campaigns" className="flex items-center text-label-sm text-secondary">
-            Explore <Icon name="chevron_right" className="text-[14px]" />
+            Explore <ChevronRight size={14} />
           </Link>
         </div>
         <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
@@ -286,7 +302,7 @@ function CreateSnapFlow() {
                 </span>
                 {active && (
                   <span className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-secondary text-white">
-                    <Icon name="check" className="text-[12px]" />
+                    <Check size={12} />
                   </span>
                 )}
               </button>
@@ -326,7 +342,7 @@ function CreateSnapFlow() {
           {!captured && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/35 text-white backdrop-blur-[1px]">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/30">
-                <Icon name="photo_camera" className="text-[32px]" />
+                <Camera size={32} />
               </div>
               <p className="text-label-md">Tap shutter for an instant capture</p>
               <button
@@ -340,7 +356,7 @@ function CreateSnapFlow() {
           )}
           <div className="pointer-events-none absolute inset-x-3 top-3 flex items-center justify-between">
             <span className="flex items-center gap-1.5 rounded-full bg-black/55 px-3 py-1.5 text-label-sm text-white backdrop-blur-md">
-              <Icon name="schedule" className="text-[14px]" />
+              <Clock size={14} />
               Instant only
             </span>
             {live && captured && (
@@ -353,11 +369,11 @@ function CreateSnapFlow() {
           <div className="absolute inset-x-0 bottom-0 flex items-end justify-between bg-gradient-to-t from-black/50 to-transparent p-3">
             <div className="flex flex-col gap-1 text-[11px] text-white/90">
               <span className="flex items-center gap-1">
-                <Icon name="location_on" className="text-[12px]" />
+                <MapPin size={12} />
                 {location || "Add location"}
               </span>
               <span className="flex items-center gap-1">
-                <Icon name="local_fire_department" className="text-[12px]" />
+                <Flame size={12} />
                 {campaign?.tag}
               </span>
             </div>
@@ -370,7 +386,7 @@ function CreateSnapFlow() {
                 }
                 className="flex h-10 w-10 items-center justify-center rounded-full bg-black/45 text-white backdrop-blur-md"
               >
-                <Icon name={flash === "off" ? "flash_off" : "flash_on"} className="text-[20px]" />
+                {flash === "off" ? <ZapOff size={20} /> : <Zap size={20} />}
               </button>
               <button
                 type="button"
@@ -378,7 +394,7 @@ function CreateSnapFlow() {
                 onClick={() => setShutter((s) => (s === "auto" ? "portrait" : s === "portrait" ? "wide" : "auto"))}
                 className="flex h-10 w-10 items-center justify-center rounded-full bg-black/45 text-white backdrop-blur-md"
               >
-                <Icon name="shutter_speed" className="text-[20px]" />
+                <Aperture size={20} />
               </button>
             </div>
           </div>
@@ -402,7 +418,7 @@ function CreateSnapFlow() {
               onClick={retake}
               className="flex h-16 w-16 items-center justify-center rounded-full bg-white/15 text-white ring-2 ring-white/30 transition-transform active:scale-90"
             >
-              <Icon name="refresh" className="text-[26px]" />
+              <RefreshCw size={26} />
             </button>
           )}
           <span className="w-20 text-right text-label-sm text-white/70">{flash}</span>
@@ -425,7 +441,7 @@ function CreateSnapFlow() {
         <div className="mt-1 flex items-center justify-between text-label-sm text-on-surface-variant">
           <span>{caption.length}/220</span>
           <span className="flex items-center gap-1">
-            <Icon name="tag" className="text-[14px]" />
+            <Tag size={14} />
             {campaign?.tag}
           </span>
         </div>
@@ -434,9 +450,9 @@ function CreateSnapFlow() {
           Location
         </label>
         <div className="relative">
-          <Icon
-            name="location_on"
-            className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-[18px] text-on-surface-variant"
+          <MapPin
+            size={18}
+            className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-on-surface-variant"
           />
           <input
             id="snap-location"
@@ -455,7 +471,7 @@ function CreateSnapFlow() {
           className="mt-space-sm flex w-full items-center justify-between rounded-2xl bg-surface-container-low p-3"
         >
           <span className="flex items-center gap-2 text-label-md">
-            <Icon name="videocam" className="text-[18px] text-secondary" />
+            <Video size={18} className="text-secondary" />
             Live Shutter
           </span>
           <span
@@ -471,7 +487,7 @@ function CreateSnapFlow() {
       {done ? (
         <div className="flex flex-col gap-space-sm rounded-3xl bg-tertiary-container/40 p-space-md text-center shadow-card">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-tertiary text-white">
-            <Icon name="check_circle" filled className="text-[28px]" />
+            <CircleCheck size={28} fill="currentColor" />
           </div>
           <p className="text-headline-sm">Snap is live</p>
           <p className="text-body-sm text-on-surface-variant">Community can vote free or support you with USDC.</p>
@@ -505,9 +521,9 @@ function CreateSnapFlow() {
             className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-primary-container text-headline-sm text-on-primary-fixed shadow-shutter transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {posting ? (
-              <Icon name="progress_activity" className="animate-spin text-[24px]" />
+              <Loader2 size={24} className="animate-spin" />
             ) : (
-              <Icon name="bolt" className="text-[24px]" />
+              <Zap size={24} />
             )}
             <span>{posting ? "Posting..." : captured ? "Post to Campaign" : "Capture first"}</span>
           </button>

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Icon } from "@/components/icon";
+import { ArrowRight, Hourglass, Tag, Trophy, Users } from "lucide-react";
 import { compactNumber } from "@/lib/format";
 import type { Campaign } from "@/lib/mock-data";
 
@@ -18,11 +18,11 @@ export function FeaturedCampaignCard({ campaign }: { campaign: Campaign }) {
       <div className="relative h-56 w-full overflow-hidden rounded-[18px] bg-surface-container-high">
         <Image src={campaign.cover} alt="" fill priority sizes="(max-width: 767px) 100vw, 720px" className="object-cover" />
         <span className="absolute top-3 left-3 flex items-center gap-1 rounded-full bg-primary-container px-3 py-1.5 text-label-md shadow-md">
-          <Icon name="tag" className="text-[16px]" />
+          <Tag size={16} />
           {campaign.tag.slice(1)}
         </span>
         <span className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-surface-container-lowest/90 px-3 py-1.5 text-label-sm shadow-md backdrop-blur-md">
-          <Icon name="emoji_events" className="text-[15px] text-primary" />
+          <Trophy size={15} className="text-primary" />
           {campaign.poolUsdc} USDC <span className="font-medium text-on-surface-variant">Pool</span>
         </span>
         <div className="absolute inset-x-0 bottom-0 flex h-16 items-end bg-gradient-to-t from-black/60 to-transparent p-3">
@@ -50,12 +50,12 @@ export function FeaturedCampaignCard({ campaign }: { campaign: Campaign }) {
               ))}
             </div>
             <span className="flex items-center gap-1 text-body-sm text-on-surface-variant">
-              <Icon name="group" className="text-[15px]" />
+              <Users size={15} />
               <strong className="text-on-surface">{compactNumber(campaign.creators)}</strong> creators
             </span>
           </div>
           <span className="flex items-center gap-1 rounded-full bg-surface-container-low px-2.5 py-1 text-body-sm text-on-surface-variant">
-            <Icon name="hourglass_top" className="text-[15px] text-secondary" />
+            <Hourglass size={15} className="text-secondary" />
             Ends in <strong>{campaign.daysLeft}d</strong>
           </span>
         </div>
@@ -70,7 +70,7 @@ export function FeaturedCampaignCard({ campaign }: { campaign: Campaign }) {
             href={`/snap?campaign=${campaign.id}`}
             className="relative z-10 flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-full bg-primary-container px-6 text-label-lg shadow-sm transition-transform active:translate-y-0.5 active:scale-95"
           >
-            Join <Icon name="arrow_forward" className="text-[18px]" />
+            Join <ArrowRight size={18} />
           </Link>
         </div>
       </div>
@@ -110,12 +110,12 @@ export function CampaignRowCard({ campaign }: { campaign: Campaign }) {
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 text-body-sm text-on-surface-variant">
               <span className="flex items-center gap-1">
-                <Icon name="group" className="text-[15px]" />
+                <Users size={15} />
                 {compactNumber(campaign.creators)}
               </span>
               <span>•</span>
               <span className="flex items-center gap-1">
-                <Icon name="hourglass_top" className="text-[15px]" />
+                <Hourglass size={15} />
                 {campaign.daysLeft}d left
               </span>
             </div>

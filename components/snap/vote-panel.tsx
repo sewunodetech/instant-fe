@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Icon } from "@/components/icon";
+import { CircleCheck, CircleDollarSign, Loader2, Sparkles, Zap } from "lucide-react";
 import {
   EST_PAYOUT_PER_VOTE_USDC,
   VOTER_POOL_SHARE,
@@ -60,12 +60,12 @@ export function VotePanel({ creatorName, poolUsdc, tiers, balance, onVoted }: Pr
     <section className="flex w-full flex-col gap-4 rounded-3xl bg-surface-container-lowest p-space-md shadow-card">
       <div className="flex items-start gap-3">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-fixed text-on-primary-fixed">
-          <Icon name="bolt" className="text-[22px]" />
+          <Zap size={22} />
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
             <h2 className="text-headline-sm font-extrabold tracking-tight">Vote to Support &amp; Win USDC</h2>
-            <Icon name="auto_awesome" className="text-[18px] text-secondary-container" />
+            <Sparkles size={18} className="text-secondary-container" />
           </div>
           <p className="mt-0.5 text-body-sm text-on-surface-variant">
             Boost {creatorName} to stay in Top 3! When this challenge ends, voters split{" "}
@@ -103,10 +103,10 @@ export function VotePanel({ creatorName, poolUsdc, tiers, balance, onVoted }: Pr
                 )}
                 <span className="flex w-full items-center justify-between">
                   <span className={`text-label-lg ${active ? "font-extrabold text-secondary" : ""}`}>{tier.usdc} USDC</span>
-                  <Icon
-                    name="check_circle"
-                    filled
-                    className={`text-[18px] text-secondary transition-opacity ${active ? "opacity-100" : "opacity-0"}`}
+                  <CircleCheck
+                    size={18}
+                    fill="currentColor"
+                    className={`text-secondary transition-opacity ${active ? "opacity-100" : "opacity-0"}`}
                   />
                 </span>
                 <span className={`mt-1 text-label-sm ${active ? "text-on-secondary-fixed-variant" : "text-on-surface-variant"}`}>
@@ -156,7 +156,7 @@ export function VotePanel({ creatorName, poolUsdc, tiers, balance, onVoted }: Pr
       <div className="flex items-center justify-between rounded-2xl bg-surface-container-low p-3">
         <div className="flex items-center gap-2">
           <div className="flex h-7 w-7 items-center justify-center rounded-full bg-tertiary-container/50 text-on-tertiary-container">
-            <Icon name="monetization_on" className="text-[16px]" />
+            <CircleDollarSign size={16} />
           </div>
           <div className="flex flex-col">
             <span className="text-label-sm">Estimated Share</span>
@@ -183,8 +183,8 @@ export function VotePanel({ creatorName, poolUsdc, tiers, balance, onVoted }: Pr
               : "bg-secondary-container text-on-secondary-container shadow-shutter hover:bg-secondary"
           } ${status === "confirming" ? "opacity-90" : ""}`}
         >
-          {status === "idle" && <Icon name="bolt" className="text-[22px]" />}
-          {status === "confirming" && <Icon name="progress_activity" className="animate-spin text-[22px]" />}
+          {status === "idle" && <Zap size={22} />}
+          {status === "confirming" && <Loader2 size={22} className="animate-spin" />}
           <span className="font-bold tracking-tight">{buttonLabel}</span>
         </button>
         <p className="flex items-center justify-center gap-2 text-center text-body-sm text-on-surface-variant">

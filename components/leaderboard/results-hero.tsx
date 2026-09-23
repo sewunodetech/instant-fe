@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import { useEffect } from "react";
+import { BadgeCheck, PartyPopper } from "lucide-react";
 import { ConfettiLayer, prefersReducedMotion, useConfetti } from "@/components/confetti";
-import { Icon } from "@/components/icon";
 import { BackButton } from "@/components/layout/back-button";
 import type { Campaign } from "@/lib/mock-data";
 
@@ -25,7 +25,7 @@ export function ResultsHero({ campaign }: { campaign: Campaign }) {
           <div className="min-w-0">
             <div className="flex items-center gap-1">
               <h1 className="text-headline-sm">{ended ? "Winners & Results" : "Live Leaderboard"}</h1>
-              {ended && <Icon name="verified" filled className="text-[18px] text-secondary" />}
+              {ended && <BadgeCheck size={18} fill="currentColor" className="text-secondary" />}
             </div>
             <div className="mt-0.5 flex items-center gap-1">
               <span className="rounded-full bg-secondary-fixed/50 px-2 py-0.5 text-label-sm text-secondary">
@@ -41,7 +41,7 @@ export function ResultsHero({ campaign }: { campaign: Campaign }) {
             onClick={burst}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-container text-on-primary-container shadow-sm transition-transform active:scale-90"
           >
-            <Icon name="celebration" className="text-[22px]" />
+            <PartyPopper size={22} />
           </button>
         )}
       </div>

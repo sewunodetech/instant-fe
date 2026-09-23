@@ -4,8 +4,21 @@ import { Suspense, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  ChevronDown,
+  CircleAlert,
+  Mail,
+  Shield,
+  User,
+  UserPlus,
+  Wallet,
+  Zap,
+} from "lucide-react";
 import { useAuth } from "@/components/providers/auth-provider";
-import { Icon } from "@/components/icon";
+import { LucideIcon } from "@/components/lucide-icon";
 import { AppleIcon, DiscordIcon, GoogleIcon, XIcon } from "@/components/auth/provider-icons";
 
 const USERNAME_RE = /^[a-z0-9_]{3,30}$/;
@@ -57,7 +70,7 @@ function BrandChip({
 }) {
   return (
     <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-surface-container-low px-3 py-2 shadow-sm ring-1 ring-surface-container">
-      <Icon name={icon} filled={filled} className={`text-[18px] ${className ?? ""}`} />
+      <LucideIcon name={icon} size={18} filled={filled} className={className} />
       <span className="text-label-sm">{label}</span>
     </span>
   );
@@ -114,7 +127,7 @@ function Spinner({ label }: { label: string }) {
       <div className="relative">
         <div className="h-12 w-12 animate-spin rounded-full border-[3px] border-primary-container border-t-on-primary-container/70" />
         <span className="absolute inset-0 flex items-center justify-center">
-          <Icon name="bolt" filled className="text-[18px] text-on-primary-container" />
+          <Zap size={18} fill="currentColor" className="text-on-primary-container" />
         </span>
       </div>
       <p className="text-label-md text-on-surface-variant">{label}</p>
@@ -181,7 +194,7 @@ function LoginContent() {
         <div className="mt-4 flex flex-col items-center px-space-xs text-center">
           <div className="relative mb-4 inline-flex items-center justify-center">
             <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-secondary-container text-on-secondary shadow-pop-blue">
-              <Icon name="person_add" className="text-[28px]" />
+              <UserPlus size={28} />
             </div>
             <Sparkles />
           </div>
@@ -207,7 +220,7 @@ function LoginContent() {
                     .map((p) => p[0]?.toUpperCase())
                     .join("")
                 : (
-                  <span className="material-symbols-outlined text-[24px]">person</span>
+                  <User size={24} />
                 )}
             </span>
             <div className="min-w-0 flex-1 text-left">
@@ -217,7 +230,7 @@ function LoginContent() {
               </p>
             </div>
             <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-tertiary-container text-on-tertiary-container">
-              <Icon name="check" filled className="text-[16px]" />
+              <Check size={16} />
             </span>
           </div>
 
@@ -264,7 +277,7 @@ function LoginContent() {
               role="alert"
               className="flex items-start gap-2 rounded-2xl bg-error-container px-3.5 py-2.5 text-body-sm text-on-error-container"
             >
-              <Icon name="error" className="mt-0.5 shrink-0 text-[18px]" />
+              <CircleAlert size={18} className="mt-0.5 shrink-0" />
               <span>{formError || error}</span>
             </div>
           )}
@@ -277,7 +290,7 @@ function LoginContent() {
             {saving ? (
               <span className="h-4 w-4 animate-spin rounded-full border-2 border-on-primary-container/30 border-t-on-primary-container" />
             ) : (
-              <Icon name="arrow_forward" className="text-[20px]" />
+              <ArrowRight size={20} />
             )}
             {saving ? "Saving…" : "Continue"}
           </button>
@@ -295,7 +308,7 @@ function LoginContent() {
       <div className="mt-3 flex flex-col items-center px-space-xs text-center">
         <div className="relative mb-space-sm inline-flex items-center justify-center">
           <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-primary-container text-on-primary-container shadow-pop-yellow">
-            <Icon name="bolt" filled className="text-[28px]" />
+            <Zap size={28} fill="currentColor" />
           </div>
           <Sparkles />
         </div>
@@ -326,7 +339,7 @@ function LoginContent() {
         <PrimaryButton
           onClick={() => openLogin({ loginMethods: ["email"] })}
           disabled={!ready}
-          icon={<Icon name="mail" className="text-[20px]" />}
+          icon={<Mail size={20} />}
         >
           Continue with email
         </PrimaryButton>
@@ -352,7 +365,7 @@ function LoginContent() {
           disabled={!ready}
         >
           <span className="flex h-7 w-7 items-center justify-center rounded-full bg-secondary-container/10 text-secondary">
-            <Icon name="account_balance_wallet" className="text-[18px]" />
+            <Wallet size={18} />
           </span>
           Continue with wallet
         </SecondaryButton>
@@ -364,7 +377,7 @@ function LoginContent() {
           className="mx-auto mt-1 flex h-10 items-center gap-1.5 px-3 text-label-md text-secondary transition-colors hover:text-secondary-container disabled:opacity-60"
         >
           More options
-          <Icon name="expand_more" className="text-[18px]" />
+          <ChevronDown size={18} />
         </button>
       </div>
 
@@ -373,13 +386,13 @@ function LoginContent() {
           role="alert"
           className="mt-4 flex items-start gap-2 rounded-2xl bg-error-container px-3.5 py-2.5 text-body-sm text-on-error-container"
         >
-          <Icon name="error" className="mt-0.5 shrink-0 text-[18px]" />
+          <CircleAlert size={18} className="mt-0.5 shrink-0" />
           <span>{error || formError}</span>
         </div>
       )}
 
       <div className="mt-auto flex items-center justify-center gap-1.5 pt-8 text-body-sm text-on-surface-variant">
-        <Icon name="shield" className="text-[16px] text-tertiary" />
+        <Shield size={16} className="text-tertiary" />
         <span>
           Secured by{" "}
           <span className="font-bold text-on-surface">Privy</span> · Terms & Privacy
@@ -416,7 +429,7 @@ export default function LoginPage() {
           href="/"
           className="flex h-9 items-center gap-1 rounded-full bg-surface-container-lowest/80 px-3 text-label-sm text-on-surface-variant shadow-soft ring-1 ring-surface-container transition-colors hover:bg-surface-container"
         >
-          <Icon name="arrow_back" className="text-[16px]" />
+          <ArrowLeft size={16} />
           Home
         </Link>
       </header>

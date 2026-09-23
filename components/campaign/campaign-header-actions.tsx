@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Icon } from "@/components/icon";
+import { Bookmark, Share2 } from "lucide-react";
 import { HeaderIconButton } from "@/components/layout/page-header";
 
 export function CampaignHeaderActions({ tag }: { tag: string }) {
@@ -19,10 +19,10 @@ export function CampaignHeaderActions({ tag }: { tag: string }) {
   return (
     <>
       <HeaderIconButton label={saved ? "Remove bookmark" : "Bookmark campaign"} onClick={() => setSaved((s) => !s)}>
-        <Icon name="bookmark" filled={saved} className={`text-[24px] ${saved ? "text-secondary" : ""}`} />
+        <Bookmark size={24} fill={saved ? "currentColor" : "none"} className={saved ? "text-secondary" : ""} />
       </HeaderIconButton>
       <HeaderIconButton label="Share campaign" onClick={share}>
-        <Icon name="share" className="text-[24px]" />
+        <Share2 size={24} />
       </HeaderIconButton>
     </>
   );

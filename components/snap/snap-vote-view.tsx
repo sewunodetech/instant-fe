@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Icon } from "@/components/icon";
+import { MessageCircle, ShieldCheck, Trophy } from "lucide-react";
 import { SnapHero } from "@/components/snap/snap-hero";
 import { SupportPanel } from "@/components/snap/support-panel";
 import { currentUser, type Campaign, type Snap } from "@/lib/mock-data";
@@ -57,20 +57,20 @@ export function SnapVoteView({ snap, campaign }: { snap: Snap; campaign: Campaig
 
         <div className="flex items-center gap-2">
           <button className="flex flex-1 items-center justify-center gap-2 rounded-full bg-surface-container-lowest px-4 py-3 shadow-sm transition-all hover:bg-surface-container active:scale-95">
-            <Icon name="mode_comment" className="text-[20px] text-on-surface-variant" />
+            <MessageCircle size={20} className="text-on-surface-variant" />
             <span className="text-label-md">{snap.comments} Comments</span>
           </button>
           <Link
             href={`/campaigns/${campaign.id}/leaderboard`}
             className="flex flex-1 items-center justify-center gap-2 rounded-full bg-surface-container-lowest px-4 py-3 text-secondary shadow-sm transition-all hover:bg-surface-container active:scale-95"
           >
-            <Icon name="leaderboard" className="text-[20px]" />
+            <Trophy size={20} />
             <span className="text-label-md">Leaderboard</span>
           </Link>
         </div>
 
         <div className="flex items-center gap-3 rounded-2xl bg-surface-container p-3 text-on-surface-variant">
-          <Icon name="verified_user" className="shrink-0 text-[20px] text-secondary" />
+          <ShieldCheck size={20} className="shrink-0 text-secondary" />
           <p className="text-body-sm leading-snug">
             Free votes protect against bots with on-chain verification. Optional support goes straight to the creator.
             Gas fees are covered by instant.fun.

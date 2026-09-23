@@ -3,8 +3,8 @@
 import { useEffect, type ReactNode } from "react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
+import { Zap } from "lucide-react";
 import { useAuth } from "@/components/providers/auth-provider";
-import { Icon } from "@/components/icon";
 
 type Props = {
   children: ReactNode;
@@ -57,7 +57,7 @@ export function AuthGuard({ children, profileHref = "/login" }: Props) {
         <div className="relative flex flex-col items-center gap-4">
           <div className="relative">
             <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-primary-container text-on-primary-container shadow-pop-yellow">
-              <Icon name="bolt" filled className="text-[32px]" />
+              <Zap size={32} fill="currentColor" />
             </div>
             <span
               aria-hidden

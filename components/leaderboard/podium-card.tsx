@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Icon } from "@/components/icon";
+import { Heart } from "lucide-react";
 import type { Creator } from "@/lib/mock-data";
 
 const podium = {
@@ -17,7 +17,7 @@ export function PodiumCard({ creator }: { creator: Creator }) {
           #{creator.rank}
         </span>
         <span className="flex items-center gap-0.5 text-label-sm text-on-surface-variant tabular-nums">
-          <Icon name="favorite" filled className="text-[13px] text-error" />
+          <Heart size={13} fill="currentColor" className="text-error" />
           {creator.votes.toLocaleString("en")}
         </span>
       </div>
