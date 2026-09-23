@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@/lib/generated/prisma";
+import { Prisma } from "@/lib/generated/prisma/client";
 import { HttpError } from "@/lib/api-response";
 
 type TxClient = Prisma.TransactionClient;

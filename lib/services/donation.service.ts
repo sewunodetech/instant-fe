@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { DonationStatus, Prisma } from "@/lib/generated/prisma";
+import { DonationStatus, Prisma } from "@/lib/generated/prisma/client";
 import { HttpError } from "@/lib/api-response";
 import { BlockchainService } from "./blockchain.service";
 
