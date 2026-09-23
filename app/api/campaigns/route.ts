@@ -3,7 +3,7 @@ import { getAuthenticatedUser } from "@/lib/auth";
 import { CampaignService } from "@/lib/services/campaign.service";
 import { paginatedResponse, successResponse, errorResponse, handleApiError } from "@/lib/api-response";
 import { parsePagination } from "@/lib/pagination";
-import { CampaignStatus } from "@/lib/generated/prisma";
+import { CampaignStatus } from "@/lib/generated/prisma/client";
 
 export async function GET(request: NextRequest) {
   try {

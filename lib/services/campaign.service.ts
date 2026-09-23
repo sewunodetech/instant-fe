@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { CampaignStatus } from "@/lib/generated/prisma";
+import { CampaignStatus } from "@/lib/generated/prisma/client";
 import { HttpError } from "@/lib/api-response";
 
 export class CampaignService {

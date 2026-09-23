@@ -22,12 +22,14 @@ export async function POST(request: NextRequest) {
     let walletAddress: string | undefined;
     try {
       const privyUser = await privy.getUser(privyId);
+      const walletAccount = privyUser.linkedAccounts?.find(
+        (a) => a.type === "wallet" && "address" in a && !!a.address,
+      );
       const wallet =
         privyUser.wallet?.address ??
-        privyUser.linkedAccounts?.find(
-          (a): a is { type: "wallet"; address: string } =>
-            a.type === "wallet" && "address" in a && typeof a.address === "string" && !!a.address
-        )?.address;
+        (walletAccount && "address" in walletAccount
+          ? walletAccount.address
+          : undefined);
       if (wallet) walletAddress = wallet.toLowerCase();
     } catch {
       // Rate limits / missing wallet — provision without one
