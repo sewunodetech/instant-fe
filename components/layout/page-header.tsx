@@ -1,8 +1,6 @@
-import Image from "next/image";
-import Link from "next/link";
 import type { ReactNode } from "react";
 import { BackButton } from "@/components/layout/back-button";
-import { currentUser } from "@/lib/mock-data";
+import { UserAvatar } from "@/components/auth/user-avatar";
 
 type Props = {
   title: string;
@@ -21,15 +19,7 @@ export function PageHeader({ title, actions, backHref }: Props) {
         </div>
         <div className="flex shrink-0 items-center gap-space-xs">
           {actions}
-          <Link href="/profile" aria-label="Profile" className="ml-1">
-            <Image
-              src={currentUser.avatar}
-              alt=""
-              width={32}
-              height={32}
-              className="h-8 w-8 rounded-full object-cover"
-            />
-          </Link>
+          <UserAvatar className="ml-1" />
         </div>
       </div>
     </header>

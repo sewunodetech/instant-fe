@@ -19,12 +19,40 @@ export async function POST(request: NextRequest) {
 
     const { userId: privyId } = await privy.verifyAuthToken(privyToken);
 
+    let walletAddress: string | undefined;
+    try {
+      const privyUser = await privy.getUser(privyId);
+      const wallet =
+        privyUser.wallet?.address ??
+        privyUser.linkedAccounts?.find(
+          (a): a is { type: "wallet"; address: string } =>
+            a.type === "wallet" && "address" in a && typeof a.address === "string" && !!a.address
+        )?.address;
+      if (wallet) walletAddress = wallet.toLowerCase();
+    } catch {
+      // Rate limits / missing wallet — provision without one
+    }
+
     let user = await prisma.user.findUnique({ where: { privyId } });
 
     if (!user) {
+      const taken = walletAddress
+        ? await prisma.user.findUnique({ where: { walletAddress } })
+        : null;
       user = await prisma.user.create({
-        data: { privyId },
+        data: {
+          privyId,
+          ...(walletAddress && !taken ? { walletAddress } : {}),
+        },
       });
+    } else if (walletAddress && !user.walletAddress) {
+      const taken = await prisma.user.findUnique({ where: { walletAddress } });
+      if (!taken) {
+        user = await prisma.user.update({
+          where: { id: user.id },
+          data: { walletAddress },
+        });
+      }
     }
 
     return successResponse({
