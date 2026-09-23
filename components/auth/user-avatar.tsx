@@ -7,6 +7,8 @@ import { useAuth } from "@/components/providers/auth-provider";
 type Props = {
   size?: number;
   className?: string;
+  /** Hide the link chrome (use just the face). */
+  bare?: boolean;
 };
 
 function initials(name: string) {
@@ -18,28 +20,44 @@ function initials(name: string) {
     .join("");
 }
 
-export function UserAvatar({ size = 32, className }: Props) {
+export function UserAvatar({ size = 32, className, bare }: Props) {
   const { user } = useAuth();
   const href = user ? "/profile" : "/login";
   const src = user?.avatarUrl;
   const label = user?.displayName || user?.username || "You";
+  const px = size;
+
+  const face = src ? (
+    <Image
+      src={src}
+      alt=""
+      width={px}
+      height={px}
+      className="rounded-full object-cover ring-2 ring-primary-container/50"
+      style={{ width: px, height: px }}
+    />
+  ) : (
+    <span
+      className="flex items-center justify-center rounded-full bg-gradient-to-br from-primary-container to-primary-fixed-dim font-bold text-on-primary-fixed shadow-sm ring-2 ring-primary-container/40"
+      style={{ width: px, height: px, fontSize: Math.max(11, px * 0.34) }}
+    >
+      {initials(label) || (
+        <span className="material-symbols-outlined text-[18px]">person</span>
+      )}
+    </span>
+  );
+
+  if (bare) {
+    return <span className={`inline-flex ${className ?? ""}`}>{face}</span>;
+  }
 
   return (
     <Link
       href={href}
-      aria-label="Profile"
-      className={`flex h-11 w-11 items-center justify-center rounded-full transition-opacity hover:opacity-90 ${className ?? ""}`}
+      aria-label={user ? "Profile" : "Sign in"}
+      className={`group flex h-11 w-11 items-center justify-center rounded-full transition-transform hover:scale-105 active:scale-95 ${className ?? ""}`}
     >
-      {src ? (
-        <Image src={src} alt="" width={size} height={size} className="h-8 w-8 rounded-full object-cover" />
-      ) : (
-        <span
-          className="flex items-center justify-center rounded-full bg-secondary-container text-label-sm text-on-secondary"
-          style={{ width: size, height: size }}
-        >
-          {initials(label) || "?"}
-        </span>
-      )}
+      {face}
     </Link>
   );
 }

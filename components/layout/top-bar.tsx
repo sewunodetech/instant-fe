@@ -6,15 +6,15 @@ import { currentUser } from "@/lib/mock-data";
 
 export function TopBar() {
   return (
-    <header className="fixed inset-x-0 top-0 z-50 mx-auto max-w-[430px] bg-surface/80 pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)] backdrop-blur-xl">
+    <header className="fixed inset-x-0 top-0 z-50 mx-auto max-w-[430px] border-b border-surface-container/60 bg-surface/85 pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)] backdrop-blur-xl">
       <div className="flex h-16 items-center justify-between px-margin">
-        <Link href="/home" aria-label="instant.fun home">
+        <Link href="/home" aria-label="instant.fun home" className="transition-opacity hover:opacity-80">
           <Image src="/brand/logo.png" alt="instant.fun" width={120} height={32} priority className="h-8 w-auto" />
         </Link>
         <div className="flex items-center gap-space-xs">
           <button
             aria-label="Notifications"
-            className="relative flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-surface-container-high"
+            className="relative flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant transition-colors hover:bg-surface-container hover:text-on-surface"
           >
             <Icon name="notifications" className="text-[24px]" />
             {currentUser.hasUnread && (
