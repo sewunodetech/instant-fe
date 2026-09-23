@@ -90,7 +90,7 @@ export default function OnboardingPage() {
               </div>
             </div>
             <div className="absolute -bottom-3 -left-2 z-20 flex -rotate-12 items-center gap-1 rounded-2xl bg-surface-container-lowest px-2.5 py-1.5 shadow-sm">
-              <span className="text-base leading-none">✨</span>
+              <Icon name="auto_awesome" filled className="text-[16px] text-secondary" />
               <span className="text-label-sm">Voted by 840+</span>
             </div>
             <div className="absolute right-4 -bottom-2 z-20 rotate-6 rounded-full bg-primary-container p-2 text-on-primary-container shadow-md">

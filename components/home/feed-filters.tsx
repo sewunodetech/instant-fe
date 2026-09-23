@@ -2,28 +2,36 @@
 
 import { useState } from "react";
 
-const filters = ["For You (Hot Snaps)", "Following", "Ending Soon ⏳"] as const;
+import { Icon } from "@/components/icon";
+
+const filters = [
+  { id: "hot", label: "For You" },
+  { id: "following", label: "Following" },
+  { id: "ending", label: "Ending Soon" },
+] as const;
 
 export function FeedFilters() {
-  const [active, setActive] = useState<(typeof filters)[number]>(filters[0]);
+  const [active, setActive] = useState<(typeof filters)[number]["id"]>("hot");
 
   return (
     <div role="tablist" className="no-scrollbar flex items-center gap-space-xs overflow-x-auto py-1">
       {filters.map((f) => {
-        const selected = f === active;
+        const selected = f.id === active;
         return (
           <button
-            key={f}
+            key={f.id}
             role="tab"
             aria-selected={selected}
-            onClick={() => setActive(f)}
-            className={`rounded-full px-4 py-2 text-label-md whitespace-nowrap transition-colors ${
+            onClick={() => setActive(f.id)}
+            className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-label-md whitespace-nowrap transition-colors ${
               selected
                 ? "bg-secondary text-on-secondary shadow-sm"
                 : "bg-surface-container-lowest text-on-surface-variant shadow-xs hover:bg-surface-container"
             }`}
           >
-            {f}
+            {f.id === "hot" && <Icon name="whatshot" className="text-[16px]" />}
+            {f.id === "ending" && <Icon name="hourglass_top" className="text-[16px]" />}
+            {f.label}
           </button>
         );
       })}

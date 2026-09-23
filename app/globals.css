@@ -195,8 +195,72 @@
 }
 
 .material-symbols-outlined {
+  font-family: "Material Symbols Outlined";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: "liga";
+  font-feature-settings: "liga";
   font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+  -webkit-font-smoothing: antialiased;
 }
 .material-symbols-outlined.filled {
   font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
+/* Responsive app shell: full-width on phones, centered wide column on desktop */
+@utility app-shell {
+  width: 100%;
+  margin-inline: auto;
+  max-width: 100%;
+}
+
+@utility app-shell-pad {
+  padding-inline: 0;
+}
+
+@media (min-width: 640px) {
+  .app-shell {
+    max-width: 42rem; /* 672px */
+  }
+  .app-shell-pad {
+    padding-inline: 1rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .app-shell {
+    max-width: 56rem; /* 896px */
+  }
+  .app-shell-pad {
+    padding-inline: 1.5rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .app-shell {
+    max-width: 64rem; /* 1024px */
+  }
+}
+
+/* Snap detail: keep the hero readable on wide screens */
+@utility snap-hero-frame {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  max-height: min(72vh, 640px);
+}
+
+@media (min-width: 1024px) {
+  .snap-hero-frame {
+    max-height: min(70vh, 580px);
+  }
 }

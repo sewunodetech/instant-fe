@@ -2,14 +2,15 @@
 
 import { useState } from "react";
 import { CampaignRowCard, FeaturedCampaignCard } from "@/components/discovery/campaign-cards";
+import { Icon } from "@/components/icon";
 import type { Campaign } from "@/lib/mock-data";
 
 const filters = [
-  { id: "all", label: "All" },
-  { id: "trending", label: "Trending", emoji: "🔥" },
-  { id: "live", label: "Live", emoji: "⚡" },
-  { id: "ending", label: "Ending Soon", emoji: "⏳" },
-  { id: "prize", label: "Top Prize", emoji: "🏆" },
+  { id: "all", label: "All", icon: "apps" },
+  { id: "trending", label: "Trending", icon: "whatshot" },
+  { id: "live", label: "Live", icon: "bolt" },
+  { id: "ending", label: "Ending Soon", icon: "hourglass_top" },
+  { id: "prize", label: "Top Prize", icon: "emoji_events" },
 ] as const;
 
 type FilterId = (typeof filters)[number]["id"];
@@ -37,7 +38,7 @@ export function CampaignDiscovery({ campaigns }: { campaigns: Campaign[] }) {
 
   return (
     <>
-      <div role="tablist" className="no-scrollbar -mx-space-md flex items-center gap-2 overflow-x-auto px-space-md py-1">
+      <div role="tablist" className="no-scrollbar -mx-space-md flex items-center gap-2 overflow-x-auto px-space-md py-1 sm:mx-0 sm:px-0">
         {filters.map((f) => {
           const active = f.id === filter;
           return (
@@ -50,8 +51,8 @@ export function CampaignDiscovery({ campaigns }: { campaigns: Campaign[] }) {
                 f.id === "all" ? "px-5" : "px-4"
               } ${active ? "bg-on-surface text-surface-container-lowest" : "bg-surface-container-lowest hover:bg-surface-container"}`}
             >
+              <Icon name={f.icon} className="text-[16px]" />
               {f.label}
-              {"emoji" in f && <span className="text-sm">{f.emoji}</span>}
             </button>
           );
         })}
@@ -59,10 +60,14 @@ export function CampaignDiscovery({ campaigns }: { campaigns: Campaign[] }) {
 
       {featured ? (
         <>
-          <FeaturedCampaignCard campaign={featured} />
-          {rest.map((c) => (
-            <CampaignRowCard key={c.id} campaign={c} />
-          ))}
+          <div className="grid grid-cols-1 gap-space-md lg:grid-cols-2">
+            <div className="lg:col-span-2">
+              <FeaturedCampaignCard campaign={featured} />
+            </div>
+            {rest.map((c) => (
+              <CampaignRowCard key={c.id} campaign={c} />
+            ))}
+          </div>
         </>
       ) : (
         <p className="rounded-3xl bg-surface-container-lowest p-6 text-center text-body-md text-on-surface-variant shadow-card">

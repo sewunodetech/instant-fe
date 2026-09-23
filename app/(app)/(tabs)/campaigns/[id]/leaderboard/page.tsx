@@ -25,7 +25,7 @@ export default async function LeaderboardPage({ params }: PageProps<"/campaigns/
   const ended = !campaign.live;
 
   return (
-    <div className="flex flex-col gap-space-md px-space-md pb-4">
+    <div className="flex flex-col gap-space-md px-space-md pb-4 sm:px-0">
       <ResultsHero campaign={campaign} />
       <ChampionCard champion={champion} dividend={board.voterDividend} ended={ended} />
       <div className="grid w-full grid-cols-2 gap-space-sm">

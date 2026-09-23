@@ -13,7 +13,7 @@ export default function HomePage() {
     <>
       <CampaignStories campaigns={activeCampaigns} />
 
-      <div className="mt-space-xs flex flex-col gap-space-md px-margin">
+      <div className="mt-space-xs flex flex-col gap-space-md px-margin sm:px-0">
         <StreakBanner
           days={currentUser.streakDays}
           bonusPct={currentUser.streakBonusPct}
@@ -21,11 +21,19 @@ export default function HomePage() {
         />
         <FeedFilters />
 
-        {first && <SnapCard snap={first} priority />}
-        <JoinSnapBanner title="Got a Summer moment?" poolUsdc={250} />
-        {rest.map((snap) => (
-          <SnapCard key={snap.id} snap={snap} />
-        ))}
+        <div className="grid grid-cols-1 gap-space-md md:grid-cols-2 xl:grid-cols-3">
+          {first && (
+            <div className="md:col-span-2 xl:col-span-1">
+              <SnapCard snap={first} priority />
+            </div>
+          )}
+          <div className="md:col-span-2 xl:col-span-3">
+            <JoinSnapBanner title="Got a Summer moment?" poolUsdc={250} />
+          </div>
+          {rest.map((snap) => (
+            <SnapCard key={snap.id} snap={snap} />
+          ))}
+        </div>
 
         <div className="flex flex-col items-center justify-center gap-2 py-6 text-center">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container text-on-surface-variant">

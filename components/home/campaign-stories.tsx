@@ -11,7 +11,7 @@ const dotColor: Record<Campaign["dot"], string> = {
 
 export function CampaignStories({ campaigns }: { campaigns: Campaign[] }) {
   return (
-    <section className="no-scrollbar flex items-center gap-space-sm overflow-x-auto scroll-smooth px-margin pt-space-md pb-space-sm">
+    <section className="no-scrollbar flex items-center gap-space-sm overflow-x-auto scroll-smooth px-margin pt-space-md pb-space-sm sm:px-0">
       <Link
         href="/snap"
         className="flex shrink-0 items-center gap-space-xs rounded-full bg-primary-container py-1.5 pr-space-md pl-space-xs text-on-primary-fixed shadow-sm transition-all hover:opacity-95 active:scale-95"

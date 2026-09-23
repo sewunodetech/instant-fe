@@ -15,13 +15,13 @@ export function SnapHero({ snap, votes, timeLeft }: Props) {
   const [liked, setLiked] = useState(false);
 
   return (
-    <div className="relative aspect-[4/5] w-full overflow-hidden">
+    <div className="snap-hero-frame bg-surface-container">
       <Image
         src={snap.image}
         alt={snap.imageAlt}
         fill
         priority
-        sizes="(max-width: 430px) 100vw, 398px"
+        sizes="(max-width: 1023px) 100vw, 520px"
         className="object-cover"
       />
 

@@ -29,7 +29,7 @@ export default function RewardsPage() {
   const total = pendingReward.lines.reduce((sum, l) => sum + l.amountUsdc, 0);
 
   return (
-    <div className="flex flex-col gap-space-md px-space-md pb-4">
+    <div className="flex flex-col gap-space-md px-space-md pb-4 sm:px-0">
       <div className="flex items-center justify-between pt-space-xs">
         <Link
           href="/home"
@@ -50,7 +50,7 @@ export default function RewardsPage() {
           <Icon name="workspace_premium" filled className="text-[15px]" />
           CAMPAIGN VICTOR
         </span>
-        <h1 className="text-headline-lg-mobile">Congratulations, {currentUser.name}! 🎉</h1>
+        <h1 className="text-headline-lg-mobile">Congratulations, {currentUser.name}!</h1>
         <p className="mt-0.5 text-on-surface-variant">
           Your snap took <span className="font-bold text-primary">{ordinal(pendingReward.place)} Place</span> in{" "}
           <Link href={`/campaigns/${campaign.id}/leaderboard`} className="hover:underline">
@@ -120,7 +120,7 @@ export default function RewardsPage() {
       <ClaimPanel
         totalUsdc={total}
         wallet={currentUser.wallet}
-        shareText={`I just won ${usd(total)} USDC in ${campaign.tag} on instant.fun! 🏆`}
+        shareText={`I just won ${usd(total)} USDC in ${campaign.tag} on instant.fun!`}
       />
     </div>
   );

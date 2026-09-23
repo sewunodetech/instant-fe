@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useState } from "react";
 import { Icon } from "@/components/icon";
 import { SnapHero } from "@/components/snap/snap-hero";
-import { VotePanel } from "@/components/snap/vote-panel";
-import { currentUser, voteTiers, type Campaign, type Snap } from "@/lib/mock-data";
+import { SupportPanel } from "@/components/snap/support-panel";
+import { currentUser, type Campaign, type Snap } from "@/lib/mock-data";
 
 function Caption({ text, campaignTag }: { text: string; campaignTag: string }) {
   return (
@@ -28,7 +28,7 @@ export function SnapVoteView({ snap, campaign }: { snap: Snap; campaign: Campaig
   const [balance, setBalance] = useState(currentUser.usdcBalance);
 
   return (
-    <>
+    <div className="flex flex-col gap-space-md lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(300px,380px)] lg:items-start lg:gap-space-lg">
       <div className="w-full overflow-hidden rounded-3xl bg-surface-container-lowest shadow-card">
         <SnapHero snap={snap} votes={votes} timeLeft={`${campaign.daysLeft}d left`} />
         <div className="p-space-md">
@@ -36,37 +36,38 @@ export function SnapVoteView({ snap, campaign }: { snap: Snap; campaign: Campaig
         </div>
       </div>
 
-      <VotePanel
-        creatorName={snap.creator.name}
-        poolUsdc={campaign.poolUsdc}
-        tiers={voteTiers}
-        balance={balance}
-        onVoted={(usdc, v) => {
-          setVotes((n) => n + v);
-          setBalance((b) => b - usdc);
-        }}
-      />
+      <div className="flex flex-col gap-space-md">
+        <SupportPanel
+          creatorName={snap.creator.name}
+          balance={balance}
+          onSupported={(usdc) => {
+            setVotes((n) => n + 1);
+            setBalance((b) => b - usdc);
+          }}
+        />
 
-      <div className="flex items-center gap-2">
-        <button className="flex flex-1 items-center justify-center gap-2 rounded-full bg-surface-container-lowest px-4 py-3 shadow-sm transition-all hover:bg-surface-container active:scale-95">
-          <Icon name="mode_comment" className="text-[20px] text-on-surface-variant" />
-          <span className="text-label-md">{snap.comments} Comments</span>
-        </button>
-        <Link
-          href={`/campaigns/${campaign.id}/leaderboard`}
-          className="flex flex-1 items-center justify-center gap-2 rounded-full bg-surface-container-lowest px-4 py-3 text-secondary shadow-sm transition-all hover:bg-surface-container active:scale-95"
-        >
-          <Icon name="leaderboard" className="text-[20px]" />
-          <span className="text-label-md">Leaderboard</span>
-        </Link>
-      </div>
+        <div className="flex items-center gap-2">
+          <button className="flex flex-1 items-center justify-center gap-2 rounded-full bg-surface-container-lowest px-4 py-3 shadow-sm transition-all hover:bg-surface-container active:scale-95">
+            <Icon name="mode_comment" className="text-[20px] text-on-surface-variant" />
+            <span className="text-label-md">{snap.comments} Comments</span>
+          </button>
+          <Link
+            href={`/campaigns/${campaign.id}/leaderboard`}
+            className="flex flex-1 items-center justify-center gap-2 rounded-full bg-surface-container-lowest px-4 py-3 text-secondary shadow-sm transition-all hover:bg-surface-container active:scale-95"
+          >
+            <Icon name="leaderboard" className="text-[20px]" />
+            <span className="text-label-md">Leaderboard</span>
+          </Link>
+        </div>
 
-      <div className="flex items-center gap-3 rounded-2xl bg-surface-container p-3 text-on-surface-variant">
-        <Icon name="verified_user" className="shrink-0 text-[20px] text-secondary" />
-        <p className="text-body-sm leading-snug">
-          Voting protects against bots with on-chain verification. Gas fees are covered by instant.fun.
-        </p>
+        <div className="flex items-center gap-3 rounded-2xl bg-surface-container p-3 text-on-surface-variant">
+          <Icon name="verified_user" className="shrink-0 text-[20px] text-secondary" />
+          <p className="text-body-sm leading-snug">
+            Free votes protect against bots with on-chain verification. Optional support goes straight to the creator.
+            Gas fees are covered by instant.fun.
+          </p>
+        </div>
       </div>
-    </>
+    </div>
   );
 }

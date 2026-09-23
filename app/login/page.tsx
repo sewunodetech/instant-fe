@@ -391,7 +391,7 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <div className="relative mx-auto flex min-h-dvh w-full max-w-[430px] flex-col overflow-hidden bg-surface">
+    <div className="relative mx-auto flex min-h-dvh w-full max-w-none flex-col overflow-hidden bg-surface sm:max-w-xl lg:max-w-2xl xl:max-w-3xl">
       <div
         aria-hidden
         className="pointer-events-none absolute top-0 left-1/2 h-56 w-[120%] -translate-x-1/2 rounded-full bg-primary-container/25 blur-3xl"
