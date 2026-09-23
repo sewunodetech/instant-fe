@@ -1,17 +1,49 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Icon } from "@/components/icon";
 import { CampaignStories } from "@/components/home/campaign-stories";
 import { FeedFilters } from "@/components/home/feed-filters";
 import { JoinSnapBanner } from "@/components/home/join-snap-banner";
-import { SnapCard } from "@/components/home/snap-card";
 import { StreakBanner } from "@/components/home/streak-banner";
-import { activeCampaigns, currentUser, feedSnaps } from "@/lib/mock-data";
+import { fetchFeedSnaps, FeedGrid } from "@/components/home/live-feed";
+import { listCampaigns } from "@/lib/api-client";
+import { mapApiCampaign } from "@/lib/mappers";
+import { activeCampaigns, currentUser, feedSnaps, type Campaign, type Snap } from "@/lib/mock-data";
 
 export default function HomePage() {
-  const [first, ...rest] = feedSnaps;
+  const [campaigns, setCampaigns] = useState<Campaign[]>(activeCampaigns);
+  const [snaps, setSnaps] = useState<Snap[]>(feedSnaps);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    listCampaigns({ status: "ACTIVE", limit: 12 })
+      .then(({ data }) => {
+        if (!cancelled && data.length > 0) {
+          setCampaigns(data.map((c, i) => mapApiCampaign(c, i)));
+        }
+      })
+      .catch(() => {
+        // keep mock campaigns
+      });
+
+    fetchFeedSnaps()
+      .then((data) => {
+        if (!cancelled) setSnaps(data);
+      })
+      .catch(() => {
+        // keep mock snaps
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <>
-      <CampaignStories campaigns={activeCampaigns} />
+      <CampaignStories campaigns={campaigns} />
 
       <div className="mt-space-xs flex flex-col gap-space-md px-margin sm:px-0">
         <StreakBanner
@@ -21,19 +53,9 @@ export default function HomePage() {
         />
         <FeedFilters />
 
-        <div className="grid grid-cols-1 gap-space-md md:grid-cols-2 xl:grid-cols-3">
-          {first && (
-            <div className="md:col-span-2 xl:col-span-1">
-              <SnapCard snap={first} priority />
-            </div>
-          )}
-          <div className="md:col-span-2 xl:col-span-3">
-            <JoinSnapBanner title="Got a Summer moment?" poolUsdc={250} />
-          </div>
-          {rest.map((snap) => (
-            <SnapCard key={snap.id} snap={snap} />
-          ))}
-        </div>
+        <FeedGrid snaps={snaps} />
+
+        <JoinSnapBanner title="Got a Summer moment?" poolUsdc={250} />
 
         <div className="flex flex-col items-center justify-center gap-2 py-6 text-center">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container text-on-surface-variant">

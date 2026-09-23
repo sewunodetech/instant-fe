@@ -15,3 +15,86 @@ export type AppUserStats = {
 };
 
 export type AppUserWithStats = AppUser & { stats?: AppUserStats | null };
+
+export type CampaignStatus = "DRAFT" | "ACTIVE" | "ENDED";
+
+export type ApiCampaign = {
+  id: string;
+  title: string;
+  description: string | null;
+  category: string | null;
+  rules: unknown;
+  maxPostsPerUser: number;
+  status: CampaignStatus;
+  startsAt: string | null;
+  endsAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type PostUser = {
+  id: string;
+  walletAddress: string | null;
+  username: string | null;
+  displayName: string | null;
+  avatarUrl: string | null;
+};
+
+export type ApiPost = {
+  id: string;
+  campaignId: string;
+  userId: string;
+  imageUrl: string;
+  caption: string | null;
+  voteCount: number;
+  donationCount: number;
+  donationAmount: string | number;
+  createdAt: string;
+  updatedAt: string;
+  user?: PostUser | null;
+  campaign?: { id: string; title: string; status: CampaignStatus } | null;
+};
+
+export type ApiDonation = {
+  id: string;
+  campaignId: string;
+  postId: string;
+  userId: string;
+  amount: string | number;
+  token: string;
+  status: "PENDING" | "CONFIRMED" | "FAILED";
+  txHash: string | null;
+  blockNumber?: string | number | null;
+  createdAt: string;
+};
+
+export type DonationIntentResult = {
+  donation: ApiDonation;
+  transaction: {
+    contractAddress: string;
+    chainId: number;
+    method: string;
+    args: string[];
+    value: string;
+    token: string;
+  };
+};
+
+export type PaginatedMeta = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+};
+
+export type Paginated<T> = {
+  data: T[];
+  meta: PaginatedMeta;
+};
+
+export type UploadResult = {
+  url: string;
+  key: string;
+  contentType: string;
+  size: number;
+};

@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Icon } from "@/components/icon";
-import { CampaignDiscovery } from "@/components/discovery/campaign-discovery";
-import { activeCampaigns } from "@/lib/mock-data";
+import { CampaignExplorer } from "@/components/discovery/campaign-explorer";
 
 export const metadata: Metadata = { title: "Explore · instant.fun" };
 
@@ -46,7 +45,7 @@ export default function CampaignsPage() {
         </Link>
       </div>
 
-      <CampaignDiscovery campaigns={activeCampaigns} />
+      <CampaignExplorer />
 
       <aside className="relative mt-1 overflow-hidden rounded-3xl bg-gradient-to-r from-surface-container to-surface-container-low p-5 shadow-[0_2px_12px_rgba(17,17,17,0.04)]">
         <div className="pointer-events-none absolute -top-3 -right-3 h-20 w-20 rounded-full bg-primary-container/20 blur-xl" />

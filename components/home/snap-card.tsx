@@ -8,34 +8,63 @@ import type { Snap } from "@/lib/mock-data";
 
 const supportOptions = [1, 5, 10];
 
-export function SnapCard({ snap, priority }: { snap: Snap; priority?: boolean }) {
+export function SnapCard({
+  snap,
+  priority,
+  onVote,
+  onSupport,
+  busy,
+}: {
+  snap: Snap;
+  priority?: boolean;
+  onVote?: () => Promise<void>;
+  onSupport?: (amount: number) => Promise<void>;
+  busy?: boolean;
+}) {
   const [voted, setVoted] = useState(false);
   const [votes, setVotes] = useState(snap.votes);
   const [support, setSupport] = useState<number | null>(null);
   const [supported, setSupported] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [pending, setPending] = useState(false);
 
   const isTop = snap.rank === 1;
 
-  function vote() {
-    if (voted) return;
-    setVoted(true);
-    setVotes((v) => v + 1);
-    navigator.vibrate?.([25, 50, 25]);
+  async function vote() {
+    if (voted || pending) return;
+    setPending(true);
+    try {
+      if (onVote) await onVote();
+      setVoted(true);
+      setVotes((v) => (onVote ? v : v + 1));
+      navigator.vibrate?.([25, 50, 25]);
+    } catch {
+      // keep unvoted on failure
+    } finally {
+      setPending(false);
+    }
   }
 
-  function sendSupport() {
-    if (supported || !support) return;
-    setSupported(true);
-    setVoted(true);
-    setVotes((v) => v + 1);
-    navigator.vibrate?.([25, 50, 25]);
+  async function sendSupport() {
+    if (supported || !support || pending) return;
+    setPending(true);
+    try {
+      if (onSupport) await onSupport(support);
+      else setVotes((v) => v + 1);
+      setSupported(true);
+      setVoted(true);
+      navigator.vibrate?.([25, 50, 25]);
+    } catch {
+      // keep unsupported on failure
+    } finally {
+      setPending(false);
+    }
   }
 
   const voteButton = (
     <button
       onClick={vote}
-      disabled={voted}
+      disabled={voted || pending || busy}
       className={`flex h-11 items-center gap-1.5 rounded-full transition-transform active:scale-95 ${
         snap.featured ? "px-4" : "px-5"
       } ${
@@ -47,7 +76,9 @@ export function SnapCard({ snap, priority }: { snap: Snap; priority?: boolean })
       }`}
     >
       <Icon name={voted ? "check_circle" : "how_to_vote"} filled={voted} className="text-[18px]" />
-      <span className="text-label-lg whitespace-nowrap">{voted ? "Voted!" : "Vote"}</span>
+      <span className="text-label-lg whitespace-nowrap">
+        {pending && !supported ? "..." : voted ? "Voted!" : "Vote"}
+      </span>
     </button>
   );
 
@@ -71,7 +102,7 @@ export function SnapCard({ snap, priority }: { snap: Snap; priority?: boolean })
         ))}
       <button
         onClick={sendSupport}
-        disabled={!support || supported}
+        disabled={!support || supported || pending}
         className={`flex h-9 items-center gap-1 rounded-full px-3 text-label-sm transition-transform active:scale-95 disabled:opacity-50 ${
           supported
             ? "bg-tertiary-container text-on-tertiary-container"
