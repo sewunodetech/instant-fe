@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans, Geist, Press_Start_2P } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { AuthProvider } from "@/components/providers/auth-provider";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
@@ -35,7 +36,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <head>
       </head>
       <body className="min-h-full bg-surface font-sans text-body-md text-on-surface selection:bg-primary-container">
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

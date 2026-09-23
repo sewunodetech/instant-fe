@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@/components/icon";
+import { UserAvatar } from "@/components/auth/user-avatar";
 import { currentUser } from "@/lib/mock-data";
 
 export function TopBar() {
@@ -20,19 +21,7 @@ export function TopBar() {
               <span className="absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-error ring-2 ring-surface" />
             )}
           </button>
-          <Link
-            href="/profile"
-            aria-label="Profile"
-            className="flex h-11 w-11 items-center justify-center rounded-full transition-opacity hover:opacity-90"
-          >
-            <Image
-              src={currentUser.avatar}
-              alt=""
-              width={32}
-              height={32}
-              className="h-8 w-8 rounded-full object-cover"
-            />
-          </Link>
+          <UserAvatar />
         </div>
       </div>
     </header>

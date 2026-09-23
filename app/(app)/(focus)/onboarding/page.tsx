@@ -110,7 +110,7 @@ export default function OnboardingPage() {
 
         <div className="mt-space-md flex flex-col gap-space-sm px-space-xs">
           <Link
-            href="/home"
+            href="/login?next=/home"
             className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-primary-container text-label-lg text-on-primary-container shadow-card transition-all hover:bg-primary-fixed active:scale-[0.98]"
           >
             Get Started
@@ -118,7 +118,7 @@ export default function OnboardingPage() {
           </Link>
           <p className="flex items-center justify-center gap-1.5 py-1">
             <span className="text-on-surface-variant">Already have an account?</span>
-            <Link href="/home" className="text-label-md text-secondary hover:underline">
+            <Link href="/login?next=/home" className="text-label-md text-secondary hover:underline">
               Log in
             </Link>
           </p>
