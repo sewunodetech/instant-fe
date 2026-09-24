@@ -3,10 +3,11 @@ import { cn } from "@/lib/utils";
 import { FadeIn, Stagger, StaggerItem } from "@/components/landing/motion-primitives";
 import { DoodleField } from "@/components/landing/pixel-doodles";
 import { communityLinks } from "@/components/landing/content";
+import { sectionLead, sectionTitle } from "@/components/landing/typography";
 
 export function CommunitySection() {
   return (
-    <section className="px-4 py-16 sm:px-6 lg:px-8">
+    <section id="community" className="scroll-mt-24 px-4 py-16 sm:px-6 lg:px-8">
       <FadeIn className="relative mx-auto max-w-6xl overflow-hidden rounded-[36px] bg-gradient-to-b from-[#8fd0ff] to-[#c9ecff] px-6 py-16 sm:px-12">
         {/* Pixel clouds + doodles */}
         <DoodleField
@@ -25,10 +26,12 @@ export function CommunitySection() {
         </div>
 
         <div className="relative z-10 mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-extrabold tracking-tight text-balance text-[#0b3b66] sm:text-5xl">
+          {/* Same scale as the other section headings, recolored for the
+              blue-sky panel instead of the default on-surface ink. */}
+          <h2 className={cn(sectionTitle, "text-[#0b3b66]")}>
             Join the instant.fun community
           </h2>
-          <p className="mx-auto mt-4 max-w-lg text-base font-medium text-pretty text-[#0b3b66]/70 sm:text-lg">
+          <p className={cn(sectionLead, "mx-auto max-w-lg text-[#0b3b66]/70")}>
             Get drop alerts, swap tips with creators, and stay first in line for new USDC
             campaigns.
           </p>
@@ -47,7 +50,7 @@ export function CommunitySection() {
                     <c.icon className="size-5" aria-hidden />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-extrabold">{c.label}</p>
+                    <p className="text-[0.9375rem] font-bold tracking-[-0.01em]">{c.label}</p>
                     <p className="truncate text-[12px] font-medium text-white/80">{c.handle}</p>
                   </div>
                   <ArrowUpRight

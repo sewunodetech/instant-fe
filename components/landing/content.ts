@@ -6,7 +6,7 @@
 
 import type React from "react";
 import type { LucideIcon } from "lucide-react";
-import { Camera, Coins, Flame, Home, Trophy, Users, Vote, Zap } from "lucide-react";
+import { Camera, Coins, Flame, Home, Sparkles, Trophy, Users, Vote, Zap } from "lucide-react";
 import { DiscordIcon, TelegramIcon, XIcon } from "@/components/landing/social-icons";
 
 /** Where the "Launch App" CTA and campaign CTAs send the visitor. */
@@ -19,9 +19,42 @@ export type NavLink = {
 };
 
 export const navLinks: NavLink[] = [
+  { href: "#what-is-it", icon: Sparkles, label: "What is it?" },
   { href: "#how-it-works", icon: Zap, label: "How it works" },
-  { href: "#campaigns", icon: Flame, label: "Live drops" },
-  { href: "#winners", icon: Trophy, label: "Winners" },
+  { href: "#community", icon: Users, label: "Community" },
+];
+
+export type Feature = {
+  icon: LucideIcon;
+  title: string;
+  body: string;
+  /** Accent theme index into the shared toy palette (0-based). */
+  theme: number;
+};
+
+/**
+ * The three product pillars — the "what is instant.fun" explainer.
+ * Drawn from the campaign flow: real live camera, gasless votes, on-chain payouts.
+ */
+export const features: Feature[] = [
+  {
+    icon: Camera,
+    title: "Live camera only",
+    body: "No gallery, no edits, no AI. Every entry is shot live in a 2-minute window, with hardware timestamps that lock out fakes.",
+    theme: 0,
+  },
+  {
+    icon: Vote,
+    title: "Gasless USDC votes",
+    body: "Back your favorite snaps with one-tap votes. Gas is fully sponsored, so it costs you $0 to help a moment rise.",
+    theme: 1,
+  },
+  {
+    icon: Coins,
+    title: "Instant on-chain payouts",
+    body: "When a drop ends, creators take 60% of the pool and the voters who backed them split 40% — settled on BNB Chain instantly.",
+    theme: 3,
+  },
 ];
 
 export type Step = {

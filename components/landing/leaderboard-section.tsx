@@ -85,7 +85,7 @@ export function LeaderboardSection() {
                   )}
                   <span
                     className={cn(
-                      "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-black",
+                      "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-extrabold",
                       theme.badge,
                     )}
                   >
@@ -94,12 +94,12 @@ export function LeaderboardSection() {
                   <div className="mx-auto mt-3 size-14 overflow-hidden rounded-2xl border-2 border-white/60 sm:size-16">
                     <Image src={r.avatar} alt="" width={64} height={64} className="size-full object-cover" />
                   </div>
-                  <p className={cn("mt-2 flex items-center justify-center gap-1 text-sm font-black", theme.score)}>
+                  <p className={cn("mt-2 flex items-center justify-center gap-1 text-sm font-extrabold", theme.score)}>
                     <Flame className="size-3.5" strokeWidth={2.6} aria-hidden />
                     {r.meta.split("·")[1]?.trim() ?? r.meta}
                   </p>
                   <p className={cn("truncate text-[11px] font-bold opacity-90", theme.score)}>{r.handle}</p>
-                  <p className={cn("mt-1 rounded-xl bg-white/25 py-1 text-sm font-black", theme.score)}>{r.amount}</p>
+                  <p className={cn("mt-1 rounded-xl bg-white/25 py-1 text-sm font-extrabold", theme.score)}>{r.amount}</p>
                 </div>
               </FadeIn>
             );
@@ -122,7 +122,7 @@ export function LeaderboardSection() {
                       Won {row.campaign}
                     </span>
                   </div>
-                  <span className="rounded-full bg-tertiary-container/50 px-3 py-1 font-black tabular-nums text-tertiary">
+                  <span className="rounded-full bg-tertiary-container/50 px-3 py-1 font-extrabold tabular-nums text-tertiary">
                     {row.payout}
                   </span>
                 </div>

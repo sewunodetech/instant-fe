@@ -35,7 +35,7 @@ export function LandingFooter() {
               className="h-7 w-auto object-contain"
             />
             <span className="h-4 w-px bg-black/10" />
-            <p className="max-w-xs text-body-sm font-medium text-on-surface-variant">
+            <p className="max-w-xs text-body-sm leading-relaxed font-medium text-on-surface-variant">
               The spontaneous photo arena. Built gasless on BNB Chain.
             </p>
           </div>

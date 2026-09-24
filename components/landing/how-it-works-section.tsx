@@ -58,7 +58,7 @@ export function HowItWorksSection() {
                   )}
 
                   <div className="mb-5 flex items-center justify-between">
-                    <span className="text-3xl font-black tracking-tight text-on-surface/15">
+                    <span className="text-3xl font-extrabold tracking-tight text-on-surface/15">
                       0{i + 1}
                     </span>
                     <div
