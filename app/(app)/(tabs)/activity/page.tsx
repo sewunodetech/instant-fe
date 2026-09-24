@@ -3,7 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { Icon } from "@/components/icon";
+import { BellOff, CheckCheck, ChevronRight } from "lucide-react";
+import { LucideIcon } from "@/components/lucide-icon";
 import { BackButton } from "@/components/layout/back-button";
 import { activityFeed, type ActivityKind } from "@/lib/mock-data";
 
@@ -47,7 +48,7 @@ export default function ActivityPage() {
           aria-label="Mark all read"
           className="flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container"
         >
-          <Icon name="done_all" className="text-[22px]" />
+          <CheckCheck size={22} />
         </button>
       </div>
 
@@ -73,7 +74,7 @@ export default function ActivityPage() {
       {items.length === 0 ? (
         <div className="flex flex-col items-center gap-2 rounded-3xl bg-surface-container-lowest p-8 text-center shadow-card">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-container">
-            <Icon name="notifications_none" className="text-[24px] text-on-surface-variant" />
+            <BellOff size={24} className="text-on-surface-variant" />
           </div>
           <p className="text-headline-sm">All clear</p>
           <p className="max-w-[240px] text-body-sm text-on-surface-variant">New activity will show up here.</p>
@@ -105,13 +106,13 @@ export default function ActivityPage() {
                       </div>
                     ) : (
                       <div className={`flex h-12 w-12 items-center justify-center rounded-full ${meta.className}`}>
-                        <Icon name={meta.icon} className="text-[22px]" filled={item.kind === "reward"} />
+                        <LucideIcon name={meta.icon} size={22} filled={item.kind === "reward"} />
                       </div>
                     )}
                     <span
                       className={`absolute -right-1 -bottom-1 flex h-5 w-5 items-center justify-center rounded-full ring-2 ring-surface ${meta.className}`}
                     >
-                      <Icon name={meta.icon} className="text-[11px]" />
+                      <LucideIcon name={meta.icon} size={11} />
                     </span>
                   </div>
                   <div className="min-w-0 flex-1">
@@ -134,7 +135,7 @@ export default function ActivityPage() {
                       {item.amountUsdc} USDC
                     </span>
                   )}
-                  <Icon name="chevron_right" className="shrink-0 text-[18px] text-on-surface-variant" />
+                  <ChevronRight size={18} className="shrink-0 text-on-surface-variant" />
                 </Link>
               </li>
             );
@@ -157,7 +158,7 @@ export default function ActivityPage() {
               href={l.href}
               className="flex flex-col items-center gap-1.5 rounded-2xl bg-surface-container-low p-3 text-label-sm transition-colors hover:bg-surface-container"
             >
-              <Icon name={l.icon} className="text-[20px] text-secondary" />
+              <LucideIcon name={l.icon} size={20} className="text-secondary" />
               {l.label}
             </Link>
           ))}

@@ -2,7 +2,17 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Icon } from "@/components/icon";
+import {
+  ArrowDownLeft,
+  ArrowUpRight,
+  Copy,
+  Eye,
+  EyeOff,
+  Shield,
+  SlidersHorizontal,
+  Wallet,
+} from "lucide-react";
+import { LucideIcon } from "@/components/lucide-icon";
 import { BackButton } from "@/components/layout/back-button";
 import { currentUser, walletTxs, type TxKind } from "@/lib/mock-data";
 
@@ -44,7 +54,7 @@ export default function WalletPage() {
           onClick={() => setHideBalance((v) => !v)}
           className="flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container"
         >
-          <Icon name={hideBalance ? "visibility_off" : "visibility"} className="text-[22px]" />
+          {hideBalance ? <EyeOff size={22} /> : <Eye size={22} />}
         </button>
       </div>
 
@@ -63,7 +73,7 @@ export default function WalletPage() {
               </div>
             </div>
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/15 ring-1 ring-white/25">
-              <Icon name="account_balance_wallet" className="text-[22px]" />
+              <Wallet size={22} />
             </div>
           </div>
 
@@ -76,7 +86,7 @@ export default function WalletPage() {
                 aria-label="Copy address"
                 className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/15"
               >
-                <Icon name="content_copy" className="text-[16px]" />
+                <Copy size={16} />
               </button>
             </div>
           </div>
@@ -88,7 +98,7 @@ export default function WalletPage() {
                 href={a.href}
                 className="flex flex-col items-center gap-1.5 rounded-2xl bg-white/12 py-3 text-label-sm ring-1 ring-white/15 transition hover:bg-white/20 active:scale-95"
               >
-                <Icon name={a.icon} className="text-[20px]" />
+                <LucideIcon name={a.icon} size={20} />
                 {a.label}
               </Link>
             ))}
@@ -100,7 +110,7 @@ export default function WalletPage() {
         <div className="rounded-3xl bg-surface-container-lowest p-4 shadow-card">
           <div className="flex items-center gap-2 text-label-sm text-on-surface-variant">
             <span className="flex h-7 w-7 items-center justify-center rounded-full bg-tertiary-container/50 text-on-tertiary-container">
-              <Icon name="south_west" className="text-[14px]" />
+              <ArrowDownLeft size={14} />
             </span>
             Received
           </div>
@@ -109,7 +119,7 @@ export default function WalletPage() {
         <div className="rounded-3xl bg-surface-container-lowest p-4 shadow-card">
           <div className="flex items-center gap-2 text-label-sm text-on-surface-variant">
             <span className="flex h-7 w-7 items-center justify-center rounded-full bg-error-container text-on-error-container">
-              <Icon name="north_east" className="text-[14px]" />
+              <ArrowUpRight size={14} />
             </span>
             Sent
           </div>
@@ -121,7 +131,7 @@ export default function WalletPage() {
         <div className="mb-space-sm flex items-center justify-between">
           <h2 className="text-label-lg">Transactions</h2>
           <button type="button" className="flex items-center gap-1 text-label-sm text-secondary">
-            Filter <Icon name="tune" className="text-[14px]" />
+            Filter <SlidersHorizontal size={14} />
           </button>
         </div>
         <ul className="flex flex-col gap-2.5">
@@ -131,7 +141,7 @@ export default function WalletPage() {
             return (
               <li key={tx.id} className="flex items-center gap-3 py-1">
                 <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${meta.className}`}>
-                  <Icon name={meta.icon} className="text-[18px]" />
+                  <LucideIcon name={meta.icon} size={18} />
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-label-md">{tx.label}</p>
@@ -159,7 +169,7 @@ export default function WalletPage() {
       </section>
 
       <div className="flex items-start gap-3 rounded-3xl bg-surface-container p-3 text-on-surface-variant">
-        <Icon name="shield" className="mt-0.5 shrink-0 text-[18px] text-secondary" />
+        <Shield size={18} className="mt-0.5 shrink-0 text-secondary" />
         <p className="text-body-sm leading-snug">
           Balances settle instantly on Base. Gas is sponsored for votes and rewards.
         </p>

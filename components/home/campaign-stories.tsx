@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Icon } from "@/components/icon";
+import { ImagePlus } from "lucide-react";
 import type { Campaign } from "@/lib/mock-data";
 
 const dotColor: Record<Campaign["dot"], string> = {
@@ -17,7 +17,7 @@ export function CampaignStories({ campaigns }: { campaigns: Campaign[] }) {
         className="flex shrink-0 items-center gap-space-xs rounded-full bg-primary-container py-1.5 pr-space-md pl-space-xs text-on-primary-fixed shadow-sm transition-all hover:opacity-95 active:scale-95"
       >
         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-surface text-primary shadow-xs">
-          <Icon name="add_a_photo" className="text-[18px]" />
+          <ImagePlus size={18} />
         </span>
         <span className="flex flex-col text-left">
           <span className="text-label-sm leading-tight">Post Snap</span>

@@ -1,4 +1,5 @@
-import { Icon } from "@/components/icon";
+import { ChevronRight } from "lucide-react";
+import { LucideIcon } from "@/components/lucide-icon";
 
 const steps = [
   {
@@ -31,14 +32,14 @@ export function HowItWorks() {
       <div className="mb-space-md flex items-center justify-between">
         <h3 className="text-headline-sm">How it works</h3>
         <button className="flex items-center gap-0.5 text-label-sm text-secondary">
-          Rules <Icon name="chevron_right" className="text-[14px]" />
+          Rules <ChevronRight size={14} />
         </button>
       </div>
       <ol className="flex flex-col gap-space-sm">
         {steps.map((step, i) => (
           <li key={step.title} className="flex items-start gap-space-md rounded-2xl bg-surface-container-low p-space-sm">
             <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full shadow-sm ${step.iconBg}`}>
-              <Icon name={step.icon} filled={step.filled} className="text-[22px]" />
+              <LucideIcon name={step.icon} size={22} filled={step.filled} />
             </div>
             <div className="min-w-0 flex-1">
               <div className={`mb-0.5 text-label-sm ${step.stepColor}`}>STEP {String(i + 1).padStart(2, "0")}</div>

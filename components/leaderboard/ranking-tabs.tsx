@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { Icon } from "@/components/icon";
+import { BadgeCheck, Info } from "lucide-react";
 import type { Creator, RewardedVoter } from "@/lib/mock-data";
 
 type Tab = "creators" | "voters";
@@ -56,7 +56,7 @@ export function RankingTabs({ creators, voters, ended }: Props) {
                 <div className="min-w-0">
                   <div className="flex items-center gap-1">
                     <span className="truncate text-label-md">@{c.handle}</span>
-                    {c.verified && <Icon name="verified" className="text-[14px] text-secondary" />}
+                    {c.verified && <BadgeCheck size={14} className="text-secondary" />}
                   </div>
                   <div className="mt-0.5 flex items-center gap-2 text-body-sm text-on-surface-variant">
                     <span className="tabular-nums">{c.votes} votes</span>
@@ -74,7 +74,7 @@ export function RankingTabs({ creators, voters, ended }: Props) {
       ) : (
         <div className="flex flex-col gap-2.5">
           <div className="mb-1 flex items-center gap-2 rounded-2xl bg-surface-container-low p-space-md">
-            <Icon name="info" className="text-[20px] text-secondary" />
+            <Info size={20} className="text-secondary" />
             <p className="text-body-sm text-on-surface-variant">
               Voters who voted early on winning snaps earn pro-rata dividend yields!
             </p>

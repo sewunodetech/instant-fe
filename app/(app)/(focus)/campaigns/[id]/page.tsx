@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Icon } from "@/components/icon";
+import { Camera, Tag, Trophy } from "lucide-react";
+import { LucideIcon } from "@/components/lucide-icon";
 import { CampaignHeaderActions } from "@/components/campaign/campaign-header-actions";
 import { CampaignFeed } from "@/components/campaign/campaign-feed";
 import { HowItWorks } from "@/components/campaign/how-it-works";
@@ -61,12 +62,12 @@ export default async function CampaignDetailPage({ params }: PageProps<"/campaig
           />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
           <span className="absolute top-3 left-3 flex items-center gap-1 rounded-full bg-primary-container px-3 py-1 text-label-md text-on-primary-fixed shadow-sm">
-            <Icon name="tag" className="text-[14px]" />
+            <Tag size={14} />
             {campaign.tag.slice(1)}
           </span>
           <div className="absolute inset-x-3 bottom-3 flex items-center justify-between">
             <span className="flex items-center gap-1.5 rounded-full bg-tertiary-fixed px-3 py-1.5 text-label-md text-on-tertiary-fixed shadow-sm">
-              <Icon name="emoji_events" className="text-[15px]" /> {campaign.poolUsdc} USDC Prize Pool
+              <Trophy size={15} /> {campaign.poolUsdc} USDC Prize Pool
             </span>
             {campaign.live && (
               <span className="flex items-center gap-1 rounded-full bg-surface-container-lowest/90 px-2.5 py-1 text-label-sm backdrop-blur-sm">
@@ -88,7 +89,7 @@ export default async function CampaignDetailPage({ params }: PageProps<"/campaig
           <dl className="grid grid-cols-3 gap-space-xs pt-space-xs">
             {stats.map((s) => (
               <div key={s.label} className="flex flex-col items-center rounded-2xl bg-surface-container-low p-2.5 text-center">
-                <Icon name={s.icon} className="mb-0.5 text-[20px] text-secondary" />
+                <LucideIcon name={s.icon} size={20} className="mb-0.5 text-secondary" />
                 <dt className="order-last text-label-sm text-on-surface-variant">{s.label}</dt>
                 <dd className="text-headline-sm leading-tight tabular-nums">{s.value}</dd>
               </div>
@@ -107,7 +108,7 @@ export default async function CampaignDetailPage({ params }: PageProps<"/campaig
             href={`/snap?campaign=${campaign.id}`}
             className="flex h-14 w-full items-center justify-center gap-space-sm rounded-full bg-primary-container text-headline-sm text-on-primary-fixed shadow-lg transition-all hover:brightness-105 active:scale-[0.98]"
           >
-            <Icon name="photo_camera" className="text-[24px]" />
+            <Camera size={24} />
             Join Campaign &amp; Snap
           </Link>
         </div>

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Icon } from "@/components/icon";
+import { Camera, ImagePlus, Vote } from "lucide-react";
 import { listCampaignPosts } from "@/lib/api-client";
 import { mapApiPost } from "@/lib/mappers";
 import { getSnapsByCampaign, type Snap } from "@/lib/mock-data";
@@ -49,7 +49,7 @@ export function CampaignFeed({ campaignId, tag }: { campaignId: string; tag: str
           href={`/snap?campaign=${campaignId}`}
           className="flex items-center gap-1 text-label-md text-secondary hover:underline"
         >
-          Post <Icon name="add_a_photo" className="text-[16px]" />
+          Post <ImagePlus size={16} />
         </Link>
       </div>
 
@@ -62,7 +62,7 @@ export function CampaignFeed({ campaignId, tag }: { campaignId: string; tag: str
       ) : snaps.length === 0 ? (
         <div className="flex flex-col items-center gap-2 rounded-2xl bg-surface-container-low p-6 text-center">
           <div className="flex h-11 w-11 items-center justify-center rounded-full bg-surface-container-highest">
-            <Icon name="photo_camera" className="text-[22px] text-on-surface-variant" />
+            <Camera size={22} className="text-on-surface-variant" />
           </div>
           <p className="text-label-md">No snaps yet</p>
           <p className="text-body-sm text-on-surface-variant">Be the first to post in {tag}.</p>
@@ -85,7 +85,7 @@ export function CampaignFeed({ campaignId, tag }: { campaignId: string; tag: str
               />
               <span className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/55 to-transparent p-1.5 pt-4 text-[10px] font-bold text-white">
                 <span className="flex min-w-0 items-center gap-0.5">
-                  <Icon name="how_to_vote" className="text-[11px]" />
+                  <Vote size={11} />
                   {snap.votes}
                 </span>
                 <span className="truncate">#{snap.creator.handle.slice(0, 8)}</span>

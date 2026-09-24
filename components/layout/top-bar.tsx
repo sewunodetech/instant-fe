@@ -3,16 +3,22 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Icon } from "@/components/icon";
+import { Bell, Camera, Compass, Home, User, type LucideIcon } from "lucide-react";
 import { UserAvatar } from "@/components/auth/user-avatar";
 import { currentUser } from "@/lib/mock-data";
 
-const navItems = [
-  { href: "/home", label: "Home", icon: "home" },
-  { href: "/campaigns", label: "Explore", icon: "explore" },
-  { href: "/snap", label: "Create", icon: "photo_camera" },
-  { href: "/activity", label: "Activity", icon: "notifications" },
-  { href: "/profile", label: "Profile", icon: "person" },
+type NavItem = {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+};
+
+const navItems: NavItem[] = [
+  { href: "/home", label: "Home", icon: Home },
+  { href: "/campaigns", label: "Explore", icon: Compass },
+  { href: "/snap", label: "Create", icon: Camera },
+  { href: "/activity", label: "Activity", icon: Bell },
+  { href: "/profile", label: "Profile", icon: User },
 ];
 
 export function TopBar() {
@@ -35,6 +41,7 @@ export function TopBar() {
               pathname === item.href ||
               (item.href !== "/home" && pathname.startsWith(`${item.href}/`));
             const isCreate = item.href === "/snap";
+            const ItemIcon = item.icon;
 
             if (isCreate) {
               return (
@@ -48,7 +55,7 @@ export function TopBar() {
                       : "bg-primary-container text-on-primary-fixed"
                   }`}
                 >
-                  <Icon name={item.icon} className="text-[18px]" />
+                  <ItemIcon size={18} />
                   {item.label}
                 </Link>
               );
@@ -65,7 +72,11 @@ export function TopBar() {
                     : "text-on-surface-variant hover:bg-surface-container hover:text-on-surface"
                 }`}
               >
-                <Icon name={item.icon} filled={active} className={`text-[18px] ${active ? "text-primary" : ""}`} />
+                <ItemIcon
+                  size={18}
+                  fill={active ? "currentColor" : "none"}
+                  className={active ? "text-primary" : ""}
+                />
                 {item.label}
                 {item.href === "/activity" && currentUser.hasUnread && !active && (
                   <span className="ml-0.5 h-2 w-2 rounded-full bg-error" />
@@ -81,7 +92,7 @@ export function TopBar() {
             aria-label="Notifications"
             className="relative flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant transition-colors hover:bg-surface-container hover:text-on-surface md:hidden"
           >
-            <Icon name="notifications" className="text-[24px]" />
+            <Bell size={24} />
             {currentUser.hasUnread && (
               <span className="absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-error ring-2 ring-surface" />
             )}

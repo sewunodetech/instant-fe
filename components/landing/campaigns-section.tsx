@@ -51,7 +51,7 @@ export function CampaignsSection() {
                 )}
               >
                 {campaign.featured && (
-                  <span className="absolute -top-px left-1/2 z-10 -translate-x-1/2 rounded-b-xl bg-bnb px-3 py-0.5 text-[10px] font-black tracking-wide text-on-primary-fixed uppercase">
+                  <span className="absolute -top-px left-1/2 z-10 -translate-x-1/2 rounded-b-xl bg-bnb px-3 py-0.5 text-[10px] font-extrabold tracking-wide text-on-primary-fixed uppercase">
                     Featured drop
                   </span>
                 )}
@@ -69,7 +69,7 @@ export function CampaignsSection() {
                       <span className="size-2 rounded-full bg-tertiary" />
                       {campaign.tag}
                     </span>
-                    <span className="rounded-full bg-bnb px-2.5 py-1 text-body-sm font-black text-on-primary-fixed shadow-sm">
+                    <span className="rounded-full bg-bnb px-2.5 py-1 text-body-sm font-extrabold text-on-primary-fixed shadow-sm">
                       {campaign.pool}
                     </span>
                   </div>

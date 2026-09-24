@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Icon } from "@/components/icon";
+import { BadgeCheck, ChevronRight } from "lucide-react";
 import type { Campaign } from "@/lib/mock-data";
 
 export function LeaderboardTeaser({ campaign }: { campaign: Campaign }) {
@@ -17,7 +17,7 @@ export function LeaderboardTeaser({ campaign }: { campaign: Campaign }) {
           href={`/campaigns/${campaign.id}/leaderboard`}
           className="flex items-center text-label-md text-secondary hover:underline"
         >
-          View All <Icon name="chevron_right" className="text-[16px]" />
+          View All <ChevronRight size={16} />
         </Link>
       </div>
 
@@ -34,7 +34,7 @@ export function LeaderboardTeaser({ campaign }: { campaign: Campaign }) {
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
               <span className="truncate text-[14px] font-bold">@{leader.handle}</span>
-              {leader.verified && <Icon name="verified" filled className="text-[14px] text-secondary" />}
+              {leader.verified && <BadgeCheck size={14} fill="currentColor" className="text-secondary" />}
             </div>
             <div className="flex items-center gap-2 text-body-sm text-on-surface-variant">
               <span className="tabular-nums">{leader.votes} votes</span>

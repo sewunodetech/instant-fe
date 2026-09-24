@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
-import { ChevronDown } from "lucide-react";
-import { NumberTicker } from "@/components/ui/number-ticker";
+import { motion, useScroll, useSpring, useTransform } from "motion/react";
 
 const easeOut = [0.16, 1, 0.3, 1] as const;
 
@@ -17,7 +15,6 @@ function heroItem(delay: number) {
 }
 
 export function LandingHero() {
-  const reduce = useReducedMotion();
   const trackRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [duration, setDuration] = useState(0);
@@ -73,7 +70,7 @@ export function LandingHero() {
     // Tall track: gives us scroll distance to scrub the video through.
     <section ref={trackRef} className="relative h-[300vh]">
       {/* Sticky viewport: video stays pinned while the page scrolls. */}
-      <div className="sticky top-0 flex h-screen flex-col items-center overflow-hidden bg-surface px-4 pt-28 text-center sm:px-6 sm:pt-32 lg:px-8">
+      <div className="sticky top-0 flex h-screen flex-col items-center overflow-hidden bg-surface px-4 pt-24 text-center sm:px-6 sm:pt-28 lg:px-8">
         {/* Full-bleed scroll-scrubbed video */}
         <video
           ref={videoRef}
@@ -85,44 +82,35 @@ export function LandingHero() {
           aria-hidden
         />
 
-        {/* Copy — anchored to the top */}
-        <div className="relative z-10 flex flex-col items-center">
-          {/* Label — what instant.fun is, in one line */}
-          <motion.p
-            {...heroItem(0.1)}
-            className="mt-6 text-base font-semibold text-on-surface-variant sm:text-lg"
-          >
-            Snap instanly, win{" "}
-            <span className="text-secondary">USDC</span> <span className="text-primary-container">on BNB Chain</span>
-          </motion.p>
+        {/* Soft readability scrim keeps the headline legible without hiding
+            the toy scene that carries the visual story. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 -z-0 h-[54%] bg-gradient-to-b from-surface via-surface/85 to-transparent"
+        />
 
-          {/* Big number — total rewards paid to creators */}
+        {/* Brand message — two elements only, so it stays clear of the artwork. */}
+        <div className="relative z-10 md:top-10 flex w-full max-w-4xl flex-col items-center">
+          {/* Display size sits one step above the section headings. Tracking is
+              only slightly negative — Plus Jakarta Sans gets cramped and uneven
+              if it's pulled in as tightly as a tighter grotesque would allow. */}
           <motion.h1
-            {...heroItem(0.15)}
-            className="mt-5 flex items-center justify-center gap-1 font-pixel text-4xl tracking-tight text-on-surface drop-shadow-sm sm:gap-1.5 sm:text-5xl lg:text-6xl"
-            style={{ lineHeight: 1 }}
+            {...heroItem(0.12)}
+            className="mt-4 text-[2.25rem] leading-[1.05] font-extrabold tracking-[-0.025em] text-balance text-on-surface sm:text-5xl lg:text-[3.75rem]"
           >
-            <span className="text-[0.7em] text-on-surface/40">$</span>
-            <NumberTicker value={1000000} className="font-pixel text-on-surface" />
+            Snap now. <span className="text-secondary">Win the moment.</span>
           </motion.h1>
 
+          {/* Sits closer to the headline than the headline does to the nav, so
+              the two read as one unit rather than two stacked blocks. */}
           <motion.p
-            {...heroItem(0.22)}
-            className="mt-3 text-body-sm font-medium tracking-wide text-on-surface-variant/90 uppercase"
+            {...heroItem(0.2)}
+            className="mt-4 max-w-xl text-base leading-relaxed font-medium text-balance text-on-surface-variant sm:text-lg"
           >
-            Paid out to creators &amp; supporter
+            Shoot live in 2 minutes. The community votes. Winners split a real{" "}
+            <span className="font-bold text-secondary">USDC</span> prize pool on{" "}
+            <span className="font-bold text-bnb">BNB Chain</span>.
           </motion.p>
-
-          {/* CTA + chevron */}
-          <motion.div {...heroItem(0.3)} className="mt-7 flex flex-col items-center">
-            <motion.div
-              animate={reduce ? undefined : { y: [0, 6, 0] }}
-              transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-              className="mt-1 text-secondary"
-            >
-              <ChevronDown className="size-6" strokeWidth={2.6} aria-hidden />
-            </motion.div>
-          </motion.div>
         </div>
       </div>
     </section>

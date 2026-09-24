@@ -1,6 +1,6 @@
 "use client";
 
-import { Icon } from "@/components/icon";
+import { Share2 } from "lucide-react";
 
 export function ShareButton({ title, className = "" }: { title: string; className?: string }) {
   async function share() {
@@ -11,7 +11,7 @@ export function ShareButton({ title, className = "" }: { title: string; classNam
 
   return (
     <button aria-label="Share" onClick={share} className={className}>
-      <Icon name="ios_share" className="text-[20px]" />
+      <Share2 size={20} />
     </button>
   );
 }

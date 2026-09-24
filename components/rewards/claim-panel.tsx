@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Check, CircleCheck, ExternalLink, RefreshCw, Share2, Zap } from "lucide-react";
 import { ConfettiLayer, useConfetti } from "@/components/confetti";
-import { Icon } from "@/components/icon";
 
 type Status = "idle" | "claiming" | "claimed";
 
@@ -76,10 +76,13 @@ export function ClaimPanel({ totalUsdc, wallet, shareText }: Props) {
             status === "claimed" ? "bg-tertiary-container text-on-tertiary-container" : "bg-primary-container text-on-primary-container"
           }`}
         >
-          <Icon
-            name={status === "claiming" ? "sync" : status === "claimed" ? "check_circle" : "bolt"}
-            className={`text-[22px] ${status === "claiming" ? "animate-spin" : ""}`}
-          />
+          {status === "claiming" ? (
+            <RefreshCw size={22} className="animate-spin" />
+          ) : status === "claimed" ? (
+            <CircleCheck size={22} />
+          ) : (
+            <Zap size={22} />
+          )}
           {status === "claiming"
             ? "Signing & Dispatching..."
             : status === "claimed"
@@ -87,14 +90,14 @@ export function ClaimPanel({ totalUsdc, wallet, shareText }: Props) {
               : "Instant Claim & Withdraw to Wallet"}
         </button>
         <p className="flex items-center justify-center gap-1.5 text-center text-body-sm text-on-surface-variant">
-          <Icon name="bolt" filled className="text-[16px] text-tertiary" />
+          <Zap size={16} fill="currentColor" className="text-tertiary" />
           Instant payout • Powered by Base • No lockups or delays
         </p>
         <button
           onClick={share}
           className="mt-1 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-secondary-fixed text-label-lg text-secondary transition-all active:scale-[0.98]"
         >
-          <Icon name={shared ? "done" : "ios_share"} className="text-[20px]" />
+          {shared ? <Check size={20} /> : <Share2 size={20} />}
           {shared ? "Story Ready to Share!" : "Share Win to Instagram Story"}
         </button>
         <a
@@ -104,7 +107,7 @@ export function ClaimPanel({ totalUsdc, wallet, shareText }: Props) {
           className="inline-flex items-center justify-center gap-1 py-2 text-center text-label-sm text-on-surface-variant transition-colors hover:text-secondary"
         >
           View Transaction Contract on BaseScan
-          <Icon name="open_in_new" className="text-[14px]" />
+          <ExternalLink size={14} />
         </a>
       </div>
 
@@ -115,7 +118,7 @@ export function ClaimPanel({ totalUsdc, wallet, shareText }: Props) {
         }`}
       >
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-tertiary text-on-tertiary">
-          <Icon name="done" className="text-[18px]" />
+          <Check size={18} />
         </div>
         <div className="flex min-w-0 flex-1 flex-col">
           <span className="text-label-md">{usd(totalUsdc)} USDC Dispatched!</span>

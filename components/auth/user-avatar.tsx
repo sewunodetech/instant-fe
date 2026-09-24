@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { User } from "lucide-react";
 import { useAuth } from "@/components/providers/auth-provider";
 
 type Props = {
@@ -41,9 +42,7 @@ export function UserAvatar({ size = 32, className, bare }: Props) {
       className="flex items-center justify-center rounded-full bg-gradient-to-br from-primary-container to-primary-fixed-dim font-bold text-on-primary-fixed shadow-sm ring-2 ring-primary-container/40"
       style={{ width: px, height: px, fontSize: Math.max(11, px * 0.34) }}
     >
-      {initials(label) || (
-        <span className="material-symbols-outlined text-[18px]">person</span>
-      )}
+      {initials(label) || <User size={18} />}
     </span>
   );
 

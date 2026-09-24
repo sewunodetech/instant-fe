@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { CampaignRowCard, FeaturedCampaignCard } from "@/components/discovery/campaign-cards";
-import { Icon } from "@/components/icon";
+import { LucideIcon } from "@/components/lucide-icon";
 import type { Campaign } from "@/lib/mock-data";
 
 const filters = [
@@ -51,7 +51,7 @@ export function CampaignDiscovery({ campaigns }: { campaigns: Campaign[] }) {
                 f.id === "all" ? "px-5" : "px-4"
               } ${active ? "bg-on-surface text-surface-container-lowest" : "bg-surface-container-lowest hover:bg-surface-container"}`}
             >
-              <Icon name={f.icon} className="text-[16px]" />
+              <LucideIcon name={f.icon} size={16} />
               {f.label}
             </button>
           );

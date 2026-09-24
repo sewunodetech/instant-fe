@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
+import { motion, useMotionValueEvent, useScroll } from "motion/react";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { APP_ENTRY_HREF, navLinks } from "@/components/landing/content";
@@ -51,7 +51,7 @@ export function LandingNav() {
             <a
               key={label}
               href={href}
-              className="flex items-center gap-1.5 rounded-full px-3.5 py-2 text-[13px] font-semibold text-on-surface-variant transition-colors hover:bg-surface-container hover:text-on-surface"
+              className="flex items-center gap-1.5 rounded-full px-3.5 py-2 text-[13px] font-semibold tracking-[-0.005em] text-on-surface-variant transition-colors hover:bg-surface-container hover:text-on-surface"
             >
               <Icon className="size-4" strokeWidth={2.2} aria-hidden />
               {label}
@@ -62,7 +62,7 @@ export function LandingNav() {
         <div className="flex items-center gap-2">
           <Link
             href={APP_ENTRY_HREF}
-            className="group flex items-center gap-1.5 rounded-full bg-secondary px-4 py-2 text-[13px] font-bold text-surface transition-transform duration-200 hover:-translate-y-0.5 active:scale-95"
+            className="group flex items-center gap-1.5 rounded-full bg-secondary px-4 py-2 text-[13px] font-bold tracking-[-0.01em] text-surface transition-transform duration-200 hover:-translate-y-0.5 active:scale-95"
           >
             Launch App
             <ArrowRight

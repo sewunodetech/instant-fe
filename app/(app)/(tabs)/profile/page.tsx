@@ -3,7 +3,20 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { Icon } from "@/components/icon";
+import {
+  Bell,
+  BadgeCheck,
+  Bookmark,
+  CirclePlus,
+  Flame,
+  Globe,
+  Plus,
+  Sparkles,
+  Trophy,
+  Vote,
+  Wallet,
+} from "lucide-react";
+import { LucideIcon } from "@/components/lucide-icon";
 import { BackButton } from "@/components/layout/back-button";
 import { compactNumber } from "@/lib/format";
 import { currentUser, profileSnaps, profileStats } from "@/lib/mock-data";
@@ -28,14 +41,14 @@ export default function ProfilePage() {
             aria-label="Wallet"
             className="flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container"
           >
-            <Icon name="account_balance_wallet" className="text-[22px]" />
+            <Wallet size={22} />
           </Link>
           <Link
             href="/activity"
             aria-label="Activity"
             className="relative flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container"
           >
-            <Icon name="notifications" className="text-[22px]" />
+            <Bell size={22} />
             {currentUser.hasUnread && (
               <span className="absolute top-2.5 right-2.5 h-2 w-2 rounded-full bg-error ring-2 ring-surface" />
             )}
@@ -45,7 +58,7 @@ export default function ProfilePage() {
             aria-label="Create campaign"
             className="flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container"
           >
-            <Icon name="add_circle_outline" className="text-[22px]" />
+            <CirclePlus size={22} />
           </Link>
         </div>
       </div>
@@ -64,7 +77,7 @@ export default function ProfilePage() {
               />
             </div>
             <span className="absolute right-0 bottom-0 flex h-7 w-7 items-center justify-center rounded-full bg-secondary text-white ring-2 ring-surface">
-              <Icon name="verified" filled className="text-[14px]" />
+              <BadgeCheck size={14} fill="currentColor" />
             </span>
           </div>
           <div className="min-w-0 flex-1">
@@ -87,15 +100,15 @@ export default function ProfilePage() {
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-1.5">
               <span className="flex items-center gap-1 rounded-full bg-surface-container px-2.5 py-1 text-label-sm text-on-surface-variant">
-                <Icon name="public" className="text-[13px] text-secondary" />
+                <Globe size={13} className="text-secondary" />
                 Base
               </span>
               <span className="flex items-center gap-1 rounded-full bg-surface-container px-2.5 py-1 text-label-sm text-on-surface-variant">
-                <Icon name="account_balance_wallet" className="text-[13px] text-secondary" />
+                <Wallet size={13} className="text-secondary" />
                 {currentUser.wallet.address}
               </span>
               <span className="flex items-center gap-1 rounded-full bg-primary-container/40 px-2.5 py-1 text-label-sm text-on-primary-container">
-                <Icon name="local_fire_department" filled className="text-[13px] text-primary" />
+                <Flame size={13} fill="currentColor" className="text-primary" />
                 {currentUser.streakDays}d streak
               </span>
             </div>
@@ -121,21 +134,21 @@ export default function ProfilePage() {
             href="/rewards"
             className="flex items-center justify-center gap-1 rounded-full bg-primary-container py-2 text-label-sm text-on-primary-fixed"
           >
-            <Icon name="emoji_events" className="text-[14px]" />
+            <Trophy size={14} />
             Rewards
           </Link>
           <Link
             href="/wallet"
             className="flex items-center justify-center gap-1 rounded-full bg-secondary-fixed py-2 text-label-sm text-on-secondary-fixed"
           >
-            <Icon name="account_balance_wallet" className="text-[14px]" />
+            <Wallet size={14} />
             Wallet
           </Link>
           <Link
             href="/create"
             className="flex items-center justify-center gap-1 rounded-full bg-surface-container py-2 text-label-sm text-on-surface"
           >
-            <Icon name="add" className="text-[14px]" />
+            <Plus size={14} />
             Campaign
           </Link>
         </div>
@@ -156,7 +169,7 @@ export default function ProfilePage() {
                   : "text-on-surface-variant hover:text-on-surface"
               }`}
             >
-              <Icon name={t.icon} filled={active} className="text-[16px]" />
+              <LucideIcon name={t.icon} size={16} filled={active} />
               {t.label}
             </button>
           );
@@ -180,7 +193,7 @@ export default function ProfilePage() {
               />
               <span className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/60 to-transparent p-1.5 pt-4 text-[10px] font-bold text-white">
                 <span className="flex items-center gap-0.5">
-                  <Icon name="how_to_vote" className="text-[11px]" />
+                  <Vote size={11} />
                   {compactNumber(snap.votes)}
                 </span>
                 <span>#{snap.rank}</span>
@@ -193,7 +206,7 @@ export default function ProfilePage() {
       {tab === "saved" && (
         <div className="flex flex-col items-center justify-center gap-2 rounded-3xl bg-surface-container-lowest p-8 text-center shadow-card">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-container">
-            <Icon name="bookmark" className="text-[24px] text-on-surface-variant" />
+            <Bookmark size={24} className="text-on-surface-variant" />
           </div>
           <p className="text-headline-sm">No saved snaps yet</p>
           <p className="max-w-[240px] text-body-sm text-on-surface-variant">
@@ -212,7 +225,7 @@ export default function ProfilePage() {
         <section className="flex flex-col gap-space-sm rounded-3xl bg-surface-container-lowest p-space-md shadow-card">
           <div className="flex items-start gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-container">
-              <Icon name="auto_awesome" className="text-[20px] text-on-primary-fixed" />
+              <Sparkles size={20} className="text-on-primary-fixed" />
             </div>
             <div>
               <h2 className="text-label-lg">Creator bio</h2>
@@ -228,7 +241,7 @@ export default function ProfilePage() {
               { label: "Earned", value: `${profileStats.totalEarnedUsdc} USDC`, icon: "payments" },
             ].map((s) => (
               <div key={s.label} className="flex flex-col items-center gap-1 rounded-2xl bg-surface-container-low p-2.5 text-center">
-                <Icon name={s.icon} className="text-[18px] text-secondary" />
+                <LucideIcon name={s.icon} size={18} className="text-secondary" />
                 <span className="text-label-sm font-bold tabular-nums">{s.value}</span>
                 <span className="text-[10px] text-on-surface-variant">{s.label}</span>
               </div>

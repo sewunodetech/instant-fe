@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Icon } from "@/components/icon";
+import { BadgeCheck, Plus } from "lucide-react";
 import { CampaignExplorer } from "@/components/discovery/campaign-explorer";
 
 export const metadata: Metadata = { title: "Explore · instant.fun" };
@@ -31,7 +31,7 @@ export default function CampaignsPage() {
         <div className="flex items-center justify-between">
           <h1 className="text-headline-lg-mobile">Explore</h1>
           <span className="flex items-center gap-1 rounded-full bg-surface-container px-3 py-1.5 shadow-sm">
-            <Icon name="verified" className="text-[18px] text-secondary" />
+            <BadgeCheck size={18} className="text-secondary" />
             <span className="text-label-sm text-on-surface-variant">Live Challenges</span>
           </span>
         </div>
@@ -40,7 +40,7 @@ export default function CampaignsPage() {
           href="/create"
           className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-full bg-primary-container text-label-md text-on-primary-fixed shadow-sm transition-transform active:scale-95"
         >
-          <Icon name="add" className="text-[18px]" />
+          <Plus size={18} />
           Create campaign
         </Link>
       </div>

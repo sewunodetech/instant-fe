@@ -1,4 +1,4 @@
-import { Icon } from "@/components/icon";
+import { Flame } from "lucide-react";
 
 type Props = {
   days: number;
@@ -13,7 +13,7 @@ export function StreakBanner({ days, bonusPct, power }: Props) {
     <div className="flex items-center justify-between overflow-hidden rounded-2xl bg-surface-container-lowest p-space-md shadow-sm">
       <div className="flex min-w-0 items-center gap-space-sm">
         <div className="flex h-11 w-11 shrink-0 animate-pulse-glow items-center justify-center rounded-full bg-primary-container/30 text-primary">
-          <Icon name="local_fire_department" filled className="text-[26px]" />
+          <Flame size={26} fill="currentColor" />
         </div>
         <div className="flex min-w-0 flex-col">
           <div className="flex items-center gap-1.5">

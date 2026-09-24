@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Icon } from "@/components/icon";
+import { Award, BadgeCheck, X } from "lucide-react";
+import { LucideIcon } from "@/components/lucide-icon";
 import { RewardConfetti } from "@/components/rewards/celebrate-button";
 import { ClaimPanel } from "@/components/rewards/claim-panel";
 import { currentUser, getCampaign, pendingReward, type RewardLine } from "@/lib/mock-data";
@@ -36,10 +37,10 @@ export default function RewardsPage() {
           aria-label="Close"
           className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container text-on-surface-variant transition-transform hover:bg-surface-container-high active:scale-95"
         >
-          <Icon name="close" className="text-[20px]" />
+          <X size={20} />
         </Link>
         <span className="flex items-center gap-1.5 rounded-full bg-tertiary-container px-3 py-1 text-label-sm text-on-tertiary-container">
-          <Icon name="verified" filled className="text-[16px]" />
+          <BadgeCheck size={16} fill="currentColor" />
           Audited &amp; Verified
         </span>
         <span className="h-10 w-10" aria-hidden />
@@ -47,7 +48,7 @@ export default function RewardsPage() {
 
       <div className="text-center">
         <span className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-primary-container px-3.5 py-1 text-label-sm text-on-primary-container shadow-sm">
-          <Icon name="workspace_premium" filled className="text-[15px]" />
+          <Award size={15} fill="currentColor" />
           CAMPAIGN VICTOR
         </span>
         <h1 className="text-headline-lg-mobile">Congratulations, {currentUser.name}!</h1>
@@ -97,7 +98,7 @@ export default function RewardsPage() {
             <li key={line.label} className="flex items-center justify-between gap-3 py-1">
               <div className="flex items-center gap-2">
                 <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${toneClass[line.tone]}`}>
-                  <Icon name={line.icon} className="text-[16px]" />
+                  <LucideIcon name={line.icon} size={16} />
                 </div>
                 <div className="flex flex-col">
                   <span>{line.label}</span>

@@ -2,14 +2,21 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Icon } from "@/components/icon";
+import { Bell, Camera, Compass, Home, User, type LucideIcon } from "lucide-react";
 
-const tabs = [
-  { href: "/home", label: "Home", icon: "home" },
-  { href: "/campaigns", label: "Explore", icon: "explore" },
-  { href: "/snap", label: "Create", icon: "photo_camera", shutter: true },
-  { href: "/activity", label: "Activity", icon: "notifications" },
-  { href: "/profile", label: "Profile", icon: "person" },
+type Tab = {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  shutter?: boolean;
+};
+
+const tabs: Tab[] = [
+  { href: "/home", label: "Home", icon: Home },
+  { href: "/campaigns", label: "Explore", icon: Compass },
+  { href: "/snap", label: "Create", icon: Camera, shutter: true },
+  { href: "/activity", label: "Activity", icon: Bell },
+  { href: "/profile", label: "Profile", icon: User },
 ];
 
 export function BottomNav() {
@@ -24,6 +31,7 @@ export function BottomNav() {
         <div className="relative flex h-20 items-center justify-around px-space-xs">
           {tabs.map((tab) => {
             const active = pathname === tab.href || pathname.startsWith(`${tab.href}/`);
+            const TabIcon = tab.icon;
 
             if (tab.shutter) {
               return (
@@ -33,7 +41,7 @@ export function BottomNav() {
                     aria-label={tab.label}
                     className="flex h-14 w-14 items-center justify-center rounded-full bg-secondary-container text-on-secondary shadow-shutter ring-4 ring-surface transition-transform hover:brightness-105 active:scale-95"
                   >
-                    <Icon name={tab.icon} className="text-[28px]" />
+                    <TabIcon size={28} />
                   </Link>
                   <span className="mt-1 text-label-sm text-on-surface-variant">{tab.label}</span>
                 </div>
@@ -51,10 +59,10 @@ export function BottomNav() {
                     : "text-on-surface-variant hover:bg-surface-container/70 hover:text-on-surface"
                 }`}
               >
-                <Icon
-                  name={tab.icon}
-                  filled={active}
-                  className={`text-[24px] ${active ? "text-primary" : ""}`}
+                <TabIcon
+                  size={24}
+                  fill={active ? "currentColor" : "none"}
+                  className={active ? "text-primary" : ""}
                 />
                 <span className="text-label-sm">{tab.label}</span>
               </Link>

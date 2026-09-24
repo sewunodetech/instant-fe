@@ -3,8 +3,23 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import {
+  ArrowRight,
+  Camera,
+  Check,
+  CircleCheck,
+  Eye,
+  Hourglass,
+  Loader2,
+  Rocket,
+  Sparkles,
+  User,
+  Users,
+  Vote,
+  X,
+} from "lucide-react";
 import { AuthGuard } from "@/components/auth/auth-guard";
-import { Icon } from "@/components/icon";
+import { LucideIcon } from "@/components/lucide-icon";
 import { BackButton } from "@/components/layout/back-button";
 import { activeCampaigns, currentUser } from "@/lib/mock-data";
 
@@ -125,7 +140,7 @@ function CreateCampaignFlow() {
           aria-label="Close"
           className="flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container"
         >
-          <Icon name="close" className="text-[22px]" />
+          <X size={22} />
         </Link>
       </div>
 
@@ -147,7 +162,7 @@ function CreateCampaignFlow() {
                   : "text-on-surface-variant hover:text-on-surface"
               } disabled:opacity-40`}
             >
-              <Icon name={s.icon} className="text-[16px]" />
+              <LucideIcon name={s.icon} size={16} />
               {s.label}
             </button>
           );
@@ -159,7 +174,7 @@ function CreateCampaignFlow() {
           <Image src={preview.cover} alt="" fill sizes="(max-width: 767px) 100vw, 720px" className="object-cover" priority />
           <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
           <span className="absolute top-3 left-3 flex items-center gap-1 rounded-full bg-primary-container px-3 py-1 text-label-md shadow-sm">
-            <Icon name="visibility" className="text-[14px]" />
+            <Eye size={14} />
             Preview
           </span>
           <div className="absolute inset-x-3 bottom-3 text-white">
@@ -167,14 +182,14 @@ function CreateCampaignFlow() {
             <p className="text-body-sm text-white/85">{preview.tagline}</p>
             <div className="mt-1.5 flex items-center gap-3 text-label-sm text-white/90">
               <span className="flex items-center gap-1">
-                <Icon name="group" className="text-[14px]" />0 creators
+                <Users size={14} />0 creators
               </span>
               <span className="flex items-center gap-1">
-                <Icon name="hourglass_top" className="text-[14px]" />
+                <Hourglass size={14} />
                 {days}d left
               </span>
               <span className="flex items-center gap-1">
-                <Icon name="photo_camera" className="text-[14px]" />
+                <Camera size={14} />
                 {entry === "photo" ? "Photos" : "Photos & video"}
               </span>
             </div>
@@ -186,7 +201,7 @@ function CreateCampaignFlow() {
         <section className="rounded-3xl bg-surface-container-lowest p-space-md shadow-card">
           <div className="mb-space-sm flex items-start gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-container">
-              <Icon name="auto_awesome" className="text-[20px] text-on-primary-fixed" />
+              <Sparkles size={20} className="text-on-primary-fixed" />
             </div>
             <div>
               <h2 className="text-label-lg">Describe your challenge</h2>
@@ -212,9 +227,9 @@ function CreateCampaignFlow() {
             className="flex h-13 w-full items-center justify-center gap-2 rounded-full bg-secondary text-label-lg text-white shadow-shutter transition-all active:scale-[0.98] disabled:opacity-50"
           >
             {generating ? (
-              <Icon name="progress_activity" className="animate-spin text-[22px]" />
+              <Loader2 size={22} className="animate-spin" />
             ) : (
-              <Icon name="auto_awesome" className="text-[22px]" />
+              <Sparkles size={22} />
             )}
             {generating ? "Generating with AI..." : "Generate campaign"}
           </button>
@@ -226,7 +241,7 @@ function CreateCampaignFlow() {
           <div className="mb-space-sm flex items-center justify-between">
             <h2 className="text-label-lg">Name &amp; pitch</h2>
             <span className="flex items-center gap-1 rounded-full bg-tertiary-container/50 px-2 py-0.5 text-label-sm text-on-tertiary-container">
-              <Icon name="check" className="text-[12px]" />
+              <Check size={12} />
               AI ready
             </span>
           </div>
@@ -265,7 +280,7 @@ function CreateCampaignFlow() {
                     active ? "bg-secondary-fixed text-on-secondary-fixed shadow-sm" : "bg-surface-container hover:bg-surface-container-high"
                   }`}
                 >
-                  <Icon name={t.icon} className={`text-[20px] ${active ? "text-secondary" : ""}`} />
+                  <LucideIcon name={t.icon} size={20} className={active ? "text-secondary" : ""} />
                   {t.label}
                 </button>
               );
@@ -298,7 +313,7 @@ function CreateCampaignFlow() {
             className="mt-space-md flex h-13 w-full items-center justify-center gap-2 rounded-full bg-secondary text-label-lg text-white shadow-shutter active:scale-[0.98]"
           >
             Continue
-            <Icon name="arrow_forward" className="text-[20px]" />
+            <ArrowRight size={20} />
           </button>
         </section>
       )}
@@ -341,14 +356,14 @@ function CreateCampaignFlow() {
                   entry === opt.id ? "bg-secondary-fixed text-on-secondary-fixed shadow-sm" : "bg-surface-container"
                 }`}
               >
-                <Icon name={opt.icon} className="text-[18px]" />
+                <LucideIcon name={opt.icon} size={18} />
                 {opt.label}
               </button>
             ))}
           </div>
 
           <div className="mt-space-md flex items-start gap-3 rounded-2xl bg-surface-container-low p-3 text-on-surface-variant">
-            <Icon name="how_to_vote" className="mt-0.5 shrink-0 text-[18px] text-secondary" />
+            <Vote size={18} className="mt-0.5 shrink-0 text-secondary" />
             <p className="text-body-sm leading-snug">
               Community votes free. Optional USDC support goes 100% to top creators when the challenge ends.
             </p>
@@ -357,7 +372,7 @@ function CreateCampaignFlow() {
           <div className="mt-space-md rounded-2xl bg-surface-container-low p-3">
             <div className="flex items-center gap-2 text-label-md">
               <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-container">
-                <Icon name="person" className="text-[16px]" />
+                <User size={16} />
               </span>
               Host · @{currentUser.handle}
             </div>
@@ -366,7 +381,7 @@ function CreateCampaignFlow() {
           {published ? (
             <div className="mt-space-md flex flex-col items-center gap-space-sm rounded-3xl bg-tertiary-container/40 p-space-md text-center">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-tertiary text-white">
-                <Icon name="check_circle" filled className="text-[28px]" />
+                <CircleCheck size={28} fill="currentColor" />
               </div>
               <p className="text-headline-sm">Campaign live</p>
               <p className="text-body-sm text-on-surface-variant">Creators can join and post snaps right away.</p>
@@ -385,9 +400,9 @@ function CreateCampaignFlow() {
               className="mt-space-md flex h-13 w-full items-center justify-center gap-2 rounded-full bg-primary-container text-label-lg text-on-primary-fixed shadow-shutter transition-all active:scale-[0.98] disabled:opacity-50"
             >
               {publishing ? (
-                <Icon name="progress_activity" className="animate-spin text-[22px]" />
+                <Loader2 size={22} className="animate-spin" />
               ) : (
-                <Icon name="rocket_launch" className="text-[22px]" />
+                <Rocket size={22} />
               )}
               {publishing ? "Publishing..." : "Publish campaign"}
             </button>

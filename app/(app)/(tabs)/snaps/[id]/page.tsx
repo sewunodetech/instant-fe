@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Icon } from "@/components/icon";
+import { Flame } from "lucide-react";
 import { BackButton } from "@/components/layout/back-button";
 import { ShareButton } from "@/components/snap/share-button";
 import { SnapVoteView } from "@/components/snap/snap-vote-view";
@@ -77,7 +77,7 @@ export default async function SnapVotePage({ params }: PageProps<"/snaps/[id]">)
           href={`/campaigns/${linkCampaignId}`}
           className="inline-flex items-center gap-1.5 rounded-full bg-secondary-fixed px-3 py-1 text-secondary shadow-sm"
         >
-          <Icon name="local_fire_department" className="text-[16px]" />
+          <Flame size={16} />
           <span className="text-label-md">{campaign.tag}</span>
         </Link>
         <ShareButton

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Icon } from "@/components/icon";
+import { ArrowRight, Sunrise, Timer } from "lucide-react";
 import { upcomingCampaign } from "@/lib/mock-data";
 
 export function NextChallengeBanner() {
@@ -11,7 +11,7 @@ export function NextChallengeBanner() {
       <div className="relative z-10 flex items-start justify-between">
         <div>
           <span className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-white/20 px-2.5 py-0.5 text-label-sm backdrop-blur-md">
-            <Icon name="timer" className="text-[14px]" />
+            <Timer size={14} />
             Starts in {c.startsIn}
           </span>
           <h2 className="text-headline-sm">{c.tag}</h2>
@@ -20,7 +20,7 @@ export function NextChallengeBanner() {
           </p>
         </div>
         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-md">
-          <Icon name="wb_twilight" className="text-[28px]" />
+          <Sunrise size={28} />
         </div>
       </div>
       <Link
@@ -28,7 +28,7 @@ export function NextChallengeBanner() {
         className="relative z-10 mt-4 flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-primary-container text-label-lg font-extrabold text-on-primary-container shadow-md transition-transform active:scale-[0.98]"
       >
         Join Next Challenge
-        <Icon name="arrow_forward" className="text-[20px]" />
+        <ArrowRight size={20} />
       </Link>
     </section>
   );
