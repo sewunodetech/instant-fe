@@ -1,49 +1,43 @@
 import { NextRequest } from "next/server";
-import { CampaignService } from "@/lib/services/campaign.service";
-import { getAuthenticatedUser } from "@/lib/auth";
+import { getAuthenticatedUser, getOptionalUser } from "@/lib/auth";
 import { PostService } from "@/lib/services/post.service";
-import { paginatedResponse, successResponse, errorResponse, handleApiError } from "@/lib/api-response";
+import { isAllowedImageUrl } from "@/lib/services/user.service";
+import { errorResponse, handleApiError, paginatedResponse, successResponse } from "@/lib/api-response";
 import { parsePagination } from "@/lib/pagination";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+/** GET /api/campaigns/:id/posts?sort=latest|top */
+export async function GET(request: NextRequest, { params }: RouteContext<"/api/campaigns/[id]/posts">) {
   try {
     const { id } = await params;
+    const viewer = await getOptionalUser(request);
     const { page, limit } = parsePagination(request.nextUrl.searchParams);
-    const { posts, total } = await CampaignService.getCampaignPosts(id, page, limit);
-    return paginatedResponse(posts, total, page, limit);
+    const sort = request.nextUrl.searchParams.get("sort") === "top" ? "top" : "latest";
+    const [{ posts, total }, remainingSnaps] = await Promise.all([
+      PostService.feed({ campaignId: id, sort, page, limit }, viewer?.id),
+      viewer ? PostService.remainingSnaps(id, viewer.id) : null,
+    ]);
+    return paginatedResponse(posts, total, page, limit, { remainingSnaps });
   } catch (error) {
     return handleApiError(error);
   }
 }
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: RouteContext<"/api/campaigns/[id]/posts">) {
   try {
     const user = await getAuthenticatedUser(request);
     const { id: campaignId } = await params;
-    const body = await request.json();
-    const { imageUrl, caption } = body;
+    const body = (await request.json().catch(() => ({}))) as { imageUrl?: unknown; caption?: unknown };
 
-    if (!imageUrl || typeof imageUrl !== "string") {
-      return errorResponse(400, "imageUrl is required");
+    if (typeof body.imageUrl !== "string" || !isAllowedImageUrl(body.imageUrl)) {
+      return errorResponse(400, "A valid image is required");
     }
-
-    try {
-      new URL(imageUrl);
-    } catch {
-      return errorResponse(400, "Invalid imageUrl format");
+    if (body.caption !== undefined && body.caption !== null && typeof body.caption !== "string") {
+      return errorResponse(400, "Caption must be text");
     }
+    const caption = typeof body.caption === "string" ? body.caption.trim() : "";
+    if (caption.length > 500) return errorResponse(400, "Caption must be at most 500 characters");
 
-    if (caption && typeof caption === "string" && caption.length > 500) {
-      return errorResponse(400, "Caption must be at most 500 characters");
-    }
-
-    const post = await PostService.create(campaignId, user.id, imageUrl, caption);
+    const post = await PostService.create(campaignId, user.id, body.imageUrl, caption || undefined);
     return successResponse(post);
   } catch (error) {
     return handleApiError(error);

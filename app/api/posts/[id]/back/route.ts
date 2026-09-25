@@ -1,25 +1,20 @@
 import { NextRequest } from "next/server";
 import { getAuthenticatedUser } from "@/lib/auth";
-import { handleApiError } from "@/lib/api-response";
+import { errorResponse, handleApiError, successResponse } from "@/lib/api-response";
 import { DonationService } from "@/lib/services/donation.service";
-import { successResponse, errorResponse } from "@/lib/api-response";
 
-export async function POST(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+/**
+ * POST /api/posts/:id/back { amount }
+ * Creates a pending support and returns the USDC transfer the client signs.
+ */
+export async function POST(request: NextRequest, { params }: RouteContext<"/api/posts/[id]/back">) {
   try {
-    const user = await getAuthenticatedUser(_request);
+    const user = await getAuthenticatedUser(request);
     const { id: postId } = await params;
-    const body = await _request.json().catch(() => ({}));
-    const { amount } = body as { amount?: number };
+    const body = (await request.json().catch(() => ({}))) as { amount?: unknown };
+    if (typeof body.amount !== "number") return errorResponse(400, "A support amount is required");
 
-    if (!amount || typeof amount !== "number" || amount <= 0) {
-      return errorResponse(400, "A positive donation amount is required");
-    }
-
-    const result = await DonationService.createDonationIntent(user.id, postId, amount);
-    return successResponse(result);
+    return successResponse(await DonationService.createIntent(user.id, postId, body.amount));
   } catch (error) {
     return handleApiError(error);
   }

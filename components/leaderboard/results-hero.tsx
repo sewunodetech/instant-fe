@@ -1,14 +1,19 @@
 "use client";
 
-import Image from "next/image";
-import { BadgeCheck, PartyPopper } from "lucide-react";
-import { ConfettiLayer, useConfetti } from "@/components/confetti";
+import { useEffect } from "react";
+import { BadgeCheck, PartyPopper, Trophy } from "lucide-react";
+import { ConfettiLayer, prefersReducedMotion, useConfetti } from "@/components/confetti";
 import { BackButton } from "@/components/layout/back-button";
-import type { Campaign } from "@/lib/mock-data";
+import { campaignTag, compactNumber, timeLeft, usdc } from "@/lib/format";
+import type { ApiCampaign } from "@/lib/types";
 
-export function ResultsHero({ campaign }: { campaign: Campaign }) {
-  const ended = !campaign.live;
+export function ResultsHero({ campaign, hasWinner }: { campaign: ApiCampaign; hasWinner: boolean }) {
+  const ended = campaign.status === "ENDED";
   const { particles, burst } = useConfetti();
+
+  useEffect(() => {
+    if (ended && hasWinner && !prefersReducedMotion()) burst();
+  }, [ended, hasWinner, burst]);
 
   return (
     <>
@@ -17,18 +22,22 @@ export function ResultsHero({ campaign }: { campaign: Campaign }) {
           <BackButton fallbackHref={`/campaigns/${campaign.id}`} />
           <div className="min-w-0">
             <div className="flex items-center gap-1">
-              <h1 className="text-headline-sm font-extrabold tracking-tight">{ended ? "Winners & Results" : "Live Leaderboard"}</h1>
+              <h1 className="text-headline-sm font-extrabold tracking-tight">
+                {ended ? "Winners & Results" : "Live Leaderboard"}
+              </h1>
               {ended && <BadgeCheck size={18} fill="currentColor" className="text-secondary" />}
             </div>
-            <div className="mt-0.5 flex items-center gap-1">
-              <span className="rounded-full bg-secondary-fixed/50 px-2 py-0.5 text-label-sm text-secondary">
-                {campaign.tag}
+            <div className="mt-0.5 flex min-w-0 items-center gap-1">
+              <span className="truncate rounded-full bg-secondary-fixed/50 px-2 py-0.5 text-label-sm text-secondary">
+                {campaignTag(campaign.title)}
               </span>
-              <span className="text-body-sm text-on-surface-variant">• ${campaign.poolUsdc} USDC Pool</span>
+              {campaign.prizePool > 0 && (
+                <span className="shrink-0 text-body-sm text-on-surface-variant">• {usdc(campaign.prizePool)} USDC</span>
+              )}
             </div>
           </div>
         </div>
-        {ended && (
+        {ended && hasWinner && (
           <button
             aria-label="Celebrate"
             onClick={burst}
@@ -40,33 +49,29 @@ export function ResultsHero({ campaign }: { campaign: Campaign }) {
       </div>
 
       <section className="relative flex w-full flex-col items-center overflow-hidden rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md text-center shadow-soft">
-        <div className="relative mb-2 h-36 w-36">
-          <Image
-            src="/mock/trophy-champion.jpg"
-            alt=""
-            fill
-            sizes="144px"
-            priority
-            className="object-contain drop-shadow-md transition-transform duration-300 hover:scale-105"
-          />
+        <div className="mb-3 flex h-20 w-20 items-center justify-center rounded-3xl bg-primary-container text-on-primary-container shadow-pop-yellow">
+          <Trophy size={40} fill="currentColor" />
         </div>
-
         {ended ? (
           <span className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-tertiary-container/40 px-3 py-1 text-label-sm text-on-tertiary-container">
             <span className="h-2 w-2 rounded-full bg-tertiary" />
-            Campaign Ended • {campaign.poolUsdc} USDC Distributed!
+            Campaign ended
           </span>
         ) : (
           <span className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-secondary-fixed/60 px-3 py-1 text-label-sm text-on-secondary-fixed-variant">
             <span className="h-2 w-2 animate-pulse rounded-full bg-tertiary" />
-            Live • {campaign.daysLeft} {campaign.daysLeft === 1 ? "day" : "days"} left
+            Live • {timeLeft(campaign.endsAt) ?? "closing"}
           </span>
         )}
-        <h2 className="text-headline-lg-mobile font-extrabold tracking-tight">{ended ? "Grand Champion Crowned" : "Race for the Crown"}</h2>
+        <h2 className="text-headline-lg-mobile font-extrabold tracking-tight">
+          {ended ? (hasWinner ? "Champion crowned" : "No entries") : "Race for the crown"}
+        </h2>
         <p className="mt-1 max-w-xs text-body-sm text-on-surface-variant">
           {ended
-            ? `Over ${campaign.votesCast.toLocaleString("en")} votes were cast by the community to decide the top creators.`
-            : `${campaign.votesCast.toLocaleString("en")} votes cast so far. Rankings update live until the campaign closes.`}
+            ? hasWinner
+              ? `${compactNumber(campaign.stats.votes)} votes from the community decided the top 3.`
+              : "This campaign closed without any snaps."
+            : `${compactNumber(campaign.stats.votes)} votes so far. Rankings update live until the campaign closes.`}
         </p>
 
         <ConfettiLayer particles={particles} />

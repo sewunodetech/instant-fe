@@ -4,9 +4,8 @@ import {
   PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { HttpError } from "@/lib/api-response";
-import { StorageServiceInterface } from "@/lib/interfaces/storage.interface";
+import type { StorageServiceInterface, StoredObject } from "@/lib/interfaces/storage.interface";
 
 const endpoint =
   process.env.AWS_ENDPOINT_URL_S3 || process.env.STORAGE_ENDPOINT || "";
@@ -18,8 +17,8 @@ const accessKeyId =
 const secretAccessKey =
   process.env.AWS_SECRET_ACCESS_KEY || process.env.STORAGE_SECRET_KEY || "";
 
-/** Signed URLs stay valid long enough to live on a post. */
-const UPLOAD_EXPIRES_IN = 7 * 24 * 3600;
+/** Public path served by app/api/media/[...key]/route.ts. */
+export const MEDIA_PREFIX = "/api/media/";
 
 function requireCredentials() {
   if (!endpoint) {
@@ -65,17 +64,24 @@ class NeonStorageService implements StorageServiceInterface {
       })
     );
 
-    return this.getSignedUrl(key, UPLOAD_EXPIRES_IN);
+    // Presigned URLs expire; stored images go through our media proxy instead.
+    return `${MEDIA_PREFIX}${key}`;
   }
 
-  async getSignedUrl(key: string, expiresIn = 3600): Promise<string> {
+  async read(key: string): Promise<StoredObject | null> {
     requireCredentials();
-
-    return getSignedUrl(
-      this.getClient(),
-      new GetObjectCommand({ Bucket: bucket, Key: key }),
-      { expiresIn }
-    );
+    try {
+      const res = await this.getClient().send(new GetObjectCommand({ Bucket: bucket, Key: key }));
+      if (!res.Body) return null;
+      return {
+        body: res.Body.transformToWebStream(),
+        contentType: res.ContentType || "application/octet-stream",
+        contentLength: res.ContentLength,
+      };
+    } catch (error) {
+      if (error instanceof Error && (error.name === "NoSuchKey" || error.name === "NotFound")) return null;
+      throw error;
+    }
   }
 
   async delete(key: string): Promise<void> {

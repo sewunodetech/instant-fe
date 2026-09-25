@@ -19,6 +19,7 @@ import {
   type User as PrivyUser,
 } from "@privy-io/react-auth";
 import { patchMe, verifyPrivyToken } from "@/lib/api-client";
+import { appChain } from "@/lib/chain";
 import type { AppUser, AppUserWithStats } from "@/lib/types";
 
 type AuthContextValue = {
@@ -37,7 +38,7 @@ type AuthContextValue = {
   logout: () => Promise<void>;
   refreshUser: () => Promise<AppUserWithStats | null>;
   updateProfile: (
-    data: Partial<Pick<AppUser, "username" | "displayName" | "avatarUrl">>
+    data: Partial<Pick<AppUser, "username" | "displayName" | "avatarUrl" | "bio">>
   ) => Promise<AppUser>;
 };
 
@@ -62,12 +63,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           landingHeader: "Welcome to instant.fun",
           loginMessage: "Snap. Join. Get Voted.",
           showWalletLoginFirst: false,
-          walletChainType: "ethereum-and-solana",
+          walletChainType: "ethereum-only",
         },
+        defaultChain: appChain,
+        supportedChains: [appChain],
         embeddedWallets: {
           ethereum: {
             createOnLogin: "users-without-wallets",
           },
+          showWalletUIs: true,
         },
       }}
     >
@@ -109,13 +113,20 @@ function AuthStateProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!ready) return;
-    if (authenticated) {
-      if (!syncInFlight.current) void refreshUser();
-    } else {
-      setUser(null);
-      setError(null);
-    }
+    // Signed-out state is derived below (`user` is masked when !authenticated).
+    if (authenticated && !syncInFlight.current) void refreshUser();
   }, [ready, authenticated, refreshUser]);
+
+  // The embedded wallet is created right after login, often after our first
+  // verify call. Re-sync once it exists so the account gets its address.
+  const privyWallet = privyUser?.wallet?.address;
+  const walletSyncedFor = useRef<string | null>(null);
+  useEffect(() => {
+    if (!user || user.walletAddress || !privyWallet || syncInFlight.current) return;
+    if (walletSyncedFor.current === privyWallet) return; // one retry per wallet
+    walletSyncedFor.current = privyWallet;
+    void refreshUser();
+  }, [user, privyWallet, refreshUser]);
 
   const { login } = useLogin({
     onComplete: () => {
@@ -145,7 +156,7 @@ function AuthStateProvider({ children }: { children: ReactNode }) {
   }, [privyLogout]);
 
   const updateProfile = useCallback(
-    async (data: Partial<Pick<AppUser, "username" | "displayName" | "avatarUrl">>) => {
+    async (data: Partial<Pick<AppUser, "username" | "displayName" | "avatarUrl" | "bio">>) => {
       const updated = await patchMe(data);
       setUser((prev) => (prev ? { ...prev, ...updated } : { ...updated }));
       return updated;
@@ -165,7 +176,7 @@ function AuthStateProvider({ children }: { children: ReactNode }) {
     () => ({
       ready,
       authenticated,
-      user,
+      user: authenticated ? user : null,
       privyUser,
       needsProfile: authenticated && !!user && !user.username,
       isSyncing: ready && authenticated && isSyncing && !user,

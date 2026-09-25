@@ -1,62 +1,56 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import { User } from "lucide-react";
 import { useAuth } from "@/components/providers/auth-provider";
+import { RemoteImage } from "@/components/ui/remote-image";
+import { initialsOf, nameOf } from "@/lib/format";
+import type { PublicUser } from "@/lib/types";
 
-type Props = {
+type AvatarUser = Pick<PublicUser, "avatarUrl" | "displayName" | "username" | "walletAddress">;
+
+/** Round avatar for any user: uploaded photo, else initials on the brand gradient. */
+export function Avatar({
+  user,
+  size = 32,
+  className = "",
+}: {
+  user: AvatarUser | null | undefined;
   size?: number;
   className?: string;
-  /** Hide the link chrome (use just the face). */
-  bare?: boolean;
-};
-
-function initials(name: string) {
-  return name
-    .split(/[\s_]+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((p) => p[0]?.toUpperCase() ?? "")
-    .join("");
-}
-
-export function UserAvatar({ size = 32, className, bare }: Props) {
-  const { user } = useAuth();
-  const href = user ? "/profile" : "/login";
-  const src = user?.avatarUrl;
-  const label = user?.displayName || user?.username || "You";
-  const px = size;
-
-  const face = src ? (
-    <Image
-      src={src}
-      alt=""
-      width={px}
-      height={px}
-      className="rounded-full object-cover ring-2 ring-secondary-container/50"
-      style={{ width: px, height: px }}
-    />
-  ) : (
+}) {
+  if (user?.avatarUrl) {
+    return (
+      <RemoteImage
+        src={user.avatarUrl}
+        alt=""
+        width={size}
+        height={size}
+        className={`shrink-0 rounded-full bg-surface-container object-cover ${className}`}
+        style={{ width: size, height: size }}
+      />
+    );
+  }
+  return (
     <span
-      className="flex items-center justify-center rounded-full bg-gradient-to-br from-secondary-container to-secondary font-bold text-on-secondary shadow-sm ring-2 ring-secondary-container/40"
-      style={{ width: px, height: px, fontSize: Math.max(11, px * 0.34) }}
+      aria-hidden
+      className={`flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-secondary-container to-secondary font-bold text-on-secondary ${className}`}
+      style={{ width: size, height: size, fontSize: Math.max(10, size * 0.36) }}
     >
-      {initials(label) || <User size={18} />}
+      {initialsOf(nameOf(user))}
     </span>
   );
+}
 
-  if (bare) {
-    return <span className={`inline-flex ${className ?? ""}`}>{face}</span>;
-  }
-
+/** Signed-in user's avatar linking to their profile. */
+export function UserAvatar({ size = 32, className }: { size?: number; className?: string }) {
+  const { user } = useAuth();
   return (
     <Link
-      href={href}
-      aria-label={user ? "Profile" : "Sign in"}
-      className={`group flex h-11 w-11 items-center justify-center rounded-full transition-transform hover:scale-105 active:scale-95 ${className ?? ""}`}
+      href={user ? "/profile" : "/login"}
+      aria-label={user ? "Your profile" : "Sign in"}
+      className={`flex h-11 w-11 items-center justify-center rounded-full transition-transform hover:scale-105 active:scale-95 ${className ?? ""}`}
     >
-      {face}
+      <Avatar user={user} size={size} className="ring-2 ring-secondary-container/40" />
     </Link>
   );
 }

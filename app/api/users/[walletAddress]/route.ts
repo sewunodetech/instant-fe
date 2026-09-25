@@ -1,31 +1,29 @@
 import { NextRequest } from "next/server";
 import { UserService } from "@/lib/services/user.service";
-import { successResponse, errorResponse, handleApiError } from "@/lib/api-response";
+import { errorResponse, handleApiError, successResponse } from "@/lib/api-response";
+import type { PublicProfile } from "@/lib/types";
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ walletAddress: string }> }
-) {
+/**
+ * GET /api/users/:handle — public profile.
+ * The segment keeps its historical name but accepts a username, wallet address or user id.
+ */
+export async function GET(_request: NextRequest, { params }: RouteContext<"/api/users/[walletAddress]">) {
   try {
-    const { walletAddress } = await params;
-
-    if (!/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
-      return errorResponse(400, "Invalid wallet address format");
-    }
-
-    const user = await UserService.findByWalletAddress(walletAddress);
+    const { walletAddress: handle } = await params;
+    const user = await UserService.findByHandle(handle);
     if (!user) return errorResponse(404, "User not found");
 
-    const stats = await UserService.getStats(walletAddress);
-
-    return successResponse({
+    const profile: PublicProfile = {
       id: user.id,
       walletAddress: user.walletAddress,
       username: user.username,
       displayName: user.displayName,
       avatarUrl: user.avatarUrl,
-      stats,
-    });
+      bio: user.bio,
+      createdAt: user.createdAt.toISOString(),
+      stats: await UserService.getStats(user.id),
+    };
+    return successResponse(profile);
   } catch (error) {
     return handleApiError(error);
   }

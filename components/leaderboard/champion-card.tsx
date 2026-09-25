@@ -1,15 +1,13 @@
-import Image from "next/image";
 import Link from "next/link";
-import { Award, ChevronRight, Gift, Heart } from "lucide-react";
-import type { Creator, Leaderboard } from "@/lib/mock-data";
+import { Award, Heart } from "lucide-react";
+import { Avatar } from "@/components/auth/user-avatar";
+import { RemoteImage } from "@/components/ui/remote-image";
+import { handleOf, profileKey, usdc } from "@/lib/format";
+import type { LeaderboardEntry } from "@/lib/types";
 
-type Props = {
-  champion: Creator;
-  dividend: Leaderboard["voterDividend"];
-  ended: boolean;
-};
-
-export function ChampionCard({ champion, dividend, ended }: Props) {
+export function ChampionCard({ entry, ended }: { entry: LeaderboardEntry; ended: boolean }) {
+  const { post } = entry;
+  const handle = handleOf(post.user);
   return (
     <section className="relative w-full overflow-hidden rounded-3xl border-2 border-primary-container bg-surface-container-lowest p-space-md shadow-soft ring-4 ring-primary-container/15">
       <div className="mb-space-sm flex items-center justify-between">
@@ -19,66 +17,31 @@ export function ChampionCard({ champion, dividend, ended }: Props) {
         </span>
         <span className="flex items-center gap-1 rounded-full bg-surface-container-high px-2.5 py-1 text-label-sm tabular-nums">
           <Heart size={15} fill="currentColor" className="text-error" />
-          {champion.votes.toLocaleString("en")} votes
+          {post.voteCount.toLocaleString("en")} votes
         </span>
       </div>
 
       <div className="flex items-center gap-3">
-        <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-surface-container">
-          <Image src={champion.snapImage} alt={`Winning snap by @${champion.handle}`} fill sizes="96px" className="object-cover" />
-          <div className="absolute inset-0 flex items-end justify-center bg-gradient-to-t from-black/50 via-transparent to-transparent pb-1.5">
-            <span className="rounded-full bg-black/40 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur-sm">
-              View Snap
-            </span>
-          </div>
-        </div>
-
+        <Link
+          href={`/snaps/${post.id}`}
+          className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-surface-container"
+        >
+          <RemoteImage src={post.imageUrl} alt={`Winning snap by @${handle}`} fill sizes="96px" className="object-cover" />
+        </Link>
         <div className="flex h-24 min-w-0 flex-1 flex-col justify-between py-0.5">
-          <div>
-            <div className="flex items-center gap-2">
-              {champion.avatar && (
-                <Image src={champion.avatar} alt="" width={24} height={24} className="h-6 w-6 rounded-full object-cover" />
-              )}
-              <span className="truncate text-label-lg">@{champion.handle}</span>
-            </div>
-            {champion.tagline && (
-              <p className="mt-0.5 truncate text-body-sm text-on-surface-variant">&ldquo;{champion.tagline}&rdquo;</p>
-            )}
-          </div>
-          <div className="mt-2 flex items-center justify-between pt-2">
+          <Link href={`/u/${profileKey(post.user)}`} className="flex min-w-0 items-center gap-2">
+            <Avatar user={post.user} size={24} />
+            <span className="truncate text-label-lg">@{handle}</span>
+          </Link>
+          {post.caption && <p className="truncate text-body-sm text-on-surface-variant">&ldquo;{post.caption}&rdquo;</p>}
+          {entry.prize > 0 && (
             <div>
-              <span className="block text-label-sm text-on-surface-variant">
-                {ended ? "Creator Payout" : "Est. Creator Payout"}
-              </span>
-              <span className="text-headline-sm font-extrabold tabular-nums">
-                +{champion.payoutUsdc.toFixed(2)} USDC
-              </span>
+              <span className="block text-label-sm text-on-surface-variant">{ended ? "Prize" : "On track for"}</span>
+              <span className="text-headline-sm font-extrabold text-tertiary tabular-nums">+{usdc(entry.prize)} USDC</span>
             </div>
-          </div>
+          )}
         </div>
       </div>
-
-      <Link
-        href="/rewards"
-        className="mt-3 flex items-center justify-between rounded-2xl bg-surface-container-low p-2.5 transition-colors hover:bg-surface-container"
-      >
-        <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-secondary-fixed text-secondary">
-            <Gift size={16} />
-          </div>
-          <div>
-            <span className="block text-label-sm leading-tight">
-              {ended ? "Voter Dividend Unlocked" : "Voter Dividend Pool"}
-            </span>
-            <span className="text-body-sm leading-tight text-on-surface-variant">
-              {ended
-                ? `${dividend.count} Top Voters won +${dividend.eachUsdc} USDC each!`
-                : `Top ${dividend.count} voters on track for +${dividend.eachUsdc} USDC each`}
-            </span>
-          </div>
-        </div>
-        <ChevronRight size={18} className="text-secondary" />
-      </Link>
     </section>
   );
 }
