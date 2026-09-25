@@ -26,12 +26,9 @@ export default function OnboardingPage() {
       <main className="flex flex-1 flex-col px-space-md pb-8">
         <div className="mt-2 flex flex-col items-center px-space-xs text-center">
           <div className="relative mb-space-sm inline-flex items-center justify-center">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-container/40 text-primary">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary-container/30 text-secondary">
               <Sparkles size={24} fill="currentColor" />
             </div>
-            <svg aria-hidden className="absolute -top-3 -right-3 h-6 w-6 rotate-12 text-primary-fixed drop-shadow-sm" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z" />
-            </svg>
           </div>
           <h1 className="max-w-[340px] text-headline-xl-mobile font-extrabold tracking-tight leading-tight">
             Turn Your Moments Into{" "}
@@ -51,11 +48,11 @@ export default function OnboardingPage() {
 
         {/* Decorative sample snap */}
         <div aria-hidden className="relative my-space-lg flex w-full items-center justify-center select-none">
-          <div className="absolute -top-3 left-4 z-20 flex -rotate-6 animate-pulse items-center gap-1 rounded-full bg-surface-container-lowest px-3 py-1.5 shadow-[0_4px_20px_rgba(17,17,17,0.08)]">
+          <div className="absolute -top-3 left-4 z-20 flex -rotate-6 items-center gap-1 rounded-full bg-surface-container-lowest px-3 py-1.5 shadow-soft">
             <Zap size={18} className="text-secondary" />
             <span className="text-label-sm">Trending Snap</span>
           </div>
-          <div className="absolute -top-4 right-5 z-20 flex rotate-12 items-center gap-1 rounded-full bg-tertiary-container px-3 py-1.5 text-label-md text-on-tertiary-container shadow-md">
+          <div className="absolute -top-4 right-5 z-20 flex rotate-12 items-center gap-1 rounded-full bg-tertiary-container px-3 py-1.5 text-label-md text-on-tertiary-container shadow-soft">
             <CircleDollarSign size={16} fill="currentColor" />
             +50 USDC
           </div>
@@ -68,7 +65,7 @@ export default function OnboardingPage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
                 <div className="absolute inset-x-2.5 bottom-2.5 flex items-center justify-between">
                   <span className="flex items-center gap-1.5 rounded-full bg-black/40 px-2.5 py-1 text-label-sm text-white backdrop-blur-md">
-                    <MapPin size={15} fill="currentColor" className="text-primary-container" />
+                    <MapPin size={15} fill="currentColor" className="text-secondary-container" />
                     Salt &amp; Sea Cafe
                   </span>
                   <span className="flex items-center gap-1 rounded-full bg-black/40 px-2.5 py-1 text-label-sm text-white backdrop-blur-md">
@@ -90,11 +87,7 @@ export default function OnboardingPage() {
                 <span className="rounded-full bg-surface-container-high px-2 py-0.5 text-label-sm">Rank #1</span>
               </div>
             </div>
-            <div className="absolute -bottom-3 -left-2 z-20 flex -rotate-12 items-center gap-1 rounded-2xl bg-surface-container-lowest px-2.5 py-1.5 shadow-sm">
-              <Sparkles size={16} fill="currentColor" className="text-secondary" />
-              <span className="text-label-sm">Voted by 840+</span>
-            </div>
-            <div className="absolute right-4 -bottom-2 z-20 rotate-6 rounded-full bg-primary-container p-2 text-on-primary-container shadow-md">
+            <div className="absolute right-4 -bottom-2 z-20 rotate-6 rounded-full bg-secondary-container p-2 text-on-secondary shadow-soft">
               <Smile size={20} fill="currentColor" className="block" />
             </div>
           </div>
@@ -112,7 +105,7 @@ export default function OnboardingPage() {
         <div className="mt-space-md flex flex-col gap-space-sm px-space-xs">
           <Link
             href="/login?next=/home"
-            className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-primary-container text-label-lg font-bold text-on-primary-container shadow-soft transition-all hover:-translate-y-0.5 hover:bg-primary-fixed active:scale-[0.98]"
+            className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-secondary-container text-label-lg font-bold text-on-secondary shadow-soft transition-all hover:-translate-y-0.5 hover:bg-secondary active:scale-[0.98]"
           >
             Get Started
             <ArrowRight size={20} />

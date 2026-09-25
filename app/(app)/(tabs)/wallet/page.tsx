@@ -105,9 +105,7 @@ export default function WalletPage() {
         </button>
       </div>
 
-      <section className="relative overflow-hidden rounded-3xl border-2 border-white/15 bg-gradient-to-br from-secondary-container via-secondary to-on-primary-fixed p-space-md text-white shadow-pop-yellow">
-        <div className="pointer-events-none absolute -top-10 -right-8 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
-        <div className="pointer-events-none absolute -bottom-12 -left-8 h-40 w-40 rounded-full bg-primary-container/25 blur-2xl" />
+      <section className="relative overflow-hidden rounded-3xl border-2 border-white/15 bg-gradient-to-br from-secondary-container via-secondary to-on-secondary-fixed-variant p-space-md text-white shadow-pop-blue">
         <div className="relative flex flex-col gap-space-md">
           <div className="flex items-start justify-between">
             <div>

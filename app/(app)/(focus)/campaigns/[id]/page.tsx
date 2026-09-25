@@ -61,7 +61,7 @@ export default async function CampaignDetailPage({ params }: PageProps<"/campaig
             className="object-cover transition-transform duration-700 hover:scale-105"
           />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-          <span className="absolute top-3 left-3 flex items-center gap-1 rounded-full bg-primary-container px-3 py-1 text-label-md text-on-primary-fixed shadow-sm">
+          <span className="absolute top-3 left-3 flex items-center gap-1 rounded-full bg-secondary-container px-3 py-1 text-label-md text-on-secondary shadow-sm">
             <Tag size={14} />
             {campaign.tag.slice(1)}
           </span>
@@ -106,7 +106,7 @@ export default async function CampaignDetailPage({ params }: PageProps<"/campaig
         <div className="app-shell mx-auto">
           <Link
             href={`/snap?campaign=${campaign.id}`}
-            className="flex h-14 w-full items-center justify-center gap-space-sm rounded-full bg-primary-container text-headline-sm text-on-primary-fixed shadow-lg transition-all hover:brightness-105 active:scale-[0.98]"
+            className="flex h-14 w-full items-center justify-center gap-space-sm rounded-full bg-secondary-container text-headline-sm text-on-secondary shadow-lg transition-all hover:brightness-105 active:scale-[0.98]"
           >
             <Camera size={24} />
             Join Campaign &amp; Snap

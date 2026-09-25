@@ -10,7 +10,7 @@ export function StreakBanner({ days, bonusPct, power }: Props) {
   const pct = Math.round((power.left / power.max) * 100);
 
   return (
-    <div className="flex items-center justify-between overflow-hidden rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft ring-4 ring-[#ff6b6b]/15">
+    <div className="flex items-center justify-between overflow-hidden rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft">
       <div className="flex min-w-0 items-center gap-space-sm">
         <div className="flex h-11 w-11 shrink-0 animate-pulse-glow items-center justify-center rounded-2xl bg-[#ff6b6b] text-white shadow-sm">
           <Flame size={24} fill="currentColor" />

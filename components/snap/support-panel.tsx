@@ -98,7 +98,7 @@ export function SupportPanel({
   return (
     <section className="flex w-full flex-col gap-4 rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft">
       <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#ff6b6b] text-white shadow-sm">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-secondary-container text-on-secondary shadow-sm">
           <Vote size={22} />
         </div>
         <div className="min-w-0 flex-1">
@@ -212,7 +212,7 @@ export function SupportPanel({
 
       <div className="flex items-center justify-between rounded-2xl bg-surface-container-low p-3">
         <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary-container/50 text-on-primary-container">
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-secondary-container/50 text-secondary">
             <HandHeart size={16} />
           </div>
           <div className="flex flex-col">
@@ -220,7 +220,7 @@ export function SupportPanel({
             <span className="text-body-sm text-on-surface-variant">No platform fee</span>
           </div>
         </div>
-        <span className="text-label-lg font-extrabold text-primary tabular-nums">
+        <span className="text-label-lg font-extrabold text-secondary tabular-nums">
           {amount > 0 ? `${usd(amount)} USDC` : "—"}
         </span>
       </div>
@@ -234,7 +234,7 @@ export function SupportPanel({
           className={`flex h-14 w-full items-center justify-center gap-2 rounded-full text-label-lg transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 ${
             status === "success"
               ? "bg-tertiary text-on-tertiary"
-              : "bg-primary-container text-on-primary-fixed shadow-shutter hover:brightness-105"
+              : "bg-secondary-container text-on-secondary shadow-shutter hover:brightness-105"
           } ${status === "confirming" ? "opacity-90" : ""}`}
         >
           {status === "idle" && <HandHeart size={22} />}

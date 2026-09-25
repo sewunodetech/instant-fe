@@ -173,7 +173,7 @@ function CreateCampaignFlow() {
         <div className="relative aspect-[16/9] w-full">
           <Image src={preview.cover} alt="" fill sizes="(max-width: 767px) 100vw, 720px" className="object-cover" priority />
           <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
-          <span className="absolute top-3 left-3 flex items-center gap-1 rounded-full bg-primary-container px-3 py-1 text-label-md shadow-sm">
+          <span className="absolute top-3 left-3 flex items-center gap-1 rounded-full bg-secondary-container px-3 py-1 text-label-md text-on-secondary shadow-sm">
             <Eye size={14} />
             Preview
           </span>
@@ -200,7 +200,7 @@ function CreateCampaignFlow() {
       {step === "brief" && (
         <section className="rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft">
           <div className="mb-space-sm flex items-start gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#106df4] text-white shadow-sm">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-secondary-container text-on-secondary shadow-sm">
               <Sparkles size={20} />
             </div>
             <div>
@@ -371,7 +371,7 @@ function CreateCampaignFlow() {
 
           <div className="mt-space-md rounded-2xl bg-surface-container-low p-3">
             <div className="flex items-center gap-2 text-label-md">
-              <span className="flex h-8 w-8 items-center justify-center rounded-2xl bg-primary-container">
+              <span className="flex h-8 w-8 items-center justify-center rounded-2xl bg-secondary-container text-on-secondary">
                 <User size={16} />
               </span>
               Host · @{currentUser.handle}
@@ -397,7 +397,7 @@ function CreateCampaignFlow() {
               type="button"
               onClick={publish}
               disabled={!canPublish}
-              className="mt-space-md flex h-13 w-full items-center justify-center gap-2 rounded-full bg-primary-container text-label-lg text-on-primary-fixed shadow-shutter transition-all active:scale-[0.98] disabled:opacity-50"
+              className="mt-space-md flex h-13 w-full items-center justify-center gap-2 rounded-full bg-secondary-container text-label-lg text-on-secondary shadow-shutter transition-all active:scale-[0.98] disabled:opacity-50"
             >
               {publishing ? (
                 <Loader2 size={22} className="animate-spin" />

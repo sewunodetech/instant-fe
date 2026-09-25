@@ -2,7 +2,7 @@
 
 import { useCallback, useState, type CSSProperties } from "react";
 
-const colors = ["#FFE000", "#106DF4", "#71FB96", "#FF6B8B", "#FFBE0B"];
+const colors = ["#FFE000", "#106DF4", "#71FB96", "#D9E2FF", "#54E07F"];
 
 type Particle = { id: number; style: CSSProperties };
 

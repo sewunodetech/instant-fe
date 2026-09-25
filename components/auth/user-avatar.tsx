@@ -34,12 +34,12 @@ export function UserAvatar({ size = 32, className, bare }: Props) {
       alt=""
       width={px}
       height={px}
-      className="rounded-full object-cover ring-2 ring-primary-container/50"
+      className="rounded-full object-cover ring-2 ring-secondary-container/50"
       style={{ width: px, height: px }}
     />
   ) : (
     <span
-      className="flex items-center justify-center rounded-full bg-gradient-to-br from-primary-container to-primary-fixed-dim font-bold text-on-primary-fixed shadow-sm ring-2 ring-primary-container/40"
+      className="flex items-center justify-center rounded-full bg-gradient-to-br from-secondary-container to-secondary font-bold text-on-secondary shadow-sm ring-2 ring-secondary-container/40"
       style={{ width: px, height: px, fontSize: Math.max(11, px * 0.34) }}
     >
       {initials(label) || <User size={18} />}

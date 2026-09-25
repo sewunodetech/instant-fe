@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Award, ChevronRight, Gift, Heart, Medal } from "lucide-react";
+import { Award, ChevronRight, Gift, Heart } from "lucide-react";
 import type { Creator, Leaderboard } from "@/lib/mock-data";
 
 type Props = {
@@ -54,7 +54,6 @@ export function ChampionCard({ champion, dividend, ended }: Props) {
                 +{champion.payoutUsdc.toFixed(2)} USDC
               </span>
             </div>
-            <Medal size={28} fill="currentColor" className="text-primary" />
           </div>
         </div>
       </div>

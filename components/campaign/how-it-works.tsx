@@ -4,8 +4,8 @@ import { LucideIcon } from "@/components/lucide-icon";
 const steps = [
   {
     icon: "waving_hand",
-    iconBg: "bg-primary-fixed text-on-primary-fixed",
-    stepColor: "text-on-primary-container",
+    iconBg: "bg-secondary-container text-on-secondary",
+    stepColor: "text-secondary",
     title: "Join the Campaign",
     body: "Tap Join and get your camera shutter primed.",
   },

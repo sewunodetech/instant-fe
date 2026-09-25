@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { SnapCard } from "@/components/home/snap-card";
 import { listCampaigns, listCampaignPosts, votePost, backPost, ApiClientError } from "@/lib/api-client";
 import { mapApiCampaign, mapApiPost } from "@/lib/mappers";
@@ -35,10 +35,6 @@ function ApiAwareSnapCard({ snap, priority }: { snap: Snap; priority?: boolean }
   const [votes, setVotes] = useState(snap.votes);
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => {
-    setVotes(snap.votes);
-  }, [snap.votes]);
-
   const isMock = snap.id.startsWith("snap-");
 
   async function handleVote() {
@@ -65,37 +61,29 @@ function ApiAwareSnapCard({ snap, priority }: { snap: Snap; priority?: boolean }
   }
 
   return (
-    <div className="[&>article]:h-full">
-      <SnapCard
-        snap={{ ...snap, votes }}
-        priority={priority}
-        onVote={handleVote}
-        onSupport={handleSupport}
-        busy={busy}
-      />
-    </div>
+    <SnapCard
+      snap={{ ...snap, votes }}
+      priority={priority}
+      onVote={handleVote}
+      onSupport={handleSupport}
+      busy={busy}
+    />
   );
 }
 
 function FeedGrid({ snaps }: { snaps: Snap[] }) {
-  const [first, ...rest] = snaps;
-
-  if (!first) {
+  if (snaps.length === 0) {
     return (
-      <p className="rounded-3xl bg-surface-container-lowest p-6 text-center text-body-md text-on-surface-variant shadow-card">
+      <p className="rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-6 text-center text-body-md text-on-surface-variant shadow-soft">
         No snaps yet. Be the first to post!
       </p>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 gap-space-md md:grid-cols-2 xl:grid-cols-3">
-      <div className="md:col-span-2 xl:col-span-1">
-        <ApiAwareSnapCard snap={first} priority />
-      </div>
-      <div className="md:col-span-2 xl:col-span-3" />
-      {rest.map((snap) => (
-        <ApiAwareSnapCard key={snap.id} snap={snap} />
+    <div className="flex flex-col gap-space-md">
+      {snaps.map((snap, i) => (
+        <ApiAwareSnapCard key={snap.id} snap={snap} priority={i === 0} />
       ))}
     </div>
   );

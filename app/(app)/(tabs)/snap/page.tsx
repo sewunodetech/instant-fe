@@ -404,7 +404,7 @@ function CreateSnapFlow() {
               onClick={capture}
               className="flex h-16 w-16 items-center justify-center rounded-full bg-white ring-4 ring-white/30 transition-transform active:scale-90"
             >
-              <span className="h-12 w-12 rounded-full bg-primary-container ring-2 ring-black/10" />
+              <span className="h-12 w-12 rounded-full bg-secondary-container ring-2 ring-black/10" />
             </button>
           ) : (
             <button
@@ -493,7 +493,7 @@ function CreateSnapFlow() {
             type="button"
             onClick={post}
             disabled={!canPost}
-            className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-primary-container text-headline-sm text-on-primary-fixed shadow-shutter transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-secondary-container text-headline-sm text-on-secondary shadow-shutter transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {posting ? (
               <Loader2 size={24} className="animate-spin" />

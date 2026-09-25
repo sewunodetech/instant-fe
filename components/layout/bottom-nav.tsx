@@ -55,14 +55,14 @@ export function BottomNav() {
                 aria-current={active ? "page" : undefined}
                 className={`flex min-h-12 min-w-14 flex-col items-center justify-center gap-0.5 rounded-2xl transition-all ${
                   active
-                    ? "bg-primary-container/25 text-on-primary-container"
+                    ? "bg-secondary-container/20 text-secondary"
                     : "text-on-surface-variant hover:bg-surface-container/70 hover:text-on-surface"
                 }`}
               >
                 <TabIcon
                   size={24}
                   fill={active ? "currentColor" : "none"}
-                  className={active ? "text-primary" : ""}
+                  className={active ? "text-secondary" : ""}
                 />
                 <span className="text-label-sm">{tab.label}</span>
               </Link>
