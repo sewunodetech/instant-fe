@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "motion/react";
 import { ArrowLeft, ArrowRight, AtSign, CircleAlert, Loader2, Mail, ShieldCheck, Wallet } from "lucide-react";
-import { AuthBackdrop } from "@/components/auth/auth-backdrop";
+import { AuthScene } from "@/components/auth/auth-backdrop";
 import { AppleIcon, DiscordIcon, GoogleIcon, XIcon } from "@/components/auth/provider-icons";
 import { useAuth } from "@/components/providers/auth-provider";
 
@@ -29,7 +29,7 @@ function Sheet({ children }: { children: React.ReactNode }) {
       initial={{ y: 48, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, delay: 0.15, ease }}
-      className="relative z-10 mt-auto w-full rounded-t-[2rem] bg-surface-container-lowest/95 px-5 pt-3 pb-[calc(env(safe-area-inset-bottom,0px)+1.25rem)] shadow-[0_-12px_40px_rgba(15,23,42,0.18)] backdrop-blur-xl sm:mb-6 sm:rounded-[2rem] sm:pb-6"
+      className="relative z-10 w-full rounded-t-[2rem] bg-surface-container-lowest/95 px-5 pt-3 pb-[calc(env(safe-area-inset-bottom,0px)+1.25rem)] shadow-[0_-12px_40px_rgba(15,23,42,0.18)] backdrop-blur-xl"
     >
       <span aria-hidden className="mx-auto mb-4 block h-1.5 w-10 rounded-full bg-on-surface/15" />
       {children}
@@ -113,6 +113,8 @@ function LoginContent() {
             : "Join photo challenges, get voted, win real USDC prizes."}
         </p>
       </motion.div>
+
+      <AuthScene />
 
       <Sheet>
         {redirecting && error && !user ? (
@@ -233,9 +235,9 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <div className="relative flex min-h-dvh w-full flex-col overflow-hidden bg-surface">
-      <AuthBackdrop />
-      <div className="relative mx-auto flex min-h-dvh w-full max-w-[30rem] flex-col">
+    // Same phone column as the app shell, so login → home feels like one app.
+    <div className="min-h-dvh w-full bg-surface-dim">
+      <div className="app-shell relative flex min-h-dvh flex-col overflow-hidden bg-surface sm:shadow-elevated">
         <header className="relative z-10 flex h-16 items-center justify-between px-5 pt-safe">
           <Link href="/" aria-label="instant.fun home">
             <Image src="/brand/logo.png" alt="instant.fun" width={120} height={32} priority className="h-8 w-auto" />
