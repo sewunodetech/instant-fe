@@ -1,18 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
 import { PartyPopper } from "lucide-react";
-import { ConfettiLayer, prefersReducedMotion, useConfetti } from "@/components/confetti";
+import { ConfettiLayer, useConfetti } from "@/components/confetti";
 
-/** Confetti over the reward card; bursts once on mount and again on each tap. */
+/** Confetti over the reward card; bursts on tap. */
 export function RewardConfetti() {
   const { particles, burst } = useConfetti();
-
-  useEffect(() => {
-    if (prefersReducedMotion()) return;
-    const t = setTimeout(burst, 400);
-    return () => clearTimeout(t);
-  }, [burst]);
 
   return (
     <>

@@ -44,33 +44,10 @@ export default function ProfilePage() {
 
   return (
     <div className="flex flex-col gap-space-md px-space-md pb-4 sm:px-0">
-      <div className="flex items-center justify-between pt-3">
-        <BackButton fallbackHref="/home" />
-        <div className="flex items-center gap-1">
-          <Link
-            href="/activity"
-            aria-label="Activity"
-            className="relative flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container"
-          >
-            <Bell size={22} />
-            {currentUser.hasUnread && (
-              <span className="absolute top-2.5 right-2.5 h-2 w-2 rounded-full bg-error ring-2 ring-surface" />
-            )}
-          </Link>
-          <Link
-            href="/create"
-            aria-label="Create campaign"
-            className="flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container"
-          >
-            <CirclePlus size={22} />
-          </Link>
-        </div>
-      </div>
-
       <section className="rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft">
         <div className="flex items-start gap-space-md">
           <div className="relative">
-            <div className="h-22 w-22 overflow-hidden rounded-full bg-surface-container ring-3 ring-primary-container">
+            <div className="h-22 w-22 overflow-hidden rounded-full bg-surface-container ring-3 ring-secondary-container">
               <Image
                 src={avatar}
                 alt={displayName}
@@ -106,8 +83,8 @@ export default function ProfilePage() {
                 <Wallet size={13} className="text-secondary" />
                 {walletShort ?? "No wallet yet"}
               </span>
-              <span className="flex items-center gap-1 rounded-full bg-primary-container/40 px-2.5 py-1 text-label-sm text-on-primary-container">
-                <Flame size={13} fill="currentColor" className="text-primary" />
+              <span className="flex items-center gap-1 rounded-full bg-secondary-container/20 px-2.5 py-1 text-label-sm text-secondary">
+                <Flame size={13} fill="currentColor" className="text-secondary" />
                 {currentUser.streakDays}d streak
               </span>
             </div>
@@ -131,7 +108,7 @@ export default function ProfilePage() {
         <div className="mt-space-sm grid grid-cols-3 gap-space-xs">
           <Link
             href="/rewards"
-            className="flex items-center justify-center gap-1 rounded-full bg-primary-container py-2 text-label-sm text-on-primary-fixed"
+            className="flex items-center justify-center gap-1 rounded-full bg-secondary-container py-2 text-label-sm text-on-secondary"
           >
             <Trophy size={14} />
             Rewards
@@ -162,11 +139,10 @@ export default function ProfilePage() {
               role="tab"
               aria-selected={active}
               onClick={() => setTab(t.id)}
-              className={`flex flex-1 items-center justify-center gap-1.5 rounded-full py-2 text-label-md transition-all ${
-                active
-                  ? "bg-surface-container-lowest text-on-surface shadow-sm"
-                  : "text-on-surface-variant hover:text-on-surface"
-              }`}
+              className={`flex flex-1 items-center justify-center gap-1.5 rounded-full py-2 text-label-md transition-all ${active
+                ? "bg-surface-container-lowest text-on-surface shadow-sm"
+                : "text-on-surface-variant hover:text-on-surface"
+                }`}
             >
               <LucideIcon name={t.icon} size={16} filled={active} />
               {t.label}
@@ -223,7 +199,7 @@ export default function ProfilePage() {
       {tab === "about" && (
         <section className="flex flex-col gap-space-sm rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft">
           <div className="flex items-start gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#106df4] text-white shadow-sm">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-secondary-container text-on-secondary shadow-sm">
               <Sparkles size={20} />
             </div>
             <div>

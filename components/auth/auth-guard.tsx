@@ -44,19 +44,9 @@ export function AuthGuard({ children, profileHref = "/login" }: Props) {
 
     return (
       <div className="relative flex min-h-dvh flex-col items-center justify-center gap-5 overflow-hidden bg-surface">
-        {/* Soft brand glow */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute top-1/4 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-primary-container/30 blur-3xl"
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute right-0 bottom-0 h-48 w-48 rounded-full bg-secondary-container/15 blur-3xl"
-        />
-
         <div className="relative flex flex-col items-center gap-4">
           <div className="relative">
-            <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-primary-container text-on-primary-container shadow-pop-yellow">
+            <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-secondary-container text-on-secondary-container shadow-pop-blue">
               <Zap size={32} fill="currentColor" />
             </div>
             <span
@@ -79,7 +69,7 @@ export function AuthGuard({ children, profileHref = "/login" }: Props) {
           />
 
           <div className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary-container [animation-delay:-0.2s]" />
+            <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-secondary [animation-delay:-0.2s]" />
             <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-secondary-container [animation-delay:-0.1s]" />
             <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-tertiary" />
           </div>

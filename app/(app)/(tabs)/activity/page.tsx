@@ -10,7 +10,7 @@ import { activityFeed, type ActivityKind } from "@/lib/mock-data";
 
 const kindMeta: Record<ActivityKind, { icon: string; className: string }> = {
   vote: { icon: "how_to_vote", className: "bg-secondary-fixed text-on-secondary-fixed" },
-  support: { icon: "volunteer_activism", className: "bg-primary-container text-on-primary-fixed" },
+  support: { icon: "volunteer_activism", className: "bg-secondary-container text-on-secondary" },
   follow: { icon: "person_add", className: "bg-tertiary-container text-on-tertiary-container" },
   reward: { icon: "emoji_events", className: "bg-tertiary text-on-tertiary" },
   campaign: { icon: "campaign", className: "bg-error-container text-on-error-container" },
@@ -36,7 +36,6 @@ export default function ActivityPage() {
     <div className="flex flex-col gap-space-md px-space-md pb-4 sm:px-0">
       <div className="flex items-center justify-between pt-3">
         <div className="flex items-center gap-2">
-          <BackButton fallbackHref="/home" />
           <div>
             <h1 className="text-headline-sm font-extrabold tracking-tight">Activity</h1>
             <p className="text-label-sm text-on-surface-variant">Votes, support &amp; campaign updates</p>
@@ -60,9 +59,8 @@ export default function ActivityPage() {
               role="tab"
               aria-selected={active}
               onClick={() => setFilter(f.id)}
-              className={`h-9 shrink-0 rounded-full px-4 text-label-md shadow-sm transition-all active:scale-95 ${
-                active ? "bg-on-surface text-surface-container-lowest" : "bg-surface-container-lowest hover:bg-surface-container"
-              }`}
+              className={`h-9 shrink-0 rounded-full px-4 text-label-md shadow-sm transition-all active:scale-95 ${active ? "bg-on-surface text-surface-container-lowest" : "bg-surface-container-lowest hover:bg-surface-container"
+                }`}
             >
               {f.label}
             </button>
@@ -94,11 +92,10 @@ export default function ActivityPage() {
               <li key={item.id}>
                 <Link
                   href={href}
-                  className={`flex items-center gap-3 rounded-3xl border-2 p-3 transition-all hover:-translate-y-0.5 hover:shadow-card-hover ${
-                    item.unread
-                      ? "border-primary-container bg-surface-container-lowest shadow-soft ring-4 ring-primary-container/15"
-                      : "border-on-surface/10 bg-surface-container-lowest shadow-soft"
-                  }`}
+                  className={`flex items-center gap-3 rounded-3xl border-2 p-3 transition-all hover:-translate-y-0.5 hover:shadow-card-hover ${item.unread
+                    ? "border-secondary-container bg-surface-container-lowest shadow-soft ring-4 ring-secondary-container/15"
+                    : "border-on-surface/10 bg-surface-container-lowest shadow-soft"
+                    }`}
                 >
                   <div className="relative shrink-0">
                     {item.avatar ? (
@@ -126,11 +123,10 @@ export default function ActivityPage() {
                   </div>
                   {typeof item.amountUsdc === "number" && item.amountUsdc > 0 && (
                     <span
-                      className={`shrink-0 rounded-full px-2.5 py-1 text-label-sm tabular-nums ${
-                        item.kind === "support" && item.title.startsWith("You")
-                          ? "bg-surface-container text-on-surface"
-                          : "bg-tertiary-container/50 text-on-tertiary-container"
-                      }`}
+                      className={`shrink-0 rounded-full px-2.5 py-1 text-label-sm tabular-nums ${item.kind === "support" && item.title.startsWith("You")
+                        ? "bg-surface-container text-on-surface"
+                        : "bg-tertiary-container/50 text-on-tertiary-container"
+                        }`}
                     >
                       {item.kind === "support" && item.title.startsWith("You") ? "−" : "+"}
                       {item.amountUsdc} USDC
@@ -143,28 +139,6 @@ export default function ActivityPage() {
           })}
         </ul>
       )}
-
-      <div className="rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft">
-        <div className="mb-space-sm flex items-center justify-between">
-          <h2 className="text-label-lg font-extrabold">Quick links</h2>
-        </div>
-        <div className="grid grid-cols-3 gap-space-xs">
-          {[
-            { href: "/wallet", label: "Wallet", icon: "account_balance_wallet" },
-            { href: "/rewards", label: "Rewards", icon: "emoji_events" },
-            { href: "/campaigns", label: "Explore", icon: "explore" },
-          ].map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className="flex flex-col items-center gap-1.5 rounded-2xl bg-surface-container-low p-3 text-label-sm transition-colors hover:bg-surface-container"
-            >
-              <LucideIcon name={l.icon} size={20} className="text-secondary" />
-              {l.label}
-            </Link>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }

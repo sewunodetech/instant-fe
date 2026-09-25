@@ -7,7 +7,7 @@ import type { Campaign } from "@/lib/mock-data";
 const initials = [
   { label: "JD", className: "bg-secondary-fixed text-on-secondary-fixed" },
   { label: "MK", className: "bg-tertiary-container text-on-tertiary-container" },
-  { label: "SL", className: "bg-primary-container text-on-surface" },
+  { label: "SL", className: "bg-tertiary-container text-on-tertiary-container" },
 ];
 
 // Cards use a stretched detail link; the Join link sits above it with z-10.
@@ -17,12 +17,12 @@ export function FeaturedCampaignCard({ campaign }: { campaign: Campaign }) {
     <article className="relative overflow-hidden rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-4 shadow-soft transition-all hover:-translate-y-1 hover:shadow-card-hover">
       <div className="relative h-56 w-full overflow-hidden rounded-[18px] bg-surface-container-high">
         <Image src={campaign.cover} alt="" fill priority sizes="(max-width: 767px) 100vw, 720px" className="object-cover" />
-        <span className="absolute top-3 left-3 flex items-center gap-1 rounded-full bg-primary-container px-3 py-1.5 text-label-md shadow-md">
+        <span className="absolute top-3 left-3 flex items-center gap-1 rounded-full bg-secondary-container px-3 py-1.5 text-label-md text-on-secondary shadow-md">
           <Tag size={16} />
           {campaign.tag.slice(1)}
         </span>
         <span className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-surface-container-lowest/90 px-3 py-1.5 text-label-sm shadow-md backdrop-blur-md">
-          <Trophy size={15} className="text-primary" />
+          <Trophy size={15} className="text-secondary" />
           {campaign.poolUsdc} USDC <span className="font-medium text-on-surface-variant">Pool</span>
         </span>
         <div className="absolute inset-x-0 bottom-0 flex h-16 items-end bg-gradient-to-t from-black/60 to-transparent p-3">
@@ -68,7 +68,7 @@ export function FeaturedCampaignCard({ campaign }: { campaign: Campaign }) {
           </Link>
           <Link
             href={`/snap?campaign=${campaign.id}`}
-            className="relative z-10 flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-full bg-primary-container px-6 text-label-lg shadow-sm transition-transform active:translate-y-0.5 active:scale-95"
+            className="relative z-10 flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-full bg-secondary-container px-6 text-label-lg text-on-secondary shadow-sm transition-transform active:translate-y-0.5 active:scale-95"
           >
             Join <ArrowRight size={18} />
           </Link>
@@ -87,7 +87,7 @@ export function CampaignRowCard({ campaign }: { campaign: Campaign }) {
           {campaign.badge && (
             <span
               className={`absolute top-1.5 left-1.5 rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
-                campaign.badge === "New" ? "bg-on-surface/75 text-white backdrop-blur-sm" : "bg-primary-container"
+                campaign.badge === "New" ? "bg-on-surface/75 text-white backdrop-blur-sm" : "bg-secondary-container text-on-secondary"
               }`}
             >
               {campaign.badge}

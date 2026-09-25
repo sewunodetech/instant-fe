@@ -17,7 +17,6 @@ import {
 } from "lucide-react";
 import { LucideIcon } from "@/components/lucide-icon";
 import type { Snap } from "@/lib/mock-data";
-import { Button } from "@base-ui/react/button";
 
 const supportOptions = [1, 5, 10];
 
@@ -106,7 +105,7 @@ export function SnapCard({
             onClick={() => setSupport((cur) => (cur === b ? null : b))}
             className={`h-9 rounded-full px-2.5 text-label-sm transition-transform active:scale-95 ${
               support === b
-                ? "bg-primary-container text-on-primary-fixed shadow-sm"
+                ? "bg-secondary-container text-on-secondary shadow-sm"
                 : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
             }`}
           >
@@ -119,7 +118,7 @@ export function SnapCard({
         className={`flex h-9 items-center gap-1 rounded-full px-3 text-label-sm transition-transform active:scale-95 disabled:opacity-50 ${
           supported
             ? "bg-tertiary-container text-on-tertiary-container"
-            : "bg-primary-container text-on-primary-fixed shadow-sm"
+            : "bg-secondary-container text-on-secondary shadow-sm"
         }`}
       >
         {supported ? <Heart size={16} fill="currentColor" /> : <HandHeart size={16} />}
@@ -130,14 +129,15 @@ export function SnapCard({
 
   const actions = (
     <div className="flex items-center gap-2">
-      <Button
+      <button
+        type="button"
         aria-label={saved ? "Unsave" : "Save"}
         aria-pressed={saved}
         onClick={() => setSaved((s) => !s)}
         className="p-1 text-on-surface-variant hover:text-on-surface"
       >
         <Bookmark size={22} fill={saved ? "currentColor" : "none"} />
-      </Button>
+      </button>
     </div>
   );
 
@@ -229,7 +229,7 @@ export function SnapCard({
         </div>
         <div className="flex items-center justify-between rounded-xl bg-surface-container-low p-2 text-body-sm text-on-surface-variant">
           <div className="flex items-center gap-1.5">
-            <HandHeart size={16} className="text-primary" />
+            <HandHeart size={16} className="text-secondary" />
             <span>Free vote · Support goes 100% to @{snap.creator.handle}</span>
           </div>
           <span className="text-[12px] font-bold text-secondary tabular-nums">{votes} Votes</span>

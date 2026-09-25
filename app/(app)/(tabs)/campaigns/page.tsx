@@ -1,28 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BadgeCheck, Plus } from "lucide-react";
+import { BadgeCheck, Plus, ShieldCheck } from "lucide-react";
 import { CampaignExplorer } from "@/components/discovery/campaign-explorer";
 
 export const metadata: Metadata = { title: "Explore · instant.fun" };
-
-function CrownDoodle() {
-  return (
-    <svg aria-hidden className="h-7 w-7" fill="none" viewBox="0 0 36 36">
-      <path d="M5 26.5C8 28.5 28 28.5 31 26.5" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" />
-      <path
-        d="M6 25L4.5 12.5C4.3 11 6 10.2 7.2 11.2L12 15.5L17 7.5C17.6 6.5 19 6.5 19.6 7.5L24.5 15.5L29 11.2C30.2 10.2 31.8 11 31.6 12.5L30 25"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2.5"
-      />
-      <circle cx="7" cy="9" fill="currentColor" r="1.5" />
-      <circle cx="18.3" cy="5.5" fill="currentColor" r="1.5" />
-      <circle cx="29.5" cy="9" fill="currentColor" r="1.5" />
-      <path d="M33 4L34.5 6L33 8L31.5 6Z" fill="currentColor" />
-    </svg>
-  );
-}
 
 export default function CampaignsPage() {
   return (
@@ -38,7 +19,7 @@ export default function CampaignsPage() {
         <p className="mt-1 text-on-surface-variant">Pick a challenge, post a snap, earn support!</p>
         <Link
           href="/create"
-          className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-full bg-primary-container text-label-md text-on-primary-fixed shadow-sm transition-transform active:scale-95"
+          className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-full bg-secondary-container text-label-md text-on-secondary shadow-sm transition-transform active:scale-95"
         >
           <Plus size={18} />
           Create campaign
@@ -47,11 +28,10 @@ export default function CampaignsPage() {
 
       <CampaignExplorer />
 
-      <aside className="relative mt-1 overflow-hidden rounded-3xl border-2 border-on-surface/10 bg-gradient-to-r from-surface-container to-surface-container-low p-5 shadow-soft ring-4 ring-[#f0b90b]/15">
-        <div className="pointer-events-none absolute -top-3 -right-3 h-20 w-20 rounded-full bg-primary-container/20 blur-xl" />
+      <aside className="relative mt-1 overflow-hidden rounded-3xl border-2 border-on-surface/10 bg-gradient-to-r from-surface-container to-surface-container-low p-5 shadow-soft">
         <div className="relative z-10 flex items-center gap-4">
-          <div className="flex h-13 w-13 shrink-0 items-center justify-center rounded-2xl bg-[#f0b90b] text-white shadow-sm">
-            <CrownDoodle />
+          <div className="flex h-13 w-13 shrink-0 items-center justify-center rounded-2xl bg-secondary-container text-on-secondary shadow-sm">
+            <ShieldCheck size={28} />
           </div>
           <div className="min-w-0 flex-1">
             <span className="mb-0.5 block text-[10px] font-bold tracking-wider text-secondary uppercase">Community Creed</span>

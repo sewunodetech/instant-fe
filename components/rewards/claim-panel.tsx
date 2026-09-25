@@ -49,7 +49,7 @@ export function ClaimPanel({ totalUsdc, wallet, shareText }: Props) {
       <section className="rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#106df4] text-[11px] font-black text-white shadow-sm">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-secondary-container text-[11px] font-black text-on-secondary shadow-sm">
               {wallet.network.split(" ")[0].toUpperCase()}
             </div>
             <div className="flex flex-col">
@@ -73,7 +73,7 @@ export function ClaimPanel({ totalUsdc, wallet, shareText }: Props) {
           disabled={status !== "idle"}
           aria-live="polite"
           className={`flex h-[52px] w-full items-center justify-center gap-2 rounded-full text-label-lg shadow-[0_4px_20px_rgba(17,17,17,0.08)] transition-all active:translate-y-0.5 active:scale-[0.98] ${
-            status === "claimed" ? "bg-tertiary-container text-on-tertiary-container" : "bg-primary-container text-on-primary-container"
+            status === "claimed" ? "bg-tertiary-container text-on-tertiary-container" : "bg-secondary-container text-on-secondary"
           }`}
         >
           {status === "claiming" ? (

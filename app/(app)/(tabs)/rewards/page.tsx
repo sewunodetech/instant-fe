@@ -61,12 +61,9 @@ export default function RewardsPage() {
       </div>
 
       <section className="relative overflow-hidden rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft ring-4 ring-primary-container/20">
-        <div className="pointer-events-none absolute -top-12 -right-12 h-48 w-48 rounded-full bg-primary-container/25 blur-2xl" />
-        <div className="pointer-events-none absolute -bottom-10 -left-10 h-44 w-44 rounded-full bg-secondary-fixed/30 blur-2xl" />
         <RewardConfetti />
         <div className="relative flex flex-col items-center text-center">
           <div className="relative my-1 flex h-44 w-44 items-center justify-center">
-            <div className="absolute inset-2 animate-pulse rounded-full bg-primary-container/20" />
             <Image
               src="/mock/reward-coin.jpg"
               alt=""

@@ -1,21 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect } from "react";
 import { BadgeCheck, PartyPopper } from "lucide-react";
-import { ConfettiLayer, prefersReducedMotion, useConfetti } from "@/components/confetti";
+import { ConfettiLayer, useConfetti } from "@/components/confetti";
 import { BackButton } from "@/components/layout/back-button";
 import type { Campaign } from "@/lib/mock-data";
 
 export function ResultsHero({ campaign }: { campaign: Campaign }) {
   const ended = !campaign.live;
   const { particles, burst } = useConfetti();
-
-  useEffect(() => {
-    if (!ended || prefersReducedMotion()) return;
-    const t = setTimeout(burst, 400);
-    return () => clearTimeout(t);
-  }, [ended, burst]);
 
   return (
     <>
@@ -39,7 +32,7 @@ export function ResultsHero({ campaign }: { campaign: Campaign }) {
           <button
             aria-label="Celebrate"
             onClick={burst}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-container text-on-primary-container shadow-sm transition-transform active:scale-90"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary-container text-on-secondary shadow-sm transition-transform active:scale-90"
           >
             <PartyPopper size={22} />
           </button>
@@ -47,9 +40,6 @@ export function ResultsHero({ campaign }: { campaign: Campaign }) {
       </div>
 
       <section className="relative flex w-full flex-col items-center overflow-hidden rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md text-center shadow-soft">
-        <div className="pointer-events-none absolute -top-12 -left-12 h-32 w-32 rounded-full bg-primary-fixed/25 blur-2xl" />
-        <div className="pointer-events-none absolute -right-10 -bottom-10 h-36 w-36 rounded-full bg-secondary-fixed/30 blur-2xl" />
-
         <div className="relative mb-2 h-36 w-36">
           <Image
             src="/mock/trophy-champion.jpg"

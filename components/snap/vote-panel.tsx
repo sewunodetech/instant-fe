@@ -59,7 +59,7 @@ export function VotePanel({ creatorName, poolUsdc, tiers, balance, onVoted }: Pr
   return (
     <section className="flex w-full flex-col gap-4 rounded-3xl bg-surface-container-lowest p-space-md shadow-card">
       <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-fixed text-on-primary-fixed">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary-container text-on-secondary">
           <Zap size={22} />
         </div>
         <div className="min-w-0 flex-1">
