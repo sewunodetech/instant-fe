@@ -6,6 +6,8 @@ import { ChampionCard } from "@/components/leaderboard/champion-card";
 import { PodiumCard } from "@/components/leaderboard/podium-card";
 import { RankingTabs } from "@/components/leaderboard/ranking-tabs";
 import { ResultsHero } from "@/components/leaderboard/results-hero";
+import { Stagger, StaggerItem } from "@/components/ui/motion-kit";
+import { rankPill } from "@/components/ui/rank";
 import { BackButton } from "@/components/layout/back-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/state";
@@ -18,7 +20,7 @@ export function LeaderboardView({ id }: { id: string }) {
 
   if (board.loading && !board.data) {
     return (
-      <div role="status" aria-label="Loading leaderboard" className="flex flex-col gap-space-md px-space-md pt-3 pb-4 sm:px-0">
+      <div role="status" aria-label="Loading leaderboard" className="flex flex-col gap-space-md px-space-md pt-3 pb-4">
         <Skeleton className="h-12 w-2/3 rounded-full" />
         <Skeleton className="h-52 w-full rounded-3xl" />
         <Skeleton className="h-40 w-full rounded-3xl" />
@@ -31,7 +33,7 @@ export function LeaderboardView({ id }: { id: string }) {
   }
   if (!board.data) {
     return (
-      <div className="flex flex-col gap-space-md px-space-md pt-3 sm:px-0">
+      <div className="flex flex-col gap-space-md px-space-md pt-3">
         <BackButton fallbackHref="/campaigns" />
         <ErrorState message={board.error ?? "Campaign not found"} onRetry={board.reload} />
       </div>
@@ -43,14 +45,14 @@ export function LeaderboardView({ id }: { id: string }) {
   const [champion, second, third, ...rest] = entries;
 
   return (
-    <div className="flex flex-col gap-space-md px-space-md pb-4 sm:px-0">
+    <div className="flex flex-col gap-space-md px-space-md pb-4">
       <ResultsHero campaign={campaign} hasWinner={Boolean(champion)} />
 
       {myEntry && (
         <Link
           href={`/snaps/${myEntry.post.id}`}
           className={`flex items-center gap-3 rounded-3xl p-space-md shadow-soft ${
-            myEntry.rank <= 3 ? "bg-primary-container text-on-primary-container" : "bg-secondary-fixed text-on-secondary-fixed"
+            myEntry.rank <= 3 ? rankPill(myEntry.rank) : "bg-secondary-fixed text-on-secondary-fixed"
           }`}
         >
           {myEntry.rank <= 3 ? <Trophy size={28} /> : <Sparkles size={28} />}
@@ -74,16 +76,28 @@ export function LeaderboardView({ id }: { id: string }) {
       )}
 
       {champion ? (
-        <>
-          <ChampionCard entry={champion} ended={ended} />
+        <Stagger className="flex flex-col gap-space-md" delay={0.2}>
+          <StaggerItem>
+            <ChampionCard entry={champion} ended={ended} />
+          </StaggerItem>
           {(second || third) && (
             <div className="grid w-full grid-cols-2 gap-space-sm">
-              {second && <PodiumCard entry={second} />}
-              {third && <PodiumCard entry={third} />}
+              {second && (
+                <StaggerItem>
+                  <PodiumCard entry={second} />
+                </StaggerItem>
+              )}
+              {third && (
+                <StaggerItem>
+                  <PodiumCard entry={third} />
+                </StaggerItem>
+              )}
             </div>
           )}
-          <RankingTabs entries={rest} voters={topVoters} />
-        </>
+          <StaggerItem className="flex flex-col gap-space-md">
+            <RankingTabs entries={rest} voters={topVoters} />
+          </StaggerItem>
+        </Stagger>
       ) : (
         <EmptyState
           icon={<Camera size={24} />}
@@ -102,7 +116,7 @@ export function LeaderboardView({ id }: { id: string }) {
       {ended ? (
         <Link
           href="/campaigns"
-          className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-secondary text-label-lg font-extrabold text-on-secondary shadow-md transition-transform active:scale-[0.98]"
+          className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-secondary-container text-label-lg font-extrabold text-on-secondary shadow-md transition-transform active:scale-[0.98]"
         >
           Find the next challenge
         </Link>

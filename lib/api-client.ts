@@ -97,7 +97,7 @@ const json = (body: unknown): RequestInit => ({ body: JSON.stringify(body) });
 export const verifyPrivyToken = (privyToken: string) =>
   apiFetch<{ user: AppUser }>("/api/auth/verify", { method: "POST", ...json({ privyToken }) });
 export const fetchMe = () => apiFetch<AppUserWithStats>("/api/users/me");
-export const patchMe = (data: Partial<Pick<AppUser, "username" | "displayName" | "avatarUrl" | "bio">>) =>
+export const patchMe = (data: Partial<Pick<AppUser, "username" | "displayName" | "avatarUrl" | "bio" | "isPrivate">>) =>
   apiFetch<AppUser>("/api/users/me", { method: "PATCH", ...json(data) });
 export const getMyActivity = () => apiFetch<ActivityItem[]>("/api/users/me/activity");
 
@@ -122,7 +122,20 @@ export const createCampaign = (data: {
   maxPostsPerUser?: number;
   durationDays: number;
 }) => apiFetch<ApiCampaign>("/api/campaigns", { method: "POST", ...json(data) });
-export const endCampaign = (id: string) => apiFetch<ApiCampaign>(`/api/campaigns/${id}/end`, { method: "POST" });
+export const updateCampaign = (
+  id: string,
+  data: {
+    title?: string;
+    description?: string | null;
+    category?: string | null;
+    rules?: string[];
+    coverImageUrl?: string | null;
+    prizePool?: number;
+    maxPostsPerUser?: number;
+    extendDays?: number;
+  }
+) => apiFetch<ApiCampaign>(`/api/campaigns/${id}`, { method: "PATCH", ...json(data) });
+export const endCampaign =(id: string) => apiFetch<ApiCampaign>(`/api/campaigns/${id}/end`, { method: "POST" });
 export const getLeaderboard = (id: string) => apiFetch<Leaderboard>(`/api/campaigns/${id}/leaderboard`);
 export const listCampaignPosts = (id: string, params?: { sort?: "latest" | "top"; page?: number; limit?: number }) =>
   apiFetchPaginated<ApiPost, { remainingSnaps: number | null }>(`/api/campaigns/${id}/posts${qs({ ...params })}`);

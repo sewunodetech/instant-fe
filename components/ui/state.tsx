@@ -14,10 +14,10 @@ export function EmptyState({
   action?: { label: string; href?: string; onClick?: () => void };
 }) {
   const actionClass =
-    "mt-1 rounded-full bg-on-surface px-5 py-2.5 text-label-md font-bold text-surface shadow-sm transition-transform hover:-translate-y-0.5 active:scale-95";
+    "mt-1 rounded-full bg-secondary-container px-5 py-2.5 text-label-md font-bold text-on-secondary shadow-pop-blue transition-transform hover:-translate-y-0.5 active:scale-95";
   return (
     <div className="flex flex-col items-center gap-2 rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-8 text-center shadow-soft">
-      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-container text-on-surface-variant">
+      <div className="animate-float flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary-fixed text-secondary">
         {icon}
       </div>
       <p className="text-headline-sm font-extrabold tracking-tight">{title}</p>

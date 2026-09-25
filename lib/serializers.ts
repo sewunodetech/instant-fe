@@ -56,7 +56,7 @@ type CampaignRow = {
 
 export function serializeCampaign(
   c: CampaignRow,
-  extra?: { stats?: CampaignStats; topImageUrl?: string | null }
+  extra?: { stats?: CampaignStats; topImageUrl?: string | null; joined?: boolean }
 ): ApiCampaign {
   return {
     id: c.id,
@@ -74,6 +74,7 @@ export function serializeCampaign(
     creator: toPublicUser(c.creator),
     stats: extra?.stats ?? { snaps: 0, creators: 0, votes: 0 },
     topImageUrl: extra?.topImageUrl ?? null,
+    joined: extra?.joined ?? false,
   };
 }
 

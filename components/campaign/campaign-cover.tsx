@@ -3,8 +3,8 @@ import { campaignTag } from "@/lib/format";
 import type { ApiCampaign } from "@/lib/types";
 
 const GRADIENTS = [
-  "from-secondary-container via-secondary to-on-secondary-fixed-variant",
-  "from-tertiary-container via-tertiary to-on-tertiary-fixed-variant",
+  "from-secondary-fixed via-secondary-container to-secondary",
+  "from-tertiary-fixed via-tertiary-container to-secondary-container",
   "from-primary-container via-primary-fixed-dim to-secondary-container",
   "from-error-container via-secondary-container to-secondary",
 ];

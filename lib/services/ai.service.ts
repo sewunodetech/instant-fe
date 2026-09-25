@@ -47,37 +47,110 @@ function parseDraft(content: string): CampaignDraft {
   };
 }
 
+/** An OpenAI-compatible chat-completions endpoint we can draft with. */
+type Provider = {
+  name: string;
+  url: string;
+  apiKey: string;
+  model: string;
+  headers?: Record<string, string>;
+  extraBody?: Record<string, unknown>;
+};
+
+function listFromEnv(value: string | undefined, exclude: string) {
+  return (value || "")
+    .split(",")
+    .map((m) => m.trim())
+    .filter((m) => m && m !== exclude);
+}
+
+/** Gemini (free tier via Google AI Studio) first, OpenRouter as backup. */
+function providers(): Provider[] {
+  const list: Provider[] = [];
+  if (process.env.GEMINI_API_KEY) {
+    list.push({
+      name: "gemini",
+      url: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+      apiKey: process.env.GEMINI_API_KEY,
+      model: process.env.GEMINI_MODEL || "gemini-3.8-flash",
+    });
+  }
+  if (process.env.OPENROUTER_API_KEY) {
+    const model = process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini";
+    const fallbacks = listFromEnv(process.env.OPENROUTER_FALLBACK_MODELS, model);
+    list.push({
+      name: "openrouter",
+      url: "https://openrouter.ai/api/v1/chat/completions",
+      apiKey: process.env.OPENROUTER_API_KEY,
+      model,
+      headers: { "HTTP-Referer": "https://instant.fun", "X-Title": "instant.fun" },
+      // OpenRouter tries these in order when the primary errors or is rate-limited.
+      extraBody: fallbacks.length ? { models: fallbacks } : undefined,
+    });
+  }
+  return list;
+}
+
+async function complete(provider: Provider, prompt: string) {
+  const body = JSON.stringify({
+    model: provider.model,
+    ...provider.extraBody,
+    messages: [
+      { role: "system", content: SYSTEM_PROMPT },
+      { role: "user", content: prompt },
+    ],
+    temperature: 0.8,
+  });
+
+  let response: Response | null = null;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    response = await fetch(provider.url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${provider.apiKey}`,
+        "Content-Type": "application/json",
+        ...provider.headers,
+      },
+      body,
+      signal: AbortSignal.timeout(30_000),
+    }).catch(() => null);
+    if (response?.status !== 429 || attempt === 1) break;
+    // One short retry, honouring Retry-After when it's small.
+    const retryAfter = Number(response.headers.get("retry-after"));
+    await new Promise((r) =>
+      setTimeout(r, Number.isFinite(retryAfter) && retryAfter > 0 && retryAfter <= 5 ? retryAfter * 1000 : 1500)
+    );
+  }
+
+  if (!response?.ok) {
+    const detail = response ? (await response.text().catch(() => "")).slice(0, 300) : "network error";
+    console.warn(`[ai] ${provider.name} request failed`, { status: response?.status, model: provider.model, detail });
+    return { ok: false as const, status: response?.status ?? 0 };
+  }
+  const data = (await response.json()) as { choices?: { message?: { content?: string } }[] };
+  return { ok: true as const, content: data.choices?.[0]?.message?.content ?? "" };
+}
+
 export class AIService {
   static get isConfigured() {
-    return Boolean(process.env.OPENROUTER_API_KEY);
+    return providers().length > 0;
   }
 
   static async generateCampaign(prompt: string): Promise<CampaignDraft> {
-    const apiKey = process.env.OPENROUTER_API_KEY;
-    if (!apiKey) throw new HttpError(503, "AI drafting isn't available right now — fill the form manually.");
+    const list = providers();
+    if (list.length === 0) throw new HttpError(503, "AI drafting isn't available right now — fill the form manually.");
 
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://instant.fun",
-        "X-Title": "instant.fun",
-      },
-      body: JSON.stringify({
-        model: process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini",
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: prompt },
-        ],
-        temperature: 0.8,
-      }),
-      signal: AbortSignal.timeout(30_000),
-    }).catch(() => null);
+    let rateLimited = false;
+    for (const provider of list) {
+      const result = await complete(provider, prompt);
+      if (result.ok) return parseDraft(result.content);
+      rateLimited ||= result.status === 429;
+    }
 
-    if (!response?.ok) throw new HttpError(502, "AI drafting failed. Try again in a moment.");
-    const data = (await response.json()) as { choices?: { message?: { content?: string } }[] };
-    return parseDraft(data.choices?.[0]?.message?.content ?? "");
+    if (rateLimited) {
+      throw new HttpError(429, "The AI is busy right now. Wait a minute and try again, or fill the form manually.");
+    }
+    throw new HttpError(502, "AI drafting failed. Try again in a moment.");
   }
 
   static async generateFromTrends(topics: string[]) {

@@ -22,6 +22,7 @@ export async function PATCH(request: NextRequest) {
       displayName: body.displayName,
       avatarUrl: body.avatarUrl,
       bio: body.bio,
+      isPrivate: body.isPrivate,
     });
     return successResponse(updated);
   } catch (error) {

@@ -6,8 +6,8 @@ import { handleOf, usdc } from "@/lib/format";
 import type { LeaderboardEntry } from "@/lib/types";
 
 const podium = {
-  2: { rankLabel: "2nd place", badge: "bg-secondary-container text-on-secondary", prize: "text-secondary" },
-  3: { rankLabel: "3rd place", badge: "bg-tertiary-container text-on-tertiary-container", prize: "text-tertiary" },
+  2: { rankLabel: "2nd place · Silver", badge: "bg-silver text-on-silver", prize: "text-on-silver" },
+  3: { rankLabel: "3rd place · Bronze", badge: "bg-bronze text-on-bronze", prize: "text-on-bronze" },
 } as const;
 
 export function PodiumCard({ entry }: { entry: LeaderboardEntry }) {
@@ -24,7 +24,7 @@ export function PodiumCard({ entry }: { entry: LeaderboardEntry }) {
           #{entry.rank}
         </span>
         <span className="flex items-center gap-0.5 text-label-sm text-on-surface-variant tabular-nums">
-          <Heart size={13} fill="currentColor" className="text-error" />
+          <Heart size={13} fill="currentColor" className="text-vote" />
           {post.voteCount.toLocaleString("en")}
         </span>
       </div>

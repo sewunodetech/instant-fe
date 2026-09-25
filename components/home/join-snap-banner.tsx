@@ -23,7 +23,7 @@ export function JoinSnapBanner({ campaign }: { campaign: ApiCampaign }) {
       </div>
       <Link
         href={`/snap?campaign=${campaign.id}`}
-        className="shrink-0 rounded-full bg-on-surface px-4 py-2.5 text-label-sm font-bold text-surface shadow-sm transition-transform hover:-translate-y-0.5 active:scale-95"
+        className="shrink-0 rounded-full bg-surface-container-lowest px-4 py-2.5 text-label-sm font-bold text-secondary shadow-sm transition-transform hover:-translate-y-0.5 active:scale-95"
       >
         Join
       </Link>

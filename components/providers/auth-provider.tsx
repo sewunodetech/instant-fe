@@ -38,7 +38,7 @@ type AuthContextValue = {
   logout: () => Promise<void>;
   refreshUser: () => Promise<AppUserWithStats | null>;
   updateProfile: (
-    data: Partial<Pick<AppUser, "username" | "displayName" | "avatarUrl" | "bio">>
+    data: Partial<Pick<AppUser, "username" | "displayName" | "avatarUrl" | "bio" | "isPrivate">>
   ) => Promise<AppUser>;
 };
 
@@ -156,7 +156,7 @@ function AuthStateProvider({ children }: { children: ReactNode }) {
   }, [privyLogout]);
 
   const updateProfile = useCallback(
-    async (data: Partial<Pick<AppUser, "username" | "displayName" | "avatarUrl" | "bio">>) => {
+    async (data: Partial<Pick<AppUser, "username" | "displayName" | "avatarUrl" | "bio" | "isPrivate">>) => {
       const updated = await patchMe(data);
       setUser((prev) => (prev ? { ...prev, ...updated } : { ...updated }));
       return updated;

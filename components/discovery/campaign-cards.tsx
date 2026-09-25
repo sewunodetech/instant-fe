@@ -1,11 +1,55 @@
+"use client";
+
 import Link from "next/link";
-import { ArrowRight, Camera, Hourglass, Tag, Trophy, Users } from "lucide-react";
+import { ArrowRight, Camera, CircleCheck, Crown, Hourglass, Tag, Trophy, Users } from "lucide-react";
+import { useAuth } from "@/components/providers/auth-provider";
 import { CampaignCover } from "@/components/campaign/campaign-cover";
 import { campaignTag, compactNumber, timeLeft, usdc } from "@/lib/format";
 import type { ApiCampaign } from "@/lib/types";
 
-// Cards use a stretched detail link; the Join link sits above it with z-10.
+// Cards use a stretched detail link; the action link sits above it with z-10.
 
+type ActionState = "join" | "joined" | "hosting" | "results";
+
+export function useCampaignAction(campaign: ApiCampaign): ActionState {
+  const { user } = useAuth();
+  if (campaign.status !== "ACTIVE") return "results";
+  if (user && campaign.creator?.id === user.id) return "hosting";
+  return campaign.joined ? "joined" : "join";
+}
+
+const ACTION = {
+  join: { label: "Join", icon: ArrowRight, className: "bg-secondary-container text-on-secondary shadow-pop-blue" },
+  joined: { label: "Joined", icon: CircleCheck, className: "bg-tertiary-container text-on-tertiary-container" },
+  hosting: { label: "Hosting", icon: Crown, className: "bg-gold text-on-gold" },
+  results: { label: "Results", icon: Trophy, className: "bg-gold text-on-gold" },
+} as const;
+
+/** Join → Joined once you've posted, Hosting for your own campaign, Results once it ends. */
+export function CampaignActionButton({ campaign, size = "md" }: { campaign: ApiCampaign; size?: "md" | "sm" }) {
+  const state = useCampaignAction(campaign);
+  const { label, icon: Icon, className } = ACTION[state];
+  const href =
+    state === "join" ? `/snap?campaign=${campaign.id}` : state === "results" ? `/campaigns/${campaign.id}/leaderboard` : `/campaigns/${campaign.id}`;
+  return (
+    <Link
+      href={href}
+      className={`relative z-10 flex shrink-0 items-center justify-center gap-1.5 rounded-full font-bold transition-transform active:scale-95 ${className} ${
+        size === "md" ? "h-11 px-5 text-label-lg" : "h-9 px-3.5 text-label-sm"
+      }`}
+    >
+      {state === "join" ? (
+        <>
+          {label} <Icon size={size === "md" ? 18 : 14} />
+        </>
+      ) : (
+        <>
+          <Icon size={size === "md" ? 18 : 14} /> {label}
+        </>
+      )}
+    </Link>
+  );
+}
 function StatusPill({ campaign }: { campaign: ApiCampaign }) {
   const left = timeLeft(campaign.endsAt);
   if (campaign.status === "ENDED" || !left) {
@@ -70,21 +114,7 @@ export function FeaturedCampaignCard({ campaign }: { campaign: ApiCampaign }) {
           >
             {campaign.description || campaign.title}
           </Link>
-          {live ? (
-            <Link
-              href={`/snap?campaign=${campaign.id}`}
-              className="relative z-10 flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-full bg-secondary-container px-6 text-label-lg text-on-secondary shadow-sm transition-transform active:scale-95"
-            >
-              Join <ArrowRight size={18} />
-            </Link>
-          ) : (
-            <Link
-              href={`/campaigns/${campaign.id}/leaderboard`}
-              className="relative z-10 flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-full bg-primary-container px-5 text-label-lg text-on-primary-container shadow-sm transition-transform active:scale-95"
-            >
-              Results <Trophy size={18} />
-            </Link>
-          )}
+          <CampaignActionButton campaign={campaign} />
         </div>
       </div>
     </article>
@@ -125,12 +155,7 @@ export function CampaignRowCard({ campaign }: { campaign: ApiCampaign }) {
               <span>•</span>
               <span className="truncate">{live ? (timeLeft(campaign.endsAt) ?? "Live") : "Ended"}</span>
             </div>
-            <Link
-              href={live ? `/snap?campaign=${campaign.id}` : `/campaigns/${campaign.id}/leaderboard`}
-              className="relative z-10 flex h-8 shrink-0 items-center rounded-full bg-secondary-fixed px-4 text-label-sm text-on-secondary-fixed transition-transform active:scale-95"
-            >
-              {live ? "Join" : "Results"}
-            </Link>
+            <CampaignActionButton campaign={campaign} size="sm" />
           </div>
         </div>
       </div>

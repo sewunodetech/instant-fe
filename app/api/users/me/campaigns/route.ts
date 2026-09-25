@@ -11,8 +11,8 @@ export async function GET(request: NextRequest) {
     const { page, limit } = parsePagination(request.nextUrl.searchParams);
     const hosted = request.nextUrl.searchParams.get("role") === "hosted";
     const { campaigns, total } = hosted
-      ? await CampaignService.hostedBy(user.id, page, limit)
-      : await CampaignService.joinedBy(user.id, page, limit);
+      ? await CampaignService.hostedBy(user.id, page, limit, user.id)
+      : await CampaignService.joinedBy(user.id, page, limit, user.id);
     return paginatedResponse(campaigns, total, page, limit);
   } catch (error) {
     return handleApiError(error);

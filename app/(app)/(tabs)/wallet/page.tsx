@@ -87,7 +87,7 @@ export default function WalletPage() {
     />
     <div className="flex flex-col gap-4 px-4 pt-2">
 
-      <section className="relative overflow-hidden rounded-3xl border-2 border-white/15 bg-gradient-to-br from-secondary-container via-secondary to-on-secondary-fixed-variant p-space-md text-white shadow-pop-blue">
+      <section className="relative overflow-hidden rounded-3xl border-2 border-white/15 bg-gradient-to-br from-secondary-container via-secondary-container to-secondary p-space-md text-white shadow-pop-blue">
         <div className="flex flex-col gap-space-md">
           <div className="flex items-start justify-between">
             <div>
@@ -112,7 +112,7 @@ export default function WalletPage() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-1 rounded-2xl bg-black/15 p-3">
+          <div className="flex flex-col gap-1 rounded-2xl bg-white/15 p-3">
             <span className="text-label-sm text-white/70">
               {wallet.isEmbedded ? "Your instant.fun wallet" : address ? "Connected wallet" : "Wallet"}
             </span>
@@ -267,8 +267,8 @@ export default function WalletPage() {
 
 function Sheet({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   return (
-    <div role="dialog" aria-modal="true" aria-label={title} className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 sm:items-center">
-      <div className="app-shell flex max-h-[92dvh] w-full flex-col gap-space-sm overflow-y-auto rounded-t-3xl bg-surface p-space-md pb-[calc(env(safe-area-inset-bottom,0px)+1rem)] shadow-elevated sm:rounded-3xl">
+    <div role="dialog" aria-modal="true" aria-label={title} className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40">
+      <div className="app-shell flex max-h-[92dvh] w-full flex-col gap-space-sm overflow-y-auto rounded-t-3xl bg-surface p-space-md pb-[calc(env(safe-area-inset-bottom,0px)+1rem)] shadow-elevated">
         <div className="flex items-center justify-between">
           <h2 className="text-headline-sm font-extrabold">{title}</h2>
           <button type="button" aria-label="Close" onClick={onClose} className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-surface-container">
@@ -289,7 +289,7 @@ function ReceiveSheet({ address, onClose }: { address: string; onClose: () => vo
       </p>
       <div className="flex items-center gap-2 rounded-2xl bg-surface-container-low p-3">
         <code className="min-w-0 flex-1 text-body-sm break-all">{address}</code>
-        <CopyButton value={address} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary text-white" />
+        <CopyButton value={address} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary-container text-on-secondary" />
       </div>
       {FAUCET_URL && (
         <a
@@ -436,7 +436,7 @@ function SendSheet({
         type="button"
         onClick={send}
         disabled={!canSend}
-        className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-secondary text-label-lg text-white disabled:opacity-50"
+        className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-secondary-container text-label-lg text-white disabled:opacity-50"
       >
         {sending ? <Loader2 size={18} className="animate-spin" /> : <ArrowUpRight size={18} />}
         {sending ? "Confirm in wallet…" : `Send ${symbol}`}

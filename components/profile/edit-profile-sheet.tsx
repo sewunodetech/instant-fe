@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Camera, Loader2, X } from "lucide-react";
+import { Camera, Loader2, Lock, X } from "lucide-react";
 import { Avatar } from "@/components/auth/user-avatar";
 import { useAuth } from "@/components/providers/auth-provider";
 import { errorMessage, uploadFile } from "@/lib/api-client";
@@ -16,6 +16,7 @@ export function EditProfileSheet({ onClose, onSaved }: { onClose: () => void; on
   const [username, setUsername] = useState(user?.username ?? "");
   const [displayName, setDisplayName] = useState(user?.displayName ?? "");
   const [bio, setBio] = useState(user?.bio ?? "");
+  const [isPrivate, setIsPrivate] = useState(user?.isPrivate ?? false);
   const [avatar, setAvatar] = useState<{ blob: Blob; url: string } | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,6 +47,7 @@ export function EditProfileSheet({ onClose, onSaved }: { onClose: () => void; on
         username: normalized,
         displayName: displayName.trim(),
         bio: bio.trim(),
+        isPrivate,
         ...(avatarUrl ? { avatarUrl } : {}),
       });
       onSaved();
@@ -56,10 +58,10 @@ export function EditProfileSheet({ onClose, onSaved }: { onClose: () => void; on
   }
 
   return (
-    <div role="dialog" aria-modal="true" aria-label="Edit profile" className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 sm:items-center">
+    <div role="dialog" aria-modal="true" aria-label="Edit profile" className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40">
       <form
         onSubmit={save}
-        className="app-shell flex max-h-[92dvh] w-full flex-col gap-space-sm overflow-y-auto rounded-t-3xl bg-surface p-space-md pb-[calc(env(safe-area-inset-bottom,0px)+1rem)] shadow-elevated sm:rounded-3xl"
+        className="app-shell flex max-h-[92dvh] w-full flex-col gap-space-sm overflow-y-auto rounded-t-3xl bg-surface p-space-md pb-[calc(env(safe-area-inset-bottom,0px)+1rem)] shadow-elevated"
       >
         <div className="flex items-center justify-between">
           <h2 className="text-headline-sm font-extrabold">Edit profile</h2>
@@ -75,7 +77,7 @@ export function EditProfileSheet({ onClose, onSaved }: { onClose: () => void; on
           ) : (
             <Avatar user={user} size={96} />
           )}
-          <span className="absolute right-0 bottom-0 flex h-8 w-8 items-center justify-center rounded-full bg-secondary text-white ring-2 ring-surface">
+          <span className="absolute right-0 bottom-0 flex h-8 w-8 items-center justify-center rounded-full bg-secondary-container text-on-secondary ring-2 ring-surface">
             <Camera size={16} />
           </span>
         </button>
@@ -116,6 +118,29 @@ export function EditProfileSheet({ onClose, onSaved }: { onClose: () => void; on
           />
         </label>
 
+        <button
+          type="button"
+          role="switch"
+          aria-checked={isPrivate}
+          onClick={() => setIsPrivate((v) => !v)}
+          className="flex items-center gap-3 rounded-2xl bg-surface-container-low p-3 text-left"
+        >
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-container">
+            <Lock size={18} className="text-secondary" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-label-md">Private account</span>
+            <span className="block text-body-sm text-on-surface-variant">
+              Hide your snaps, stats and joined campaigns on your profile. Snaps still appear in campaigns for voting.
+            </span>
+          </span>
+          <span className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${isPrivate ? "bg-secondary-container" : "bg-surface-container-highest"}`}>
+            <span
+              className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-all duration-200 ${isPrivate ? "left-6" : "left-1"}`}
+            />
+          </span>
+        </button>
+
         {error && (
           <p role="alert" className="rounded-2xl bg-error/10 px-3 py-2 text-body-sm text-error">
             {error}
@@ -125,7 +150,7 @@ export function EditProfileSheet({ onClose, onSaved }: { onClose: () => void; on
         <button
           type="submit"
           disabled={saving}
-          className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-secondary text-label-lg text-white disabled:opacity-60"
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-secondary-container text-label-lg text-white disabled:opacity-60"
         >
           {saving && <Loader2 size={18} className="animate-spin" />}
           {saving ? "Saving…" : "Save"}

@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { CircleCheck, ExternalLink, HandHeart, Loader2, ShieldCheck, Wallet } from "lucide-react";
+import { motion } from "motion/react";
+import { ExternalLink, HandHeart, Loader2, ShieldCheck, Wallet } from "lucide-react";
+import { SuccessBurst } from "@/components/ui/success-burst";
 import {
   cancelSupport,
   confirmSupport,
@@ -131,8 +133,20 @@ export function SupportPanel({
       </div>
 
       {status === "success" ? (
-        <div className="flex flex-col items-center gap-2 rounded-2xl bg-tertiary-container/40 p-4 text-center">
-          <CircleCheck size={32} fill="currentColor" className="text-tertiary" />
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative flex flex-col items-center gap-2 overflow-hidden rounded-2xl bg-secondary-fixed/60 p-4 text-center"
+        >
+          <SuccessBurst />
+          <motion.span
+            initial={{ scale: 0.3, rotate: -15 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: "spring", stiffness: 420, damping: 12 }}
+            className="flex h-14 w-14 items-center justify-center rounded-full bg-secondary-container text-on-secondary shadow-pop-blue"
+          >
+            <HandHeart size={28} fill="currentColor" />
+          </motion.span>
           <p className="text-label-lg">Support sent — thank you!</p>
           {message && <p className="text-body-sm text-on-surface-variant">{message}</p>}
           {txHash && (
@@ -148,7 +162,7 @@ export function SupportPanel({
           <button type="button" onClick={() => setStatus("idle")} className="text-label-sm text-on-surface-variant underline">
             Send more
           </button>
-        </div>
+        </motion.div>
       ) : (
         <>
           <div className="grid grid-cols-4 gap-2">

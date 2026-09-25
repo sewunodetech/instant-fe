@@ -1,22 +1,24 @@
 import Link from "next/link";
 import { Award, Heart } from "lucide-react";
 import { Avatar } from "@/components/auth/user-avatar";
-import { RemoteImage } from "@/components/ui/remote-image";
+import { Shine } from "@/components/ui/motion-kit";
 import { handleOf, profileKey, usdc } from "@/lib/format";
 import type { LeaderboardEntry } from "@/lib/types";
+import { RemoteImage } from "@/components/ui/remote-image";
 
 export function ChampionCard({ entry, ended }: { entry: LeaderboardEntry; ended: boolean }) {
   const { post } = entry;
   const handle = handleOf(post.user);
   return (
-    <section className="relative w-full overflow-hidden rounded-3xl border-2 border-primary-container bg-surface-container-lowest p-space-md shadow-soft ring-4 ring-primary-container/15">
+    <section className="relative w-full overflow-hidden rounded-3xl border-2 border-gold bg-surface-container-lowest p-space-md shadow-soft ring-4 ring-gold/20">
       <div className="mb-space-sm flex items-center justify-between">
-        <span className="flex items-center gap-1.5 rounded-full bg-primary-container px-3 py-1 text-label-sm font-extrabold text-on-primary-container">
+        <span className="relative flex items-center gap-1.5 overflow-hidden rounded-full bg-gold px-3 py-1 text-label-sm font-extrabold text-on-gold">
+          <Shine />
           <Award size={16} fill="currentColor" />
           {ended ? "#1 Champion" : "#1 Leading"}
         </span>
         <span className="flex items-center gap-1 rounded-full bg-surface-container-high px-2.5 py-1 text-label-sm tabular-nums">
-          <Heart size={15} fill="currentColor" className="text-error" />
+          <Heart size={15} fill="currentColor" className="text-vote" />
           {post.voteCount.toLocaleString("en")} votes
         </span>
       </div>

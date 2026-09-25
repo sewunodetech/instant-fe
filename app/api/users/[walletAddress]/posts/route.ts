@@ -9,11 +9,13 @@ import { parsePagination } from "@/lib/pagination";
 export async function GET(request: NextRequest, { params }: RouteContext<"/api/users/[walletAddress]/posts">) {
   try {
     const { walletAddress: handle } = await params;
-    const [user, viewer] = await Promise.all([UserService.findByHandle(handle), getOptionalUser(request)]);
-    if (!user) return errorResponse(404, "User not found");
+    const viewer = await getOptionalUser(request);
+    const resolved = await UserService.resolveForViewer(handle, viewer?.id);
+    if (!resolved) return errorResponse(404, "User not found");
+    if (resolved.restricted) return errorResponse(403, "This account is private");
 
     const { page, limit } = parsePagination(request.nextUrl.searchParams);
-    const { posts, total } = await PostService.feed({ userId: user.id, page, limit }, viewer?.id);
+    const { posts, total } = await PostService.feed({ userId: resolved.user.id, page, limit }, viewer?.id);
     return paginatedResponse(posts, total, page, limit);
   } catch (error) {
     return handleApiError(error);

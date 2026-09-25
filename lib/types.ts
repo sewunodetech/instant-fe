@@ -11,6 +11,7 @@ export type PublicUser = {
 export type AppUser = PublicUser & {
   privyId: string | null;
   bio: string | null;
+  isPrivate: boolean;
 };
 
 export type UserStats = {
@@ -27,7 +28,10 @@ export type AppUserWithStats = AppUser & { stats?: UserStats | null };
 export type PublicProfile = PublicUser & {
   bio: string | null;
   createdAt: string;
-  stats: UserStats;
+  isPrivate: boolean;
+  /** Private profile viewed by someone else: stats and lists are hidden. */
+  restricted: boolean;
+  stats: UserStats | null;
 };
 
 export type CampaignStats = {
@@ -53,6 +57,8 @@ export type ApiCampaign = {
   stats: CampaignStats;
   /** Top snap image, used as a cover when the host didn't upload one. */
   topImageUrl: string | null;
+  /** The signed-in viewer has posted at least one snap here. */
+  joined: boolean;
 };
 
 export type ApiPost = {

@@ -15,7 +15,7 @@ export default function CampaignsPage() {
         actions={
           <Link
             href="/create"
-            className="flex h-11 items-center gap-1.5 rounded-full bg-on-surface px-4 text-label-md font-bold text-surface transition-transform active:scale-95"
+            className="flex h-11 items-center gap-1.5 rounded-full bg-secondary-container px-4 text-label-md font-bold text-on-secondary shadow-pop-blue transition-transform active:scale-95"
           >
             <Plus size={18} />
             Host

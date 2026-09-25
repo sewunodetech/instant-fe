@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { getAuthenticatedUser } from "@/lib/auth";
+import { getAuthenticatedUser, getOptionalUser } from "@/lib/auth";
 import { CampaignService, type CampaignFilter } from "@/lib/services/campaign.service";
 import { isAllowedImageUrl } from "@/lib/services/user.service";
 import { errorResponse, handleApiError, paginatedResponse, successResponse } from "@/lib/api-response";
@@ -14,7 +14,14 @@ export async function GET(request: NextRequest) {
     const { page, limit } = parsePagination(params);
     const raw = (params.get("status") || "active").toLowerCase() as CampaignFilter;
     const filter = FILTERS.includes(raw) ? raw : "active";
-    const { campaigns, total } = await CampaignService.list(filter, page, limit, params.get("category") || undefined);
+    const viewer = await getOptionalUser(request);
+    const { campaigns, total } = await CampaignService.list(
+      filter,
+      page,
+      limit,
+      params.get("category") || undefined,
+      viewer?.id
+    );
     return paginatedResponse(campaigns, total, page, limit);
   } catch (error) {
     return handleApiError(error);
