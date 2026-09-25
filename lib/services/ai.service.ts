@@ -1,118 +1,86 @@
 import { HttpError } from "@/lib/api-response";
 
-interface TrendData {
-  topics: string[];
-  categories?: string[];
-  hashtags?: string[];
+export type CampaignDraft = {
+  title: string;
+  description: string;
+  category: string;
+  rules: string[];
+  durationDays: number;
+};
+
+const SYSTEM_PROMPT = `You design photo challenges for instant.fun, a mobile app where people snap live photos for a themed campaign and the community votes; the top 3 snaps win the prize pool.
+Return ONLY a JSON object with exactly these fields:
+{
+  "title": "catchy challenge name, max 40 characters, no hashtag",
+  "description": "2-3 sentences explaining what to capture, max 300 characters",
+  "category": "one word: lifestyle, food, travel, fashion, pets, sports, art, nature, city or friends",
+  "rules": ["3 to 5 short rules, each under 100 characters"],
+  "durationDays": integer between 3 and 14
+}`;
+
+function clampText(value: unknown, max: number) {
+  return typeof value === "string" ? value.trim().slice(0, max) : "";
 }
 
-class MockTrendProvider {
-  async getCurrentTrends(): Promise<TrendData> {
-    return {
-      topics: ["OOTD", "streetwear", "rainy season", "campus outfit"],
-      categories: ["fashion", "lifestyle"],
-      hashtags: ["#ootd", "#streetwear", "#rainyseason"],
-    };
+function parseDraft(content: string): CampaignDraft {
+  const json = content.replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/, "").trim();
+  let raw: Record<string, unknown>;
+  try {
+    raw = JSON.parse(json);
+  } catch {
+    throw new HttpError(502, "AI returned an unreadable draft. Try again.");
   }
+
+  const title = clampText(raw.title, 60).replace(/^#/, "");
+  if (title.length < 3) throw new HttpError(502, "AI draft was incomplete. Try again.");
+
+  const days = Number(raw.durationDays ?? (Number(raw.durationHours) || 0) / 24);
+  return {
+    title,
+    description: clampText(raw.description, 2000),
+    category: clampText(raw.category, 50).toLowerCase(),
+    rules: (Array.isArray(raw.rules) ? raw.rules : [])
+      .map((r) => clampText(r, 140))
+      .filter(Boolean)
+      .slice(0, 5),
+    durationDays: Number.isFinite(days) ? Math.min(30, Math.max(1, Math.round(days) || 7)) : 7,
+  };
 }
 
 export class AIService {
-  private static trendProvider = new MockTrendProvider();
+  static get isConfigured() {
+    return Boolean(process.env.OPENROUTER_API_KEY);
+  }
 
-  static async generateCampaign(prompt?: string) {
+  static async generateCampaign(prompt: string): Promise<CampaignDraft> {
     const apiKey = process.env.OPENROUTER_API_KEY;
-    const model = process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini";
+    if (!apiKey) throw new HttpError(503, "AI drafting isn't available right now — fill the form manually.");
 
-    if (!apiKey) {
-      return this.generateMockCampaign(prompt);
-    }
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://instant.fun",
+        "X-Title": "instant.fun",
+      },
+      body: JSON.stringify({
+        model: process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini",
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: prompt },
+        ],
+        temperature: 0.8,
+      }),
+      signal: AbortSignal.timeout(30_000),
+    }).catch(() => null);
 
-    try {
-      const systemPrompt = `You are a social media campaign generator for Instant.fun, an on-chain social platform. Generate a campaign in JSON format with these exact fields:
-{
-  "title": "string - catchy campaign title",
-  "description": "string - campaign description",
-  "category": "string - campaign category (fashion, food, tech, art, lifestyle, etc)",
-  "rules": ["string array of campaign rules"],
-  "durationHours": number - campaign duration in hours
-}
-
-Return ONLY valid JSON, no markdown, no explanation.`;
-
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-          "HTTP-Referer": "https://instant.fun",
-          "X-Title": "Instant.fun",
-        },
-        body: JSON.stringify({
-          model,
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: prompt || "Generate a fun social media campaign" },
-          ],
-          temperature: 0.8,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`OpenRouter API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      const content = data.choices?.[0]?.message?.content || "";
-
-      let generatedData;
-      try {
-        generatedData = JSON.parse(content);
-      } catch {
-        throw new HttpError(500, "Failed to parse AI response");
-      }
-
-      return generatedData;
-    } catch (error) {
-      if (error instanceof HttpError) throw error;
-      return this.generateMockCampaign(prompt);
-    }
+    if (!response?.ok) throw new HttpError(502, "AI drafting failed. Try again in a moment.");
+    const data = (await response.json()) as { choices?: { message?: { content?: string } }[] };
+    return parseDraft(data.choices?.[0]?.message?.content ?? "");
   }
 
   static async generateFromTrends(topics: string[]) {
-    const prompt = `Generate a social campaign based on these trending topics: ${topics.join(", ")}`;
-    return this.generateCampaign(prompt);
-  }
-
-  static async generateMockCampaign(prompt?: string) {
-    const trendingTopics = await this.trendProvider.getCurrentTrends();
-    const topics = trendingTopics.topics;
-
-    const mockCampaigns = [
-      {
-        title: "Rainy Day OOTD",
-        description: "Show your best outfit for a rainy day. No filters, just vibes.",
-        category: "fashion",
-        rules: ["No filters", "Maximum 3 photos", "Original photo only"],
-        durationHours: 24,
-      },
-      {
-        title: "Street Eats Challenge",
-        description: "Capture the best street food near you. Be authentic!",
-        category: "food",
-        rules: ["Must be street food", "No restaurant photos", "Maximum 3 photos"],
-        durationHours: 48,
-      },
-      {
-        title: "Campus Life",
-        description: "Show us your campus moments. Study, chill, explore.",
-        category: "lifestyle",
-        rules: ["Original photo only", "Must be on campus", "Maximum 3 photos"],
-        durationHours: 72,
-      },
-    ];
-
-    const selected = mockCampaigns[Math.floor(Math.random() * mockCampaigns.length)];
-
-    return selected;
+    return this.generateCampaign(`Design a photo challenge around these trending topics: ${topics.join(", ")}`);
   }
 }

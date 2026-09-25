@@ -1,10 +1,12 @@
-/** Full-screen flows without the bottom tab bar (detail pages, voting, payouts). */
+import { AuthGuard } from "@/components/auth/auth-guard";
+
+/** Full-screen flows without the dock (campaign detail, creation). */
 export default function FocusLayout({ children }: LayoutProps<"/">) {
   return (
-    <div className="flex min-h-dvh w-full justify-center bg-surface-dim sm:py-0">
-      <div className="app-shell app-shell-pad flex min-h-dvh flex-col bg-surface shadow-elevated">
-        {children}
+    <AuthGuard>
+      <div className="min-h-dvh w-full bg-surface-dim">
+        <div className="app-shell flex min-h-dvh flex-col bg-surface sm:shadow-elevated">{children}</div>
       </div>
-    </div>
+    </AuthGuard>
   );
 }

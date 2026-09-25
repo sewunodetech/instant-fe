@@ -4,24 +4,14 @@ import { Suspense, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Check,
-  ChevronDown,
-  CircleAlert,
-  Mail,
-  Shield,
-  User,
-  UserPlus,
-  Wallet,
-  Zap,
-} from "lucide-react";
-import { useAuth } from "@/components/providers/auth-provider";
-import { LucideIcon } from "@/components/lucide-icon";
+import { motion } from "motion/react";
+import { ArrowLeft, ArrowRight, AtSign, CircleAlert, Loader2, Mail, ShieldCheck, Wallet } from "lucide-react";
+import { AuthBackdrop } from "@/components/auth/auth-backdrop";
 import { AppleIcon, DiscordIcon, GoogleIcon, XIcon } from "@/components/auth/provider-icons";
+import { useAuth } from "@/components/providers/auth-provider";
 
 const USERNAME_RE = /^[a-z0-9_]{3,30}$/;
+const ease = [0.16, 1, 0.3, 1] as const;
 
 const socials = [
   { id: "google", label: "Google", Icon: GoogleIcon },
@@ -30,418 +20,235 @@ const socials = [
   { id: "twitter", label: "X", Icon: XIcon },
 ] as const;
 
-function Sparkles() {
-  return (
-    <svg
-      aria-hidden
-      className="absolute -top-3 -right-3 h-6 w-6 rotate-12 text-primary-fixed drop-shadow-sm"
-      fill="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z" />
-    </svg>
-  );
-}
+type Method = "email" | "google" | "apple" | "discord" | "twitter" | "wallet";
 
-function AccentUnderline() {
+/** White sheet that rises over the scene; holds every auth step. */
+function Sheet({ children }: { children: React.ReactNode }) {
   return (
-    <svg
-      aria-hidden
-      className="absolute -bottom-2 left-0 h-3 w-full text-secondary-container opacity-80"
-      fill="none"
-      preserveAspectRatio="none"
-      viewBox="0 0 100 12"
+    <motion.section
+      initial={{ y: 48, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.6, delay: 0.15, ease }}
+      className="relative z-10 mt-auto w-full rounded-t-[2rem] bg-surface-container-lowest/95 px-5 pt-3 pb-[calc(env(safe-area-inset-bottom,0px)+1.25rem)] shadow-[0_-12px_40px_rgba(15,23,42,0.18)] backdrop-blur-xl sm:mb-6 sm:rounded-[2rem] sm:pb-6"
     >
-      <path d="M2 8.5C30 2 70 2 98 9.5" stroke="currentColor" strokeLinecap="round" strokeWidth="3.5" />
-    </svg>
-  );
-}
-
-function BrandChip({
-  icon,
-  label,
-  className,
-  filled,
-}: {
-  icon: string;
-  label: string;
-  className?: string;
-  filled?: boolean;
-}) {
-  return (
-    <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-surface-container-low px-3 py-2 shadow-sm ring-1 ring-surface-container">
-      <LucideIcon name={icon} size={18} filled={filled} className={className} />
-      <span className="text-label-sm">{label}</span>
-    </span>
-  );
-}
-
-function PrimaryButton({
-  children,
-  onClick,
-  disabled,
-  icon,
-}: {
-  children: React.ReactNode;
-  onClick: () => void;
-  disabled?: boolean;
-  icon?: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className="flex h-[52px] w-full items-center justify-center gap-2.5 rounded-full bg-primary-container text-label-lg text-on-primary-container shadow-pop-yellow transition-all hover:bg-primary-fixed hover:shadow-glow-amber active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60"
-    >
-      {icon}
+      <span aria-hidden className="mx-auto mb-4 block h-1.5 w-10 rounded-full bg-on-surface/15" />
       {children}
-    </button>
+    </motion.section>
   );
 }
 
-function SecondaryButton({
-  children,
-  onClick,
-  disabled,
-}: {
-  children: React.ReactNode;
-  onClick: () => void;
-  disabled?: boolean;
-}) {
+function ErrorNote({ message }: { message: string }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className="flex h-[52px] w-full items-center justify-center gap-2.5 rounded-full border border-outline-variant/60 bg-surface-container-lowest text-label-lg text-on-surface shadow-soft transition-all hover:bg-surface-container hover:shadow-card active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60"
-    >
-      {children}
-    </button>
-  );
-}
-
-function Spinner({ label }: { label: string }) {
-  return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-4">
-      <div className="relative">
-        <div className="h-12 w-12 animate-spin rounded-full border-[3px] border-primary-container border-t-on-primary-container/70" />
-        <span className="absolute inset-0 flex items-center justify-center">
-          <Zap size={18} fill="currentColor" className="text-on-primary-container" />
-        </span>
-      </div>
-      <p className="text-label-md text-on-surface-variant">{label}</p>
-    </div>
+    <p role="alert" className="flex items-start gap-2 rounded-2xl bg-error-container px-3.5 py-2.5 text-body-sm text-on-error-container">
+      <CircleAlert size={18} className="mt-0.5 shrink-0" />
+      {message}
+    </p>
   );
 }
 
 function LoginContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const nextPath = searchParams.get("next") || "/home";
-  const { ready, authenticated, user, needsProfile, isSyncing, error, login, updateProfile } =
+  const nextPath = useSearchParams().get("next") || "/home";
+  const { ready, authenticated, user, needsProfile, isSyncing, error, login, logout, refreshUser, updateProfile } =
     useAuth();
 
   const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
-    if (!ready || isSyncing) return;
-    if (authenticated && !needsProfile) {
-      router.replace(nextPath);
-    }
-  }, [ready, authenticated, needsProfile, isSyncing, router, nextPath]);
+    if (ready && !isSyncing && authenticated && !needsProfile && user) router.replace(nextPath);
+  }, [ready, authenticated, needsProfile, isSyncing, user, router, nextPath]);
 
-  const openLogin = (methods?: {
-    loginMethods?: ("email" | "google" | "apple" | "discord" | "twitter" | "wallet")[];
-  }) => {
+  const open = (method?: Method) => {
     setFormError(null);
-    login(methods);
+    login(method ? { loginMethods: [method] } : undefined);
   };
 
   async function completeProfile(e: React.FormEvent) {
     e.preventDefault();
-    setFormError(null);
-
     const normalized = username.trim().toLowerCase().replace(/^@/, "");
     if (!USERNAME_RE.test(normalized)) {
-      setFormError("Username must be 3–30 chars: a–z, 0–9, underscore.");
+      setFormError("3–30 characters: a–z, 0–9 or underscore.");
       return;
     }
-
     setSaving(true);
-    setSubmitted(true);
+    setFormError(null);
     try {
-      await updateProfile({
-        username: normalized,
-        displayName: displayName.trim() || user?.displayName || undefined,
-      });
+      await updateProfile({ username: normalized, displayName: displayName.trim() || undefined });
       router.replace(nextPath);
     } catch (err) {
-      setSubmitted(false);
-      setFormError(err instanceof Error ? err.message : "Could not save username");
-    } finally {
+      setFormError(err instanceof Error ? err.message : "Couldn't save your username.");
       setSaving(false);
     }
   }
 
-  if (ready && authenticated && needsProfile) {
-    return (
-      <main className="flex flex-1 flex-col px-space-md pb-10">
-        <div className="mt-4 flex flex-col items-center px-space-xs text-center">
-          <div className="relative mb-4 inline-flex items-center justify-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-secondary-container text-on-secondary shadow-pop-blue">
-              <UserPlus size={28} />
-            </div>
-            <Sparkles />
-          </div>
-          <h1 className="text-headline-lg-mobile">
-            Claim your{" "}
-            <span className="relative -rotate-1 rounded-2xl bg-primary-container px-2.5 py-0.5 font-extrabold text-on-primary-container shadow-sm">
-              handle
-            </span>
-          </h1>
-          <p className="mt-space-sm max-w-[280px] leading-relaxed text-on-surface-variant">
-            Pick a unique username so the community can find and tag you.
-          </p>
-        </div>
-
-        <form onSubmit={completeProfile} className="mt-7 flex flex-col gap-space-sm" noValidate>
-          <div className="mb-1 flex items-center justify-center gap-3 rounded-3xl border border-outline-variant/50 bg-surface-container-lowest/80 p-3 shadow-soft">
-            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary-container to-primary-fixed-dim text-headline-sm font-extrabold text-on-primary-fixed ring-[3px] ring-primary-container/40">
-              {(username || displayName)
-                ? (username || displayName)
-                    .split(/[\s_]+/)
-                    .filter(Boolean)
-                    .slice(0, 2)
-                    .map((p) => p[0]?.toUpperCase())
-                    .join("")
-                : (
-                  <User size={24} />
-                )}
-            </span>
-            <div className="min-w-0 flex-1 text-left">
-              <p className="truncate text-label-lg">{displayName || username || "Your handle"}</p>
-              <p className="truncate text-body-sm text-on-surface-variant">
-                {username ? `@${username}` : "@username will appear here"}
-              </p>
-            </div>
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-tertiary-container text-on-tertiary-container">
-              <Check size={16} />
-            </span>
-          </div>
-
-          <label className="flex flex-col gap-1.5 text-left">
-            <span className="text-label-sm text-on-surface-variant">Username</span>
-            <div className="flex h-[52px] items-center gap-2 rounded-2xl border border-outline-variant/60 bg-surface-container-lowest px-4 shadow-soft transition-all focus-within:border-secondary focus-within:ring-[3px] focus-within:ring-secondary/15">
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-container text-label-sm text-on-surface-variant">
-                @
-              </span>
-              <input
-                value={username}
-                onChange={(e) => setUsername(e.target.value.replace(/\s/g, ""))}
-                autoCapitalize="none"
-                autoCorrect="off"
-                spellCheck={false}
-                placeholder="your_handle"
-                maxLength={30}
-                className="h-full w-full bg-transparent text-body-md font-medium outline-none placeholder:text-on-surface-variant/45"
-              />
-              <span
-                className={`text-label-sm tabular-nums transition-colors ${
-                  username.length >= 30 ? "text-error" : "text-on-surface-variant/60"
-                }`}
-              >
-                {username.length}/30
-              </span>
-            </div>
-          </label>
-
-          <label className="flex flex-col gap-1.5 text-left">
-            <span className="text-label-sm text-on-surface-variant">Display name (optional)</span>
-            <div className="flex h-[52px] items-center rounded-2xl border border-outline-variant/60 bg-surface-container-lowest px-4 shadow-soft transition-all focus-within:border-secondary focus-within:ring-[3px] focus-within:ring-secondary/15">
-              <input
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value.slice(0, 100))}
-                placeholder="How you appear on snaps"
-                className="h-full w-full bg-transparent text-body-md font-medium outline-none placeholder:text-on-surface-variant/45"
-              />
-            </div>
-          </label>
-
-          {(formError || error) && (
-            <div
-              role="alert"
-              className="flex items-start gap-2 rounded-2xl bg-error-container px-3.5 py-2.5 text-body-sm text-on-error-container"
-            >
-              <CircleAlert size={18} className="mt-0.5 shrink-0" />
-              <span>{formError || error}</span>
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={saving || submitted}
-            className="mt-1 flex h-[52px] w-full items-center justify-center gap-2.5 rounded-full bg-primary-container text-label-lg text-on-primary-container shadow-pop-yellow transition-all hover:bg-primary-fixed hover:shadow-glow-amber active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60"
-          >
-            {saving ? (
-              <span className="h-4 w-4 animate-spin rounded-full border-2 border-on-primary-container/30 border-t-on-primary-container" />
-            ) : (
-              <ArrowRight size={20} />
-            )}
-            {saving ? "Saving…" : "Continue"}
-          </button>
-        </form>
-      </main>
-    );
-  }
-
-  if (ready && authenticated && !needsProfile) {
-    return <Spinner label="Taking you in…" />;
-  }
+  const signedIn = ready && authenticated;
+  const claiming = signedIn && needsProfile;
+  const redirecting = signedIn && !needsProfile;
 
   return (
-    <main className="flex flex-1 flex-col px-space-md pb-8">
-      <div className="mt-3 flex flex-col items-center px-space-xs text-center">
-        <div className="relative mb-space-sm inline-flex items-center justify-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-primary-container text-on-primary-container shadow-pop-yellow">
-            <Zap size={28} fill="currentColor" />
-          </div>
-          <Sparkles />
-        </div>
-
-        <h1 className="max-w-[320px] text-headline-xl-mobile leading-tight">
-          Snap. Join.{" "}
-          <span className="relative mt-1 inline-block">
-            <span className="relative z-10 inline-block -rotate-1 rounded-2xl bg-primary-container px-3 py-0.5 font-extrabold text-on-primary-container shadow-sm">
-              Get Voted.
-            </span>
-            <AccentUnderline />
-          </span>
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, ease }}
+        className="relative z-10 px-6 pt-4 text-center"
+      >
+        <h1 className="text-[2.25rem] leading-[1.05] font-extrabold tracking-[-0.025em] text-balance text-on-surface">
+          {claiming ? (
+            <>
+              One last thing. <span className="text-secondary">Pick your name.</span>
+            </>
+          ) : (
+            <>
+              Snap now. <span className="text-secondary">Win the moment.</span>
+            </>
+          )}
         </h1>
-
-        <p className="mt-space-sm max-w-[290px] leading-relaxed text-on-surface-variant">
-          Sign in or create an account with email, social, or your wallet — one tap and you&apos;re
-          in.
+        <p className="mx-auto mt-3 max-w-xs text-base leading-relaxed font-medium text-balance text-on-surface-variant">
+          {claiming
+            ? "This is how the community finds, tags and votes for you."
+            : "Join photo challenges, get voted, win real USDC prizes."}
         </p>
-      </div>
+      </motion.div>
 
-      <ul className="no-scrollbar -mx-space-md mt-5 flex items-center justify-center gap-2 overflow-x-auto px-space-md">
-        <BrandChip icon="bolt" label="Instant Camera" className="text-secondary-container" />
-        <BrandChip icon="favorite" label="Community Votes" className="text-error" filled />
-        <BrandChip icon="emoji_events" label="USDC Rewards" className="text-tertiary" filled />
-      </ul>
-
-      <div className="mt-7 flex flex-col gap-space-sm">
-        <PrimaryButton
-          onClick={() => openLogin({ loginMethods: ["email"] })}
-          disabled={!ready}
-          icon={<Mail size={20} />}
-        >
-          Continue with email
-        </PrimaryButton>
-
-        <div className="grid grid-cols-4 gap-2.5">
-          {socials.map(({ id, label, Icon: Brand }) => (
+      <Sheet>
+        {redirecting && error && !user ? (
+          <div className="flex flex-col gap-3 py-2">
+            <ErrorNote message={`We couldn't load your account: ${error}`} />
             <button
-              key={id}
               type="button"
-              aria-label={`Continue with ${label}`}
-              title={label}
-              onClick={() => openLogin({ loginMethods: [id] })}
-              disabled={!ready}
-              className="flex h-[52px] w-full items-center justify-center rounded-2xl border border-outline-variant/60 bg-surface-container-lowest shadow-soft transition-all hover:bg-surface-container hover:shadow-card active:scale-95 disabled:pointer-events-none disabled:opacity-60"
+              onClick={() => void refreshUser()}
+              className="flex h-14 w-full items-center justify-center rounded-full bg-secondary-container text-label-lg font-bold text-on-secondary"
             >
-              <Brand className="h-5 w-5" />
+              Try again
             </button>
-          ))}
-        </div>
+            <button type="button" onClick={() => void logout()} className="h-11 text-label-md text-on-surface-variant">
+              Use a different account
+            </button>
+          </div>
+        ) : redirecting ? (
+          <div className="flex flex-col items-center gap-3 py-8" role="status">
+            <Loader2 size={28} className="animate-spin text-secondary" />
+            <p className="text-label-md text-on-surface-variant">Taking you in…</p>
+          </div>
+        ) : claiming ? (
+          <form onSubmit={completeProfile} className="flex flex-col gap-3" noValidate>
+            <label className="flex flex-col gap-1.5">
+              <span className="text-label-sm text-on-surface-variant">Username</span>
+              <span className="flex h-14 items-center gap-2 rounded-2xl bg-surface-container-low px-4 ring-2 ring-transparent transition focus-within:ring-secondary/40">
+                <AtSign size={18} className="text-on-surface-variant" />
+                <input
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value.replace(/\s/g, "").toLowerCase().slice(0, 30))}
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  autoComplete="username"
+                  spellCheck={false}
+                  autoFocus
+                  placeholder="your_handle"
+                  aria-invalid={Boolean(formError)}
+                  className="h-full w-full bg-transparent text-base font-semibold outline-none placeholder:text-on-surface-variant/45"
+                />
+                <span className="text-label-sm text-on-surface-variant/60 tabular-nums">{username.length}/30</span>
+              </span>
+            </label>
+            <label className="flex flex-col gap-1.5">
+              <span className="text-label-sm text-on-surface-variant">Display name (optional)</span>
+              <input
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value.slice(0, 50))}
+                autoComplete="nickname"
+                placeholder="How you appear on snaps"
+                className="h-14 w-full rounded-2xl bg-surface-container-low px-4 text-base outline-none ring-2 ring-transparent transition placeholder:text-on-surface-variant/45 focus:ring-secondary/40"
+              />
+            </label>
+            {(formError || error) && <ErrorNote message={formError || error!} />}
+            <button
+              type="submit"
+              disabled={saving}
+              className="mt-1 flex h-14 w-full items-center justify-center gap-2 rounded-full bg-secondary-container text-label-lg font-bold text-on-secondary shadow-pop-blue transition-transform active:scale-[0.98] disabled:opacity-60"
+            >
+              {saving ? <Loader2 size={20} className="animate-spin" /> : <ArrowRight size={20} />}
+              {saving ? "Saving…" : "Let's go"}
+            </button>
+          </form>
+        ) : (
+          <div className="flex flex-col gap-3">
+            <button
+              type="button"
+              onClick={() => open("email")}
+              disabled={!ready}
+              className="flex h-14 w-full items-center justify-center gap-2.5 rounded-full bg-secondary-container text-label-lg font-bold text-on-secondary shadow-pop-blue transition-transform active:scale-[0.98] disabled:opacity-60"
+            >
+              {ready ? <Mail size={20} /> : <Loader2 size={20} className="animate-spin" />}
+              Continue with email
+            </button>
 
-        <SecondaryButton
-          onClick={() => openLogin({ loginMethods: ["wallet"] })}
-          disabled={!ready}
-        >
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-secondary-container/10 text-secondary">
-            <Wallet size={18} />
-          </span>
-          Continue with wallet
-        </SecondaryButton>
+            <div className="flex items-center gap-3 py-1 text-label-sm text-on-surface-variant">
+              <span className="h-px flex-1 bg-on-surface/10" />
+              or continue with
+              <span className="h-px flex-1 bg-on-surface/10" />
+            </div>
 
-        <button
-          type="button"
-          onClick={() => openLogin()}
-          disabled={!ready}
-          className="mx-auto mt-1 flex h-10 items-center gap-1.5 px-3 text-label-md text-secondary transition-colors hover:text-secondary-container disabled:opacity-60"
-        >
-          More options
-          <ChevronDown size={18} />
-        </button>
-      </div>
+            <div className="grid grid-cols-4 gap-2.5">
+              {socials.map(({ id, label, Icon }) => (
+                <button
+                  key={id}
+                  type="button"
+                  aria-label={`Continue with ${label}`}
+                  onClick={() => open(id)}
+                  disabled={!ready}
+                  className="flex h-14 items-center justify-center rounded-2xl bg-surface-container-low transition-all active:scale-95 disabled:opacity-60"
+                >
+                  <Icon className="h-5 w-5" />
+                </button>
+              ))}
+            </div>
 
-      {(error || formError) && (
-        <div
-          role="alert"
-          className="mt-4 flex items-start gap-2 rounded-2xl bg-error-container px-3.5 py-2.5 text-body-sm text-on-error-container"
-        >
-          <CircleAlert size={18} className="mt-0.5 shrink-0" />
-          <span>{error || formError}</span>
-        </div>
-      )}
+            <button
+              type="button"
+              onClick={() => open("wallet")}
+              disabled={!ready}
+              className="flex h-14 w-full items-center justify-center gap-2.5 rounded-full border-2 border-on-surface/10 text-label-lg text-on-surface transition-transform active:scale-[0.98] disabled:opacity-60"
+            >
+              <Wallet size={20} className="text-bnb-dim" />
+              I have a crypto wallet
+            </button>
 
-      <div className="mt-auto flex items-center justify-center gap-1.5 pt-8 text-body-sm text-on-surface-variant">
-        <Shield size={16} className="text-tertiary" />
-        <span>
-          Secured by{" "}
-          <span className="font-bold text-on-surface">Privy</span> · Terms & Privacy
-        </span>
-      </div>
-    </main>
+            {error && <ErrorNote message={error} />}
+
+            <p className="flex items-center justify-center gap-1.5 pt-1 text-center text-label-sm text-on-surface-variant">
+              <ShieldCheck size={14} className="text-tertiary" />
+              New here? An account and free wallet are created for you.
+            </p>
+          </div>
+        )}
+      </Sheet>
+    </>
   );
 }
 
 export default function LoginPage() {
   return (
-    <div className="relative mx-auto flex min-h-dvh w-full max-w-none flex-col overflow-hidden bg-surface sm:max-w-xl lg:max-w-2xl xl:max-w-3xl">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute top-0 left-1/2 h-56 w-[120%] -translate-x-1/2 rounded-full bg-primary-container/25 blur-3xl"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute right-0 bottom-10 h-40 w-40 rounded-full bg-secondary-container/15 blur-3xl"
-      />
-
-      <header className="relative z-10 flex h-16 items-center justify-between px-space-md pt-safe">
-        <Link href="/" aria-label="instant.fun home" className="transition-opacity hover:opacity-80">
-          <Image
-            src="/brand/logo.png"
-            alt="instant.fun"
-            width={120}
-            height={32}
-            priority
-            className="h-8 w-auto"
-          />
-        </Link>
-        <Link
-          href="/"
-          className="flex h-9 items-center gap-1 rounded-full bg-surface-container-lowest/80 px-3 text-label-sm text-on-surface-variant shadow-soft ring-1 ring-surface-container transition-colors hover:bg-surface-container"
-        >
-          <ArrowLeft size={16} />
-          Home
-        </Link>
-      </header>
-
-      <div className="relative z-10 flex flex-1 flex-col">
-        <Suspense
-          fallback={
-            <div className="flex flex-1 items-center justify-center">
-              <div className="h-10 w-10 animate-spin rounded-full border-[3px] border-primary-container border-t-transparent" />
-            </div>
-          }
-        >
+    <div className="relative flex min-h-dvh w-full flex-col overflow-hidden bg-surface">
+      <AuthBackdrop />
+      <div className="relative mx-auto flex min-h-dvh w-full max-w-[30rem] flex-col">
+        <header className="relative z-10 flex h-16 items-center justify-between px-5 pt-safe">
+          <Link href="/" aria-label="instant.fun home">
+            <Image src="/brand/logo.png" alt="instant.fun" width={120} height={32} priority className="h-8 w-auto" />
+          </Link>
+          <Link
+            href="/"
+            className="flex h-10 items-center gap-1 rounded-full bg-surface-container-lowest/80 px-3.5 text-label-sm text-on-surface-variant shadow-soft backdrop-blur-md"
+          >
+            <ArrowLeft size={16} />
+            Home
+          </Link>
+        </header>
+        <Suspense fallback={<div className="flex-1" />}>
           <LoginContent />
         </Suspense>
       </div>

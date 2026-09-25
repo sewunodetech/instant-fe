@@ -9,10 +9,10 @@ const ALLOWED: Record<string, string> = {
   "image/jpeg": "jpg",
   "image/png": "png",
   "image/webp": "webp",
-  "image/gif": "gif",
-  "image/avif": "avif",
 };
+const KINDS = new Set(["snaps", "avatars", "covers"]);
 
+/** POST /api/uploads (multipart: file, kind=snaps|avatars|covers) */
 export async function POST(request: NextRequest) {
   try {
     const user = await getAuthenticatedUser(request);
@@ -23,28 +23,27 @@ export async function POST(request: NextRequest) {
       return errorResponse(400, "A file field is required");
     }
 
+    const kindField = form?.get("kind");
+    const kind = typeof kindField === "string" && KINDS.has(kindField) ? kindField : "snaps";
+
     const contentType = file.type || "application/octet-stream";
     const ext = ALLOWED[contentType];
     if (!ext) {
-      return errorResponse(415, "Only JPEG, PNG, WebP, GIF, or AVIF images are allowed");
+      return errorResponse(415, "Only JPEG, PNG or WebP images are allowed");
     }
-
     if (file.size > MAX_BYTES) {
-      return errorResponse(413, "File must be 10MB or smaller");
+      return errorResponse(413, "Image must be 10MB or smaller");
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const key = `snaps/${user.id}/${randomUUID()}.${ext}`;
+    const key = `${kind}/${user.id}/${randomUUID()}.${ext}`;
     let url: string;
     try {
       url = await StorageService.upload(buffer, key, contentType);
     } catch (error) {
       if (error instanceof HttpError) throw error;
-      console.error("[upload] S3 failed:", error);
-      throw new HttpError(
-        502,
-        `Object storage upload failed: ${error instanceof Error ? error.message : "unknown error"}`
-      );
+      console.error("[upload] storage failed:", error);
+      throw new HttpError(502, "Upload failed. Please try again.");
     }
 
     return successResponse({ url, key, contentType, size: file.size });

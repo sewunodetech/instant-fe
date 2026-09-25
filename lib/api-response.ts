@@ -29,11 +29,13 @@ export function paginatedResponse<T>(
   data: T[],
   total: number,
   page: number,
-  limit: number
+  limit: number,
+  extraMeta?: Record<string, unknown>
 ): Response {
   return Response.json({
     data,
     meta: {
+      ...extraMeta,
       page,
       limit,
       total,

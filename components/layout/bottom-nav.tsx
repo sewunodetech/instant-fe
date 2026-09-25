@@ -2,73 +2,75 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, Camera, Compass, Home, User, type LucideIcon } from "lucide-react";
+import { Bell, Camera, Compass, House, UserRound, type LucideIcon } from "lucide-react";
 
-type Tab = {
-  href: string;
-  label: string;
-  icon: LucideIcon;
-  shutter?: boolean;
-};
+type Tab = { href: string; label: string; icon: LucideIcon; match?: string[] };
 
-const tabs: Tab[] = [
-  { href: "/home", label: "Home", icon: Home },
+const left: Tab[] = [
+  { href: "/home", label: "Home", icon: House, match: ["/snaps"] },
   { href: "/campaigns", label: "Explore", icon: Compass },
-  { href: "/snap", label: "Create", icon: Camera, shutter: true },
+];
+const right: Tab[] = [
   { href: "/activity", label: "Activity", icon: Bell },
-  { href: "/profile", label: "Profile", icon: User },
+  { href: "/profile", label: "Me", icon: UserRound, match: ["/wallet"] },
 ];
 
+function isActive(pathname: string, tab: Tab) {
+  return [tab.href, ...(tab.match ?? [])].some((p) => pathname === p || pathname.startsWith(`${p}/`));
+}
+
+function TabLink({ tab, active }: { tab: Tab; active: boolean }) {
+  const Icon = tab.icon;
+  return (
+    <Link
+      href={tab.href}
+      aria-current={active ? "page" : undefined}
+      className="group flex h-14 flex-1 flex-col items-center justify-center gap-0.5 rounded-2xl transition-colors active:bg-on-surface/5"
+    >
+      <Icon
+        size={24}
+        strokeWidth={active ? 2.4 : 2}
+        className={`transition-all duration-200 ${active ? "-translate-y-0.5 text-secondary" : "text-on-surface-variant"}`}
+      />
+      <span
+        className={`text-[11px] leading-none transition-colors ${active ? "font-bold text-secondary" : "font-semibold text-on-surface-variant"}`}
+      >
+        {tab.label}
+      </span>
+    </Link>
+  );
+}
+
+/** Floating dock with a raised shutter — the app's primary action. */
 export function BottomNav() {
   const pathname = usePathname();
+  const snapActive = pathname === "/snap";
 
   return (
     <nav
-      aria-label="Bottom"
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-surface-container/60 bg-surface/90 pb-safe shadow-[0_-4px_24px_rgba(0,0,0,0.06)] backdrop-blur-xl"
+      aria-label="Main"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-50 px-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.625rem)]"
     >
-      <div className="app-shell mx-auto">
-        <div className="relative flex h-20 items-center justify-around px-space-xs">
-          {tabs.map((tab) => {
-            const active = pathname === tab.href || pathname.startsWith(`${tab.href}/`);
-            const TabIcon = tab.icon;
+      <div className="app-shell pointer-events-auto relative flex items-center rounded-[1.75rem] bg-surface-container-lowest/90 px-1.5 shadow-[0_10px_30px_-6px_rgba(15,23,42,0.22)] ring-1 ring-on-surface/[0.06] backdrop-blur-xl">
+        {left.map((tab) => (
+          <TabLink key={tab.href} tab={tab} active={isActive(pathname, tab)} />
+        ))}
 
-            if (tab.shutter) {
-              return (
-                <div key={tab.href} className="relative -top-5 flex flex-col items-center">
-                  <Link
-                    href={tab.href}
-                    aria-label={tab.label}
-                    className="flex h-14 w-14 items-center justify-center rounded-full bg-secondary-container text-on-secondary shadow-shutter ring-4 ring-surface transition-transform hover:brightness-105 active:scale-95"
-                  >
-                    <TabIcon size={28} />
-                  </Link>
-                  <span className="mt-1 text-label-sm text-on-surface-variant">{tab.label}</span>
-                </div>
-              );
-            }
-
-            return (
-              <Link
-                key={tab.href}
-                href={tab.href}
-                aria-current={active ? "page" : undefined}
-                className={`flex min-h-12 min-w-14 flex-col items-center justify-center gap-0.5 rounded-2xl transition-all ${
-                  active
-                    ? "bg-secondary-container/20 text-secondary"
-                    : "text-on-surface-variant hover:bg-surface-container/70 hover:text-on-surface"
-                }`}
-              >
-                <TabIcon
-                  size={24}
-                  fill={active ? "currentColor" : "none"}
-                  className={active ? "text-secondary" : ""}
-                />
-                <span className="text-label-sm">{tab.label}</span>
-              </Link>
-            );
-          })}
+        <div className="flex flex-1 justify-center">
+          <Link
+            href="/snap"
+            aria-label="Post a snap"
+            aria-current={snapActive ? "page" : undefined}
+            className="relative -mt-7 flex h-16 w-16 items-center justify-center rounded-full bg-secondary-container text-on-secondary shadow-shutter ring-[5px] ring-surface transition-transform active:scale-90"
+          >
+            <span aria-hidden className="absolute inset-1.5 rounded-full border-2 border-white/35" />
+            <Camera size={26} strokeWidth={2.4} />
+          </Link>
         </div>
+
+        {right.map((tab) => (
+          <TabLink key={tab.href} tab={tab} active={isActive(pathname, tab)} />
+        ))}
       </div>
     </nav>
   );

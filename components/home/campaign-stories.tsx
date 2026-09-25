@@ -1,17 +1,11 @@
 import Link from "next/link";
 import { ImagePlus } from "lucide-react";
-import type { Campaign } from "@/lib/mock-data";
+import { campaignTag, endsWithinHours, timeLeft, usdc } from "@/lib/format";
+import type { ApiCampaign } from "@/lib/types";
 
-const dotColor: Record<Campaign["dot"], string> = {
-  live: "bg-tertiary",
-  blue: "bg-secondary-container",
-  green: "bg-tertiary",
-  muted: "bg-outline-variant",
-};
-
-export function CampaignStories({ campaigns }: { campaigns: Campaign[] }) {
+export function CampaignStories({ campaigns }: { campaigns: ApiCampaign[] }) {
   return (
-    <section className="no-scrollbar flex items-center gap-space-sm overflow-x-auto scroll-smooth px-margin pt-space-md pb-space-sm sm:px-0">
+    <section className="no-scrollbar flex items-center gap-space-sm overflow-x-auto scroll-smooth px-4 pt-3 pb-1">
       <Link
         href="/snap"
         className="flex shrink-0 items-center gap-space-xs rounded-full border-2 border-on-surface/10 bg-secondary py-1.5 pr-space-md pl-space-xs text-on-secondary shadow-soft transition-all hover:opacity-95 active:scale-95"
@@ -25,30 +19,30 @@ export function CampaignStories({ campaigns }: { campaigns: Campaign[] }) {
         </span>
       </Link>
 
-      {campaigns.map((c) => (
-        <Link
-          key={c.id}
-          href={`/campaigns/${c.id}`}
-          className="flex shrink-0 items-center gap-2 rounded-full bg-surface-container-lowest py-2 pr-3.5 pl-3 shadow-sm transition-colors hover:bg-surface-container"
-        >
-          {c.dot === "live" ? (
+      {campaigns.map((c) => {
+        const urgent = endsWithinHours(c.endsAt, 24);
+        return (
+          <Link
+            key={c.id}
+            href={`/campaigns/${c.id}`}
+            className="flex shrink-0 items-center gap-2 rounded-full bg-surface-container-lowest py-2 pr-3.5 pl-3 shadow-sm transition-colors hover:bg-surface-container"
+          >
             <span className="relative flex h-2.5 w-2.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-tertiary opacity-75" />
-              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-tertiary" />
+              {urgent && (
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-error opacity-60" />
+              )}
+              <span className={`relative inline-flex h-2.5 w-2.5 rounded-full ${urgent ? "bg-error" : "bg-tertiary"}`} />
             </span>
-          ) : (
-            <span className={`h-2 w-2 rounded-full ${dotColor[c.dot]}`} />
-          )}
-          <span className="flex flex-col">
-            <span className="text-label-md">{c.tag}</span>
-            <span
-              className={`text-[10px] font-bold ${c.dot === "live" ? "text-tertiary" : "text-on-surface-variant"}`}
-            >
-              {c.poolUsdc} USDC • {c.daysLeft}d
+            <span className="flex flex-col">
+              <span className="text-label-md">{campaignTag(c.title)}</span>
+              <span className={`text-[10px] font-bold ${urgent ? "text-error" : "text-on-surface-variant"}`}>
+                {c.prizePool > 0 ? `${usdc(c.prizePool)} USDC • ` : ""}
+                {timeLeft(c.endsAt) ?? "Live"}
+              </span>
             </span>
-          </span>
-        </Link>
-      ))}
+          </Link>
+        );
+      })}
     </section>
   );
 }

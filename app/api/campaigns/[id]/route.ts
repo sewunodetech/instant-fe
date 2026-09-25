@@ -1,17 +1,13 @@
 import { NextRequest } from "next/server";
 import { CampaignService } from "@/lib/services/campaign.service";
+import { isAllowedImageUrl } from "@/lib/services/user.service";
 import { getAuthenticatedUser } from "@/lib/auth";
-import { handleApiError } from "@/lib/api-response";
-import { successResponse, errorResponse } from "@/lib/api-response";
-import { prisma } from "@/lib/prisma";
+import { errorResponse, handleApiError, successResponse } from "@/lib/api-response";
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_request: NextRequest, { params }: RouteContext<"/api/campaigns/[id]">) {
   try {
     const { id } = await params;
-    const campaign = await CampaignService.findById(id);
+    const campaign = await CampaignService.getById(id);
     if (!campaign) return errorResponse(404, "Campaign not found");
     return successResponse(campaign);
   } catch (error) {
@@ -19,40 +15,32 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+/** PATCH /api/campaigns/:id — host edits the brief while the campaign is live. */
+export async function PATCH(request: NextRequest, { params }: RouteContext<"/api/campaigns/[id]">) {
   try {
     const user = await getAuthenticatedUser(request);
     const { id } = await params;
+    const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
+    const data: { description?: string; rules?: string[]; coverImageUrl?: string | null } = {};
 
-    const campaign = await CampaignService.findById(id);
-    if (!campaign) return errorResponse(404, "Campaign not found");
-
-    const creatorPost = await prisma.post.findFirst({
-      where: { campaignId: id, userId: user.id },
-    });
-    if (!creatorPost) return errorResponse(403, "Not authorized to update this campaign");
-
-    const body = await request.json();
-    const { title, description, category, rules, maxPostsPerUser, startsAt, endsAt } = body;
-
-    if (title !== undefined && (typeof title !== "string" || title.length < 3 || title.length > 200)) {
-      return errorResponse(400, "Title must be between 3 and 200 characters");
+    if (body.description !== undefined) {
+      if (typeof body.description !== "string" || body.description.length > 2000) {
+        return errorResponse(400, "Description must be at most 2000 characters");
+      }
+      data.description = body.description.trim();
+    }
+    if (body.rules !== undefined) {
+      if (!Array.isArray(body.rules)) return errorResponse(400, "Rules must be a list");
+      data.rules = body.rules.filter((r): r is string => typeof r === "string" && r.trim().length > 0).slice(0, 10);
+    }
+    if (body.coverImageUrl !== undefined) {
+      if (body.coverImageUrl !== null && (typeof body.coverImageUrl !== "string" || !isAllowedImageUrl(body.coverImageUrl))) {
+        return errorResponse(400, "Invalid cover image");
+      }
+      data.coverImageUrl = body.coverImageUrl as string | null;
     }
 
-    const updated = await CampaignService.update(id, {
-      ...(title !== undefined && { title }),
-      ...(description !== undefined && { description }),
-      ...(category !== undefined && { category }),
-      ...(rules !== undefined && { rules }),
-      ...(maxPostsPerUser !== undefined && { maxPostsPerUser }),
-      ...(startsAt !== undefined && { startsAt: new Date(startsAt) }),
-      ...(endsAt !== undefined && { endsAt: new Date(endsAt) }),
-    });
-
-    return successResponse(updated);
+    return successResponse(await CampaignService.update(id, user.id, data));
   } catch (error) {
     return handleApiError(error);
   }

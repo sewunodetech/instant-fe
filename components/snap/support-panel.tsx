@@ -1,254 +1,240 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
-import { CircleCheck, HandHeart, Loader2, ShieldCheck, Sparkles, Vote } from "lucide-react";
-import { ApiClientError, votePost, backPost } from "@/lib/api-client";
-import { supportTiers, type SupportTier } from "@/lib/mock-data";
+import { CircleCheck, ExternalLink, HandHeart, Loader2, ShieldCheck, Wallet } from "lucide-react";
+import {
+  cancelSupport,
+  confirmSupport,
+  createSupportIntent,
+  errorMessage,
+  getWalletBalance,
+} from "@/lib/api-client";
+import { NETWORK_NAME, txUrl } from "@/lib/chain";
+import { usdc } from "@/lib/format";
+import { useApi } from "@/lib/use-api";
+import { isUserRejection, useAppWallet, walletErrorMessage } from "@/lib/wallet";
+import type { ApiPost } from "@/lib/types";
 
-type Status = "idle" | "confirming" | "success" | "error";
+const TIERS = [1, 5, 10, 25];
+type Status = "idle" | "preparing" | "signing" | "confirming" | "success" | "error";
 
-type Props = {
-  creatorName: string;
-  balance: number;
-  tiers?: SupportTier[];
-  postId?: string;
-  onSupported?: (usdc: number) => void;
-  onVoted?: () => void;
-};
-
-const usd = (n: number) => n.toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
+/**
+ * Tip a creator in USDC. No contract yet: the supporter signs a direct token
+ * transfer to the creator's wallet and the server verifies it on-chain.
+ */
 export function SupportPanel({
+  post,
   creatorName,
-  balance,
-  tiers = supportTiers,
-  postId,
   onSupported,
-  onVoted,
-}: Props) {
-  const [voted, setVoted] = useState(false);
-  const [voting, setVoting] = useState(false);
-  const [selection, setSelection] = useState<number | null>(null);
+}: {
+  post: ApiPost;
+  creatorName: string;
+  onSupported: (update: { donationCount: number; donationAmount: number }) => void;
+}) {
+  const wallet = useAppWallet();
+  const balance = useApi(() => getWalletBalance(), []);
+  const [amount, setAmount] = useState<number | null>(null);
   const [custom, setCustom] = useState("");
-  const [useCustom, setUseCustom] = useState(false);
   const [status, setStatus] = useState<Status>("idle");
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [txHash, setTxHash] = useState<string | null>(null);
 
-  const amount = useCustom ? Number(custom) || 0 : (selection ?? 0);
-  const insufficient = amount > balance;
-  const canSupport = status === "idle" && amount >= 1 && !insufficient;
+  const value = custom ? Number(custom) : (amount ?? 0);
+  const available = Number(balance.data?.balance ?? 0);
+  const hasGas = Number(balance.data?.nativeBalance ?? 0) > 0;
+  const configured = balance.data?.configured ?? true;
+  const insufficient = balance.data ? value > available : false;
+  const busy = status === "preparing" || status === "signing" || status === "confirming";
+  const canSend = !busy && value >= 0.1 && !insufficient && configured && Boolean(wallet.address);
 
-  async function voteFree() {
-    if (voted || voting) return;
-    setVoting(true);
-    setErrorMessage(null);
+  async function support() {
+    if (!canSend) return;
+    setStatus("preparing");
+    setMessage(null);
+    setTxHash(null);
+    let donationId: string | null = null;
     try {
-      if (postId) await votePost(postId);
-      setVoted(true);
-      onVoted?.();
-      navigator.vibrate?.([25, 50, 25]);
-    } catch (err) {
-      if (err instanceof ApiClientError && err.statusCode === 409) {
-        setVoted(true);
-        onVoted?.();
-      } else {
-        setErrorMessage(err instanceof ApiClientError ? err.message : "Vote failed. Try again.");
-      }
-    } finally {
-      setVoting(false);
-    }
-  }
+      const intent = await createSupportIntent(post.id, value);
+      donationId = intent.donation.id;
 
-  async function submitSupport() {
-    if (!canSupport) return;
-    setStatus("confirming");
-    setErrorMessage(null);
-    try {
-      if (postId) {
-        await backPost(postId, amount);
-      } else {
-        await new Promise((r) => setTimeout(r, 700));
+      setStatus("signing");
+      let hash: string;
+      try {
+        hash = await wallet.sendToken({
+          tokenAddress: intent.transfer.tokenAddress,
+          to: intent.transfer.to,
+          amountRaw: BigInt(intent.transfer.amountRaw),
+          description: `Support ${creatorName} with ${usdc(value)} USDC`,
+        });
+      } catch (e) {
+        void cancelSupport(intent.donation.id).catch(() => {});
+        if (isUserRejection(e)) {
+          setStatus("idle");
+          return;
+        }
+        throw new Error(walletErrorMessage(e));
       }
+      setTxHash(hash);
+
+      setStatus("confirming");
+      for (let attempt = 0; attempt < 6; attempt++) {
+        const result = await confirmSupport(intent.donation.id, hash);
+        if (result.status === "CONFIRMED") {
+          if (result.post) onSupported(result.post);
+          setStatus("success");
+          setAmount(null);
+          setCustom("");
+          navigator.vibrate?.([25, 50, 25]);
+          void balance.reload();
+          return;
+        }
+        if (result.status === "FAILED") throw new Error("The transfer failed on-chain.");
+      }
+      setMessage("Sent! Confirmation is taking longer than usual — it will show up shortly.");
       setStatus("success");
-      setVoted(true);
-      onVoted?.();
-      onSupported?.(amount);
-      navigator.vibrate?.([25, 50, 25]);
-      setTimeout(() => setStatus("idle"), 2200);
-    } catch (err) {
+    } catch (e) {
+      if (donationId && !txHash) void cancelSupport(donationId).catch(() => {});
       setStatus("error");
-      setErrorMessage(err instanceof ApiClientError ? err.message : "Support failed. Try again.");
-      setTimeout(() => setStatus("idle"), 2400);
+      setMessage(e instanceof Error && !(e instanceof TypeError) ? errorMessage(e, e.message) : errorMessage(e));
     }
   }
 
-  const supportLabel =
-    status === "confirming"
-      ? "Confirming on BSC Testnet..."
-      : status === "success"
-        ? "Support sent!"
-        : status === "error"
-          ? errorMessage || "Support failed"
-          : amount < 1
-            ? "Choose a support amount"
-            : insufficient
-              ? "Insufficient USDC balance"
-              : `Support ${amount} USDC · 100% to ${creatorName}`;
+  const label =
+    status === "preparing"
+      ? "Preparing…"
+      : status === "signing"
+        ? "Confirm in your wallet…"
+        : status === "confirming"
+          ? `Confirming on ${NETWORK_NAME}…`
+          : value >= 0.1
+            ? insufficient
+              ? "Not enough USDC"
+              : `Send ${usdc(value)} USDC to ${creatorName}`
+            : "Choose an amount";
 
   return (
-    <section className="flex w-full flex-col gap-4 rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft">
+    <section
+      id="support"
+      className="flex w-full scroll-mt-24 flex-col gap-4 rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft"
+    >
       <div className="flex items-start gap-3">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-secondary-container text-on-secondary shadow-sm">
-          <Vote size={22} />
+          <HandHeart size={22} />
         </div>
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5">
-            <h2 className="text-headline-sm font-extrabold tracking-tight">Vote &amp; Support</h2>
-            <Sparkles size={18} className="text-secondary-container" />
-          </div>
+          <h2 className="text-headline-sm font-extrabold tracking-tight">Support the creator</h2>
           <p className="mt-0.5 text-body-sm text-on-surface-variant">
-            Vote free once · optional USDC support goes 100% to {creatorName}.
+            Send USDC straight to {creatorName}&apos;s wallet. 100% goes to them — no platform fee.
           </p>
         </div>
       </div>
 
-      <button
-        type="button"
-        onClick={voteFree}
-        disabled={voted || voting}
-        aria-pressed={voted}
-        className={`flex h-14 w-full items-center justify-center gap-2 rounded-full text-label-lg transition-all active:scale-95 disabled:cursor-default ${
-          voted
-            ? "bg-tertiary-container text-on-tertiary-container"
-            : "bg-secondary-container text-on-secondary shadow-shutter hover:bg-secondary"
-        }`}
-      >
-        {voted ? <CircleCheck size={22} fill="currentColor" /> : <Vote size={22} />}
-        <span className="font-bold tracking-tight">
-          {voting ? "Submitting..." : voted ? "Vote counted — free" : "Vote free"}
-        </span>
-      </button>
-      {errorMessage && status !== "error" && (
-        <p className="text-body-sm text-error" role="alert">
-          {errorMessage}
-        </p>
+      {status === "success" ? (
+        <div className="flex flex-col items-center gap-2 rounded-2xl bg-tertiary-container/40 p-4 text-center">
+          <CircleCheck size={32} fill="currentColor" className="text-tertiary" />
+          <p className="text-label-lg">Support sent — thank you!</p>
+          {message && <p className="text-body-sm text-on-surface-variant">{message}</p>}
+          {txHash && (
+            <a
+              href={txUrl(txHash)}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-1 text-label-sm text-secondary"
+            >
+              View transaction <ExternalLink size={12} />
+            </a>
+          )}
+          <button type="button" onClick={() => setStatus("idle")} className="text-label-sm text-on-surface-variant underline">
+            Send more
+          </button>
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-4 gap-2">
+            {TIERS.map((tier) => {
+              const active = !custom && amount === tier;
+              return (
+                <button
+                  key={tier}
+                  type="button"
+                  aria-pressed={active}
+                  disabled={busy}
+                  onClick={() => {
+                    setCustom("");
+                    setAmount(tier);
+                  }}
+                  className={`h-12 rounded-2xl text-label-lg transition-all active:scale-95 ${
+                    active ? "bg-secondary-fixed font-extrabold text-secondary shadow-sm" : "bg-surface-container"
+                  }`}
+                >
+                  {tier}
+                </button>
+              );
+            })}
+          </div>
+          <label className="flex h-12 items-center gap-2 rounded-2xl bg-surface-container-low px-4 ring-2 ring-transparent focus-within:ring-secondary/40">
+            <input
+              inputMode="decimal"
+              type="number"
+              min={0.1}
+              step="0.1"
+              value={custom}
+              disabled={busy}
+              onChange={(e) => {
+                setCustom(e.target.value);
+                setAmount(null);
+              }}
+              placeholder="Custom amount"
+              aria-label="Custom USDC amount"
+              className="w-full min-w-0 bg-transparent text-body-md outline-none"
+            />
+            <span className="text-label-md text-on-surface-variant">USDC</span>
+          </label>
+
+          {(message || balance.error) && (
+            <p role="alert" className="rounded-2xl bg-error/10 px-3 py-2 text-body-sm text-error">
+              {message || balance.error}
+            </p>
+          )}
+          {!configured && (
+            <p className="rounded-2xl bg-surface-container px-3 py-2 text-body-sm text-on-surface-variant">
+              USDC support isn&apos;t enabled on this network yet.
+            </p>
+          )}
+          {configured && balance.data && !hasGas && (
+            <p className="rounded-2xl bg-surface-container px-3 py-2 text-body-sm text-on-surface-variant">
+              Your wallet needs a little {balance.data.nativeSymbol} for network fees.{" "}
+              <Link href="/wallet" className="font-bold text-secondary">
+                Open wallet
+              </Link>
+            </p>
+          )}
+
+          <button
+            type="button"
+            onClick={support}
+            disabled={!canSend}
+            className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-secondary-container text-label-lg text-on-secondary shadow-shutter transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {busy ? <Loader2 size={22} className="animate-spin" /> : <HandHeart size={22} />}
+            <span className="font-bold tracking-tight">{label}</span>
+          </button>
+        </>
       )}
 
-      <fieldset className="flex flex-col gap-2">
-        <div className="flex items-center justify-between">
-          <legend className="text-label-sm tracking-wider text-on-surface-variant uppercase">Optional support</legend>
-          <span className="text-label-sm text-secondary">To creator wallet</span>
-        </div>
-        <div className="grid grid-cols-2 gap-2">
-          {tiers.map((tier) => {
-            const active = !useCustom && selection === tier.usdc;
-            return (
-              <button
-                key={tier.usdc}
-                type="button"
-                aria-pressed={active}
-                disabled={status !== "idle"}
-                onClick={() => {
-                  setUseCustom(false);
-                  setSelection(tier.usdc);
-                }}
-                className={`relative flex flex-col items-start rounded-2xl p-3 text-left transition-all ${
-                  active
-                    ? "bg-secondary-fixed text-on-secondary-fixed shadow-sm"
-                    : "bg-surface-container hover:bg-surface-container-high"
-                }`}
-              >
-                <span className="flex w-full items-center justify-between">
-                  <span className={`text-label-lg ${active ? "font-extrabold text-secondary" : ""}`}>
-                    {tier.usdc} USDC
-                  </span>
-                  <CircleCheck
-                    size={18}
-                    fill="currentColor"
-                    className={`text-secondary transition-opacity ${active ? "opacity-100" : "opacity-0"}`}
-                  />
-                </span>
-                <span
-                  className={`mt-1 text-label-sm ${active ? "text-on-secondary-fixed-variant" : "text-on-surface-variant"}`}
-                >
-                  {tier.label}
-                </span>
-              </button>
-            );
-          })}
-
-          {useCustom ? (
-            <label className="flex flex-col rounded-2xl bg-secondary-fixed p-3 text-on-secondary-fixed shadow-sm">
-              <span className="flex items-center gap-1">
-                <input
-                  autoFocus
-                  inputMode="decimal"
-                  type="number"
-                  min={1}
-                  step={1}
-                  value={custom}
-                  onChange={(e) => setCustom(e.target.value)}
-                  placeholder="0"
-                  aria-label="Custom USDC amount"
-                  className="w-full min-w-0 bg-transparent text-label-lg font-extrabold text-secondary outline-none placeholder:text-secondary/40"
-                />
-                <span className="text-label-lg text-secondary">USDC</span>
-              </span>
-              <span className="mt-1 text-label-sm text-on-secondary-fixed-variant">Custom amount</span>
-            </label>
-          ) : (
-            <button
-              type="button"
-              disabled={status !== "idle"}
-              onClick={() => setUseCustom(true)}
-              className="flex flex-col items-start rounded-2xl bg-surface-container p-3 text-left transition-all hover:bg-surface-container-high"
-            >
-              <span className="text-label-lg">Custom</span>
-              <span className="mt-1 text-label-sm text-on-surface-variant">Enter amount</span>
-            </button>
-          )}
-        </div>
-      </fieldset>
-
-      <div className="flex items-center justify-between rounded-2xl bg-surface-container-low p-3">
-        <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-secondary-container/50 text-secondary">
-            <HandHeart size={16} />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-label-sm">Creator receives</span>
-            <span className="text-body-sm text-on-surface-variant">No platform fee</span>
-          </div>
-        </div>
-        <span className="text-label-lg font-extrabold text-secondary tabular-nums">
-          {amount > 0 ? `${usd(amount)} USDC` : "—"}
+      <Link
+        href="/wallet"
+        className="flex items-center justify-center gap-2 text-center text-body-sm text-on-surface-variant"
+      >
+        <Wallet size={14} className="text-secondary" />
+        Balance:{" "}
+        <span className={`font-bold tabular-nums ${insufficient ? "text-error" : "text-on-surface"}`}>
+          {balance.loading ? "…" : `${usdc(available)} USDC`}
         </span>
-      </div>
-
-      <div className="flex flex-col gap-2 pt-1">
-        <button
-          type="button"
-          onClick={submitSupport}
-          disabled={!canSupport}
-          aria-live="polite"
-          className={`flex h-14 w-full items-center justify-center gap-2 rounded-full text-label-lg transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 ${
-            status === "success"
-              ? "bg-tertiary text-on-tertiary"
-              : "bg-secondary-container text-on-secondary shadow-shutter hover:brightness-105"
-          } ${status === "confirming" ? "opacity-90" : ""}`}
-        >
-          {status === "idle" && <HandHeart size={22} />}
-          {status === "confirming" && <Loader2 size={22} className="animate-spin" />}
-          <span className="font-bold tracking-tight">{supportLabel}</span>
-        </button>
-        <p className="flex items-center justify-center gap-2 text-center text-body-sm text-on-surface-variant">
-          <ShieldCheck size={14} className="text-secondary" />
-          Instant on BSC Testnet · Balance:{" "}
-          <span className={`font-bold tabular-nums ${insufficient ? "text-error" : "text-on-surface"}`}>
-            {usd(balance)} USDC
-          </span>
-        </p>
-      </div>
+        <ShieldCheck size={14} className="text-secondary" />
+        {NETWORK_NAME}
+      </Link>
     </section>
   );
 }

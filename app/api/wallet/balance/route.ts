@@ -18,19 +18,7 @@ export async function GET(request: NextRequest) {
       // On-chain read failed (RPC down, rate limit, etc.) — return a graceful
       // zero balance flagged as unavailable rather than a hard 500.
       console.error("Wallet balance read failed:", chainError);
-      return successResponse(
-        {
-          address: user.walletAddress || "",
-          symbol: "USDC",
-          decimals: 18,
-          balance: "0",
-          balanceRaw: "0",
-          chainId: ChainService.chainId,
-          tokenAddress: ChainService.tokenAddress,
-          configured: ChainService.isConfigured,
-        },
-        { onchainAvailable: false },
-      );
+      return successResponse(ChainService.emptyBalance(user.walletAddress), { onchainAvailable: false });
     }
   } catch (error) {
     return handleApiError(error);

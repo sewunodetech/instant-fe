@@ -1,45 +1,34 @@
 import type { ReactNode } from "react";
 import { BackButton } from "@/components/layout/back-button";
-import { UserAvatar } from "@/components/auth/user-avatar";
 
-type Props = {
-  title: string;
-  /** Extra icon buttons shown before the profile avatar. */
-  actions?: ReactNode;
-  backHref?: string;
-};
-
-export function PageHeader({ title, actions, backHref }: Props) {
+/**
+ * Floating back/actions over an immersive (edge-to-edge) screen — no bar,
+ * just glass buttons that sit on top of the hero.
+ */
+export function PageHeader({ actions, backHref }: { actions?: ReactNode; backHref?: string }) {
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-surface-container/60 bg-surface/85 pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)] backdrop-blur-xl">
-      <div className="app-shell mx-auto flex h-16 items-center justify-between px-space-md sm:px-4 lg:px-6">
-        <div className="flex min-w-0 items-center gap-space-xs">
+    <div className="pointer-events-none fixed inset-x-0 top-0 z-40 pt-safe">
+      <div className="app-shell flex items-center justify-between px-3 pt-3">
+        <div className="pointer-events-auto rounded-full bg-surface-container-lowest/85 shadow-soft backdrop-blur-md">
           <BackButton fallbackHref={backHref} />
-          <h1 className="truncate pl-1 text-headline-sm tracking-tight">{title}</h1>
         </div>
-        <div className="flex shrink-0 items-center gap-space-xs">
-          {actions}
-          <UserAvatar className="ml-1" />
-        </div>
+        {actions && (
+          <div className="pointer-events-auto flex items-center gap-2 [&>*]:rounded-full [&>*]:bg-surface-container-lowest/85 [&>*]:shadow-soft [&>*]:backdrop-blur-md">
+            {actions}
+          </div>
+        )}
       </div>
-    </header>
+    </div>
   );
 }
 
-export function HeaderIconButton({
-  label,
-  children,
-  onClick,
-}: {
-  label: string;
-  children: ReactNode;
-  onClick?: () => void;
-}) {
+export function HeaderIconButton({ label, children, onClick }: { label: string; children: ReactNode; onClick?: () => void }) {
   return (
     <button
+      type="button"
       aria-label={label}
       onClick={onClick}
-      className="flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant transition-colors hover:bg-surface-container"
+      className="flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant transition-transform active:scale-90"
     >
       {children}
     </button>

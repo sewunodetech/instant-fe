@@ -1,17 +1,30 @@
 "use client";
 
-import { Share2 } from "lucide-react";
+import { useState } from "react";
+import { Check, Share2 } from "lucide-react";
 
-export function ShareButton({ title, className = "" }: { title: string; className?: string }) {
+/** Native share sheet on mobile; copies the link elsewhere. */
+export function ShareButton({ title, path, className = "" }: { title: string; path?: string; className?: string }) {
+  const [copied, setCopied] = useState(false);
+
   async function share() {
-    const url = window.location.href;
-    if (navigator.share) await navigator.share({ title, url }).catch(() => {});
-    else await navigator.clipboard?.writeText(url);
+    const url = path ? new URL(path, window.location.origin).toString() : window.location.href;
+    if (navigator.share) {
+      await navigator.share({ title, url }).catch(() => {});
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // clipboard unavailable
+    }
   }
 
   return (
-    <button aria-label="Share" onClick={share} className={className}>
-      <Share2 size={20} />
+    <button type="button" aria-label={copied ? "Link copied" : "Share"} onClick={share} className={className}>
+      {copied ? <Check size={20} /> : <Share2 size={20} />}
     </button>
   );
 }

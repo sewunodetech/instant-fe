@@ -1,13 +1,18 @@
 import { getAccessToken } from "@privy-io/react-auth";
 import type {
+  ActivityItem,
   ApiCampaign,
-  ApiDonation,
   ApiPost,
   AppUser,
   AppUserWithStats,
-  DonationIntentResult,
+  DonationConfirmResult,
+  DonationIntent,
+  Leaderboard,
   Paginated,
+  PublicProfile,
+  PublicUser,
   UploadResult,
+  VoteResult,
   WalletBalance,
   WalletTransfer,
 } from "@/lib/types";
@@ -22,15 +27,17 @@ export class ApiClientError extends Error {
   }
 }
 
-type ApiEnvelope<T> =
-  | { data: T; meta?: Record<string, unknown> }
-  | { statusCode: number; message: string | string[] };
+export function errorMessage(error: unknown, fallback = "Something went wrong. Please try again.") {
+  if (error instanceof ApiClientError) return error.message;
+  if (error instanceof TypeError) return "You're offline or the server is unreachable.";
+  return fallback;
+}
 
 async function parseError(res: Response): Promise<ApiClientError> {
   let message = res.statusText || "Request failed";
   try {
-    const body = (await res.json()) as ApiEnvelope<unknown> & { message?: string | string[] };
-    if (body && "message" in body && body.message) {
+    const body = (await res.json()) as { message?: string | string[] };
+    if (body?.message) {
       message = Array.isArray(body.message) ? body.message.join(", ") : body.message;
     }
   } catch {
@@ -39,161 +46,121 @@ async function parseError(res: Response): Promise<ApiClientError> {
   return new ApiClientError(res.status, message);
 }
 
-async function withAuth(headers: Headers): Promise<Headers> {
+async function request(path: string, options: RequestInit = {}) {
+  const headers = new Headers(options.headers);
+  if (!(options.body instanceof FormData) && !headers.has("Content-Type") && options.body) {
+    headers.set("Content-Type", "application/json");
+  }
   try {
     const token = await getAccessToken();
     if (token) headers.set("Authorization", `Bearer ${token}`);
   } catch {
     // Privy not ready / no session — request goes out unauthenticated
   }
-  return headers;
-}
-
-export async function apiFetch<T = unknown>(
-  path: string,
-  options: RequestInit = {}
-): Promise<T> {
-  const headers = new Headers(options.headers);
-  const isForm = options.body instanceof FormData;
-  if (!isForm && !headers.has("Content-Type") && options.body) {
-    headers.set("Content-Type", "application/json");
-  }
-  await withAuth(headers);
 
   const res = await fetch(path, { ...options, headers });
   if (!res.ok) throw await parseError(res);
+  return res;
+}
 
+export async function apiFetch<T = unknown>(path: string, options: RequestInit = {}): Promise<T> {
+  const res = await request(path, options);
   if (res.status === 204) return undefined as T;
   const json = (await res.json().catch(() => null)) as { data?: T } | null;
   return (json && "data" in json ? json.data : json) as T;
 }
 
-export async function apiFetchPaginated<T>(
+export type PaginatedWith<T, M = Record<string, never>> = Paginated<T> & { meta: M };
+
+export async function apiFetchPaginated<T, M = Record<string, never>>(
   path: string,
   options: RequestInit = {}
-): Promise<Paginated<T>> {
-  const headers = new Headers(options.headers);
-  if (!headers.has("Content-Type") && options.body) {
-    headers.set("Content-Type", "application/json");
-  }
-  await withAuth(headers);
-
-  const res = await fetch(path, { ...options, headers });
-  if (!res.ok) throw await parseError(res);
-
-  const json = (await res.json()) as { data?: T[]; meta?: Paginated<T>["meta"] };
+): Promise<PaginatedWith<T, M>> {
+  const res = await request(path, options);
+  const json = (await res.json()) as { data?: T[]; meta?: Paginated<T>["meta"] & M };
   return {
     data: json.data ?? [],
-    meta: json.meta ?? { page: 1, limit: 20, total: 0, totalPages: 0 },
+    meta: (json.meta ?? { page: 1, limit: 20, total: 0, totalPages: 0 }) as Paginated<T>["meta"] & M,
   };
 }
 
-export function fetchMe() {
-  return apiFetch<AppUserWithStats>("/api/users/me");
+function qs(params: Record<string, string | number | undefined>) {
+  const search = new URLSearchParams();
+  for (const [k, v] of Object.entries(params)) if (v !== undefined && v !== "") search.set(k, String(v));
+  const s = search.toString();
+  return s ? `?${s}` : "";
 }
 
-export function patchMe(data: Partial<Pick<AppUser, "username" | "displayName" | "avatarUrl">>) {
-  return apiFetch<AppUser>("/api/users/me", {
-    method: "PATCH",
-    body: JSON.stringify(data),
-  });
-}
+const json = (body: unknown): RequestInit => ({ body: JSON.stringify(body) });
 
-export function verifyPrivyToken(privyToken: string) {
-  return apiFetch<{ user: AppUser }>("/api/auth/verify", {
-    method: "POST",
-    body: JSON.stringify({ privyToken }),
-  });
-}
+// Auth & me
+export const verifyPrivyToken = (privyToken: string) =>
+  apiFetch<{ user: AppUser }>("/api/auth/verify", { method: "POST", ...json({ privyToken }) });
+export const fetchMe = () => apiFetch<AppUserWithStats>("/api/users/me");
+export const patchMe = (data: Partial<Pick<AppUser, "username" | "displayName" | "avatarUrl" | "bio">>) =>
+  apiFetch<AppUser>("/api/users/me", { method: "PATCH", ...json(data) });
+export const getMyActivity = () => apiFetch<ActivityItem[]>("/api/users/me/activity");
 
-export function listCampaigns(params?: {
-  status?: string;
+// Profiles
+export const getProfile = (handle: string) => apiFetch<PublicProfile>(`/api/users/${encodeURIComponent(handle)}`);
+export const listUserPosts = (handle: string, page = 1, limit = 24) =>
+  apiFetchPaginated<ApiPost>(`/api/users/${encodeURIComponent(handle)}/posts${qs({ page, limit })}`);
+export const listUserCampaigns = (handle: string, role: "joined" | "hosted", page = 1, limit = 20) =>
+  apiFetchPaginated<ApiCampaign>(`/api/users/${encodeURIComponent(handle)}/campaigns${qs({ role, page, limit })}`);
+
+// Campaigns
+export const listCampaigns = (params?: { status?: "active" | "ended" | "all"; page?: number; limit?: number }) =>
+  apiFetchPaginated<ApiCampaign>(`/api/campaigns${qs({ ...params })}`);
+export const getCampaign = (id: string) => apiFetch<ApiCampaign>(`/api/campaigns/${id}`);
+export const createCampaign = (data: {
+  title: string;
+  description?: string;
   category?: string;
-  page?: number;
-  limit?: number;
-}) {
-  const qs = new URLSearchParams();
-  if (params?.status) qs.set("status", params.status);
-  if (params?.category) qs.set("category", params.category);
-  if (params?.page) qs.set("page", String(params.page));
-  if (params?.limit) qs.set("limit", String(params.limit));
-  const suffix = qs.toString() ? `?${qs}` : "";
-  return apiFetchPaginated<ApiCampaign>(`/api/campaigns${suffix}`);
-}
-
-export function getCampaign(id: string) {
-  return apiFetch<ApiCampaign>(`/api/campaigns/${id}`);
-}
-
-export function listCampaignPosts(id: string, page = 1, limit = 20) {
-  return apiFetchPaginated<ApiPost>(
-    `/api/campaigns/${id}/posts?page=${page}&limit=${limit}`
+  rules?: string[];
+  coverImageUrl?: string;
+  prizePool?: number;
+  maxPostsPerUser?: number;
+  durationDays: number;
+}) => apiFetch<ApiCampaign>("/api/campaigns", { method: "POST", ...json(data) });
+export const endCampaign = (id: string) => apiFetch<ApiCampaign>(`/api/campaigns/${id}/end`, { method: "POST" });
+export const getLeaderboard = (id: string) => apiFetch<Leaderboard>(`/api/campaigns/${id}/leaderboard`);
+export const listCampaignPosts = (id: string, params?: { sort?: "latest" | "top"; page?: number; limit?: number }) =>
+  apiFetchPaginated<ApiPost, { remainingSnaps: number | null }>(`/api/campaigns/${id}/posts${qs({ ...params })}`);
+export const generateCampaignDraft = (prompt: string) =>
+  apiFetch<{ title: string; description: string; category: string; rules: string[]; durationDays: number }>(
+    "/api/ai/campaign/generate",
+    { method: "POST", ...json({ prompt }) }
   );
-}
 
-export function getPost(id: string) {
-  return apiFetch<ApiPost>(`/api/posts/${id}`);
-}
+// Snaps
+export const listFeed = (params?: { sort?: "latest" | "top"; page?: number; limit?: number }) =>
+  apiFetchPaginated<ApiPost>(`/api/posts${qs({ ...params })}`);
+export const getPost = (id: string) => apiFetch<ApiPost>(`/api/posts/${id}`);
+export const createPost = (campaignId: string, imageUrl: string, caption?: string) =>
+  apiFetch<ApiPost>(`/api/campaigns/${campaignId}/posts`, { method: "POST", ...json({ imageUrl, caption }) });
+export const deletePost = (id: string) => apiFetch<{ success: boolean }>(`/api/posts/${id}`, { method: "DELETE" });
+export const votePost = (id: string) => apiFetch<VoteResult>(`/api/posts/${id}/vote`, { method: "POST" });
+export const unvotePost = (id: string) => apiFetch<VoteResult>(`/api/posts/${id}/vote`, { method: "DELETE" });
+export const listPostVoters = (id: string, page = 1, limit = 20) =>
+  apiFetchPaginated<{ id: string; createdAt: string; user: PublicUser }>(`/api/posts/${id}/votes${qs({ page, limit })}`);
 
-export function createPost(campaignId: string, imageUrl: string, caption?: string) {
-  return apiFetch<ApiPost>(`/api/campaigns/${campaignId}/posts`, {
-    method: "POST",
-    body: JSON.stringify({ imageUrl, caption: caption || undefined }),
-  });
-}
+// Support (USDC transfer signed in the user's wallet, verified server-side)
+export const createSupportIntent = (postId: string, amount: number) =>
+  apiFetch<DonationIntent>(`/api/posts/${postId}/back`, { method: "POST", ...json({ amount }) });
+export const confirmSupport = (donationId: string, txHash: string) =>
+  apiFetch<DonationConfirmResult>(`/api/donations/${donationId}`, { method: "POST", ...json({ txHash }) });
+export const cancelSupport = (donationId: string) =>
+  apiFetch<{ success: boolean }>(`/api/donations/${donationId}`, { method: "DELETE" });
 
-export function votePost(postId: string) {
-  return apiFetch<{ success: boolean }>(`/api/posts/${postId}/vote`, {
-    method: "POST",
-  });
-}
+// Wallet
+export const getWalletBalance = () => apiFetch<WalletBalance>("/api/wallet/balance");
+export const getWalletTransfers = (limit = 20) => apiFetch<WalletTransfer[]>(`/api/wallet/transfers?limit=${limit}`);
 
-export function unvotePost(postId: string) {
-  return apiFetch<{ success: boolean }>(`/api/posts/${postId}/vote`, {
-    method: "DELETE",
-  });
-}
-
-export function backPost(postId: string, amount: number) {
-  return apiFetch<DonationIntentResult>(`/api/posts/${postId}/back`, {
-    method: "POST",
-    body: JSON.stringify({ amount }),
-  });
-}
-
-export function getPostVotes(postId: string, page = 1, limit = 20) {
-  return apiFetchPaginated<{
-    id: string;
-    createdAt: string;
-    user?: {
-      id: string;
-      walletAddress: string | null;
-      username: string | null;
-      displayName: string | null;
-    } | null;
-  }>(`/api/posts/${postId}/votes?page=${page}&limit=${limit}`);
-}
-
-export function getPostDonations(postId: string, page = 1, limit = 20) {
-  return apiFetchPaginated<ApiDonation>(
-    `/api/posts/${postId}/backers?page=${page}&limit=${limit}`
-  );
-}
-
-export function getWalletBalance() {
-  return apiFetch<WalletBalance>("/api/wallet/balance");
-}
-
-export function getWalletTransfers(limit = 20) {
-  return apiFetch<WalletTransfer[]>(`/api/wallet/transfers?limit=${limit}`);
-}
-
-export async function uploadFile(file: Blob | File, filename = "snap.jpg") {
+// Uploads
+export async function uploadFile(file: Blob | File, kind: "snaps" | "avatars" | "covers" = "snaps") {
   const form = new FormData();
-  const blob =
-    file instanceof File
-      ? file
-      : new File([file], filename, { type: file.type || "image/jpeg" });
+  const blob = file instanceof File ? file : new File([file], `${kind}.jpg`, { type: file.type || "image/jpeg" });
   form.append("file", blob);
+  form.append("kind", kind);
   return apiFetch<UploadResult>("/api/uploads", { method: "POST", body: form });
 }

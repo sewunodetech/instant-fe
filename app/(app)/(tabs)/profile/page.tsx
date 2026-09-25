@@ -1,229 +1,99 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import {
-  Bell,
-  BadgeCheck,
-  Bookmark,
-  CirclePlus,
-  Flame,
-  Globe,
-  Plus,
-  Sparkles,
-  Trophy,
-  Vote,
-  Wallet,
-} from "lucide-react";
-import { LucideIcon } from "@/components/lucide-icon";
-import { BackButton } from "@/components/layout/back-button";
+import { LogOut, Pencil, Plus, Wallet } from "lucide-react";
+import { EditProfileSheet } from "@/components/profile/edit-profile-sheet";
+import { ProfileSkeleton, ProfileView } from "@/components/profile/profile-view";
+import { headerIconButton, ScreenHeader } from "@/components/layout/screen-header";
 import { useAuth } from "@/components/providers/auth-provider";
-import { compactNumber } from "@/lib/format";
-import { currentUser, profileSnaps, profileStats } from "@/lib/mock-data";
+import { ErrorState } from "@/components/ui/state";
+import { getProfile } from "@/lib/api-client";
+import { useApi } from "@/lib/use-api";
 
-const tabs = [
-  { id: "snaps", label: "Snaps", icon: "photo_camera" },
-  { id: "saved", label: "Saved", icon: "bookmark" },
-  { id: "about", label: "About", icon: "info" },
-] as const;
+export default function MyProfilePage() {
+  const { user, logout } = useAuth();
+  const [editing, setEditing] = useState(false);
+  const profile = useApi(user ? () => getProfile(user.id) : null, [user?.id]);
 
-function shortAddress(address?: string | null) {
-  if (!address) return null;
-  return `${address.slice(0, 6)}…${address.slice(-4)}`;
-}
+  const header = (
+    <ScreenHeader
+      title="Profile"
+      actions={
+        <>
+          <Link href="/wallet" aria-label="Wallet" className={headerIconButton}>
+            <Wallet size={20} />
+          </Link>
+          <button type="button" aria-label="Edit profile" onClick={() => setEditing(true)} className={headerIconButton}>
+            <Pencil size={18} />
+          </button>
+        </>
+      }
+    />
+  );
 
-export default function ProfilePage() {
-  const [tab, setTab] = useState<(typeof tabs)[number]["id"]>("snaps");
-  const { user } = useAuth();
-
-  const displayName = user?.displayName || user?.username || currentUser.name;
-  const handle = user?.username || currentUser.handle;
-  const avatar = user?.avatarUrl || currentUser.avatar;
-  const walletShort = shortAddress(user?.walletAddress);
+  if (!profile.data) {
+    return (
+      <>
+        {header}
+        {profile.error ? (
+          <div className="px-4 pt-2">
+            <ErrorState message={profile.error} onRetry={profile.reload} />
+          </div>
+        ) : (
+          <ProfileSkeleton />
+        )}
+      </>
+    );
+  }
 
   return (
-    <div className="flex flex-col gap-space-md px-space-md pb-4 sm:px-0">
-      <section className="rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft">
-        <div className="flex items-start gap-space-md">
-          <div className="relative">
-            <div className="h-22 w-22 overflow-hidden rounded-full bg-surface-container ring-3 ring-secondary-container">
-              <Image
-                src={avatar}
-                alt={displayName}
-                width={96}
-                height={96}
-                priority
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <span className="absolute right-0 bottom-0 flex h-7 w-7 items-center justify-center rounded-full bg-secondary text-white ring-2 ring-surface">
-              <BadgeCheck size={14} fill="currentColor" />
-            </span>
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0">
-                <h1 className="truncate text-headline-sm font-extrabold tracking-tight">{displayName}</h1>
-                <p className="truncate text-body-sm text-on-surface-variant">@{handle}</p>
-              </div>
-              <Link
-                href="/login"
-                className="h-9 shrink-0 rounded-full bg-surface-container px-4 text-label-sm leading-9 text-on-surface-variant transition-transform active:scale-95"
-              >
-                Edit profile
-              </Link>
-            </div>
-            <div className="mt-2 flex flex-wrap items-center gap-1.5">
-              <span className="flex items-center gap-1 rounded-full bg-surface-container px-2.5 py-1 text-label-sm text-on-surface-variant">
-                <Globe size={13} className="text-secondary" />
-                BSC Testnet
-              </span>
-              <span className="flex items-center gap-1 rounded-full bg-surface-container px-2.5 py-1 text-label-sm text-on-surface-variant">
-                <Wallet size={13} className="text-secondary" />
-                {walletShort ?? "No wallet yet"}
-              </span>
-              <span className="flex items-center gap-1 rounded-full bg-secondary-container/20 px-2.5 py-1 text-label-sm text-secondary">
-                <Flame size={13} fill="currentColor" className="text-secondary" />
-                {currentUser.streakDays}d streak
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <dl className="mt-space-md grid grid-cols-4 gap-space-xs">
-          {[
-            { label: "Snaps", value: String(profileStats.snaps) },
-            { label: "Followers", value: profileStats.followers },
-            { label: "Following", value: String(profileStats.following) },
-            { label: "Earned", value: `${profileStats.totalEarnedUsdc}` },
-          ].map((s) => (
-            <div key={s.label} className="flex flex-col items-center rounded-2xl bg-surface-container-low p-2">
-              <dd className="text-label-lg font-extrabold tabular-nums">{s.value}</dd>
-              <dt className="mt-0.5 text-[10px] text-on-surface-variant">{s.label}</dt>
-            </div>
-          ))}
-        </dl>
-
-        <div className="mt-space-sm grid grid-cols-3 gap-space-xs">
-          <Link
-            href="/rewards"
-            className="flex items-center justify-center gap-1 rounded-full bg-secondary-container py-2 text-label-sm text-on-secondary"
-          >
-            <Trophy size={14} />
-            Rewards
-          </Link>
-          <Link
-            href="/wallet"
-            className="flex items-center justify-center gap-1 rounded-full bg-secondary-fixed py-2 text-label-sm text-on-secondary-fixed"
-          >
-            <Wallet size={14} />
-            Wallet
-          </Link>
-          <Link
-            href="/create"
-            className="flex items-center justify-center gap-1 rounded-full bg-surface-container py-2 text-label-sm text-on-surface"
-          >
-            <Plus size={14} />
-            Campaign
-          </Link>
-        </div>
-      </section>
-
-      <div role="tablist" className="flex items-center gap-space-xs rounded-full bg-surface-container-low p-1">
-        {tabs.map((t) => {
-          const active = t.id === tab;
-          return (
+    <>
+      {header}
+      <ProfileView
+        profile={{ ...profile.data, ...(user ?? {}), stats: profile.data.stats }}
+        isMe
+        actions={
+          <div className="grid grid-cols-2 gap-2">
             <button
-              key={t.id}
-              role="tab"
-              aria-selected={active}
-              onClick={() => setTab(t.id)}
-              className={`flex flex-1 items-center justify-center gap-1.5 rounded-full py-2 text-label-md transition-all ${active
-                ? "bg-surface-container-lowest text-on-surface shadow-sm"
-                : "text-on-surface-variant hover:text-on-surface"
-                }`}
+              type="button"
+              onClick={() => setEditing(true)}
+              className="flex h-11 items-center justify-center gap-1.5 rounded-full bg-surface-container text-label-md transition-transform active:scale-95"
             >
-              <LucideIcon name={t.icon} size={16} filled={active} />
-              {t.label}
+              <Pencil size={16} />
+              Edit profile
             </button>
-          );
-        })}
-      </div>
-
-      {tab === "snaps" && (
-        <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-4 lg:grid-cols-6">
-          {profileSnaps.map((snap) => (
             <Link
-              key={snap.id}
-              href={["snap-1", "snap-2"].includes(snap.id) ? `/snaps/${snap.id}` : `/campaigns/${snap.campaignId}`}
-              className="group relative aspect-square overflow-hidden rounded-xl bg-surface-container"
+              href="/create"
+              className="flex h-11 items-center justify-center gap-1.5 rounded-full bg-secondary-container text-label-md font-bold text-on-secondary transition-transform active:scale-95"
             >
-              <Image
-                src={snap.image}
-                alt={snap.imageAlt}
-                fill
-                sizes="(max-width: 767px) 33vw, (max-width: 1024px) 25vw, 20vw"
-                className="object-cover transition-transform group-hover:scale-105"
-              />
-              <span className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/60 to-transparent p-1.5 pt-4 text-[10px] font-bold text-white">
-                <span className="flex items-center gap-0.5">
-                  <Vote size={11} />
-                  {compactNumber(snap.votes)}
-                </span>
-                <span>#{snap.rank}</span>
-              </span>
+              <Plus size={16} />
+              Host campaign
             </Link>
-          ))}
-        </div>
-      )}
-
-      {tab === "saved" && (
-        <div className="flex flex-col items-center justify-center gap-2 rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-8 text-center shadow-soft">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-container">
-            <Bookmark size={24} className="text-on-surface-variant" />
           </div>
-          <p className="text-headline-sm font-extrabold tracking-tight">No saved snaps yet</p>
-          <p className="max-w-[240px] text-body-sm text-on-surface-variant">
-            Tap the bookmark on any snap to keep it here.
-          </p>
-          <Link
-            href="/home"
-            className="mt-1 rounded-full bg-on-surface px-5 py-2.5 text-label-md font-bold text-surface shadow-sm transition-transform hover:-translate-y-0.5 active:scale-95"
-          >
-            Browse feed
-          </Link>
-        </div>
+        }
+      />
+      <div className="px-4 pt-6">
+        <button
+          type="button"
+          onClick={() => {
+            if (window.confirm("Log out of instant.fun?")) void logout();
+          }}
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-full border-2 border-error/15 text-label-md text-error transition-colors active:bg-error/10"
+        >
+          <LogOut size={18} />
+          Log out
+        </button>
+      </div>
+      {editing && (
+        <EditProfileSheet
+          onClose={() => setEditing(false)}
+          onSaved={() => {
+            setEditing(false);
+            void profile.reload();
+          }}
+        />
       )}
-
-      {tab === "about" && (
-        <section className="flex flex-col gap-space-sm rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft">
-          <div className="flex items-start gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-secondary-container text-on-secondary shadow-sm">
-              <Sparkles size={20} />
-            </div>
-            <div>
-              <h2 className="text-label-lg font-extrabold">Creator bio</h2>
-              <p className="mt-0.5 text-body-sm text-on-surface-variant">
-                Chasing golden sunsets, tide pools, and iced matchas. Join my drops on instant.fun.
-              </p>
-            </div>
-          </div>
-          <div className="grid grid-cols-3 gap-space-xs pt-1">
-            {[
-              { label: "Win rate", value: profileStats.winRate, icon: "workspace_premium" },
-              { label: "Best rank", value: `#${profileStats.bestRank}`, icon: "leaderboard" },
-              { label: "Earned", value: `${profileStats.totalEarnedUsdc} USDC`, icon: "payments" },
-            ].map((s) => (
-              <div key={s.label} className="flex flex-col items-center gap-1 rounded-2xl bg-surface-container-low p-2.5 text-center">
-                <LucideIcon name={s.icon} size={18} className="text-secondary" />
-                <span className="text-label-sm font-bold tabular-nums">{s.value}</span>
-                <span className="text-[10px] text-on-surface-variant">{s.label}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-    </div>
+    </>
   );
 }

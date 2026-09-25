@@ -14,13 +14,15 @@ model User {
   username      String?  @unique @db.VarChar(30)
   displayName   String?  @db.VarChar(100)
   avatarUrl     String?
+  bio           String?  @db.VarChar(160)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  posts        Post[]
-  votes        Vote[]
-  donations    Donation[]
-  transactions Transaction[]
+  posts            Post[]
+  votes            Vote[]
+  donations        Donation[]
+  transactions     Transaction[]
+  campaignsCreated Campaign[] @relation("CampaignCreator")
 
   @@index([walletAddress])
   @@index([privyId])
@@ -32,13 +34,18 @@ model Campaign {
   description     String?  @db.Text
   category        String?  @db.VarChar(50)
   rules           Json?
+  coverImageUrl   String?
+  /// Total USDC awarded to the top 3 snaps (50% / 30% / 20%).
+  prizePool       Decimal  @default(0) @db.Decimal(20, 8)
   maxPostsPerUser Int      @default(3)
   status          CampaignStatus @default(DRAFT)
   startsAt        DateTime?
   endsAt          DateTime?
+  creatorId       String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
+  creator      User?    @relation("CampaignCreator", fields: [creatorId], references: [id], onDelete: SetNull)
   posts        Post[]
   donations    Donation[]
   transactions Transaction[]
@@ -46,6 +53,7 @@ model Campaign {
   @@index([status])
   @@index([startsAt])
   @@index([endsAt])
+  @@index([creatorId])
 }
 
 model Post {

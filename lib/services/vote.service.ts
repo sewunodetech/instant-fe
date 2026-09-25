@@ -1,53 +1,57 @@
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@/lib/generated/prisma/client";
+import { CampaignStatus } from "@/lib/generated/prisma/client";
 import { HttpError } from "@/lib/api-response";
+import { CampaignService } from "@/lib/services/campaign.service";
+import { publicUserSelect } from "@/lib/serializers";
+import type { VoteResult } from "@/lib/types";
 
-type TxClient = Prisma.TransactionClient;
+async function assertVotable(postId: string) {
+  await CampaignService.syncStatuses();
+  const post = await prisma.post.findUnique({ where: { id: postId }, include: { campaign: true } });
+  if (!post) throw new HttpError(404, "Snap not found");
+  const { campaign } = post;
+  if (campaign.status !== CampaignStatus.ACTIVE || (campaign.endsAt && campaign.endsAt <= new Date())) {
+    throw new HttpError(400, "Voting has closed for this campaign");
+  }
+  return post;
+}
 
 export class VoteService {
-  static async vote(userId: string, postId: string) {
-    return prisma.$transaction(async (tx: TxClient) => {
-      const post = await tx.post.findUnique({
-        where: { id: postId },
-        include: { campaign: true },
+  static async vote(userId: string, postId: string): Promise<VoteResult> {
+    const post = await assertVotable(postId);
+    if (post.userId === userId) throw new HttpError(400, "You can't vote on your own snap");
+
+    try {
+      const updated = await prisma.$transaction(async (tx) => {
+        await tx.vote.create({ data: { userId, postId } });
+        return tx.post.update({
+          where: { id: postId },
+          data: { voteCount: { increment: 1 } },
+          select: { voteCount: true },
+        });
       });
-      if (!post) throw new HttpError(404, "Post not found");
-      if (post.campaign.status !== "ACTIVE")
-        throw new HttpError(400, "Campaign is not active");
-
-      if (post.userId === userId)
-        throw new HttpError(400, "Cannot vote on your own post");
-
-      const existing = await tx.vote.findUnique({
-        where: { userId_postId: { userId, postId } },
-      });
-      if (existing) throw new HttpError(409, "Already voted on this post");
-
-      await tx.vote.create({ data: { userId, postId } });
-      await tx.post.update({
-        where: { id: postId },
-        data: { voteCount: { increment: 1 } },
-      });
-
-      return { success: true };
-    });
+      return { voteCount: updated.voteCount, hasVoted: true };
+    } catch (error) {
+      // Unique (userId, postId) — a double tap or a second device.
+      if (error instanceof Error && "code" in error && error.code === "P2002") {
+        throw new HttpError(409, "You already voted for this snap");
+      }
+      throw error;
+    }
   }
 
-  static async unvote(userId: string, postId: string) {
-    return prisma.$transaction(async (tx: TxClient) => {
-      const existing = await tx.vote.findUnique({
-        where: { userId_postId: { userId, postId } },
-      });
-      if (!existing) throw new HttpError(404, "Vote not found");
-
-      await tx.vote.delete({ where: { id: existing.id } });
-      await tx.post.update({
+  static async unvote(userId: string, postId: string): Promise<VoteResult> {
+    await assertVotable(postId);
+    const updated = await prisma.$transaction(async (tx) => {
+      const { count } = await tx.vote.deleteMany({ where: { userId, postId } });
+      if (count === 0) throw new HttpError(404, "You haven't voted for this snap");
+      return tx.post.update({
         where: { id: postId },
         data: { voteCount: { decrement: 1 } },
+        select: { voteCount: true },
       });
-
-      return { success: true };
     });
+    return { voteCount: updated.voteCount, hasVoted: false };
   }
 
   static async getPostVotes(postId: string, page = 1, limit = 20) {
@@ -58,16 +62,7 @@ export class VoteService {
         orderBy: { createdAt: "desc" },
         skip: (page - 1) * limit,
         take: limit,
-        include: {
-          user: {
-            select: {
-              id: true,
-              walletAddress: true,
-              username: true,
-              displayName: true,
-            },
-          },
-        },
+        select: { id: true, createdAt: true, user: { select: publicUserSelect } },
       }),
       prisma.vote.count({ where }),
     ]);
