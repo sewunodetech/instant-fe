@@ -33,7 +33,7 @@ export default function OnboardingPage() {
               <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z" />
             </svg>
           </div>
-          <h1 className="max-w-[340px] text-headline-xl-mobile leading-tight">
+          <h1 className="max-w-[340px] text-headline-xl-mobile font-extrabold tracking-tight leading-tight">
             Turn Your Moments Into{" "}
             <span className="relative mt-1 inline-block">
               <span className="relative z-10 inline-block -rotate-1 rounded-2xl bg-primary-container px-3 py-0.5 font-extrabold text-on-primary-container shadow-sm">
@@ -62,7 +62,7 @@ export default function OnboardingPage() {
 
           <div className="relative w-full max-w-[330px]">
             <div className="absolute inset-0 scale-[0.97] -rotate-3 rounded-3xl bg-secondary-fixed/50" />
-            <div className="relative rotate-1 rounded-3xl bg-surface-container-lowest p-3 pb-5 shadow-card transition-transform duration-300 hover:rotate-0">
+            <div className="relative rotate-1 rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-3 pb-5 shadow-soft transition-transform duration-300 hover:rotate-0">
               <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[18px] bg-surface-container">
                 <Image src="/mock/onboarding-hero.jpg" alt="" fill priority sizes="306px" className="object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
@@ -112,7 +112,7 @@ export default function OnboardingPage() {
         <div className="mt-space-md flex flex-col gap-space-sm px-space-xs">
           <Link
             href="/login?next=/home"
-            className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-primary-container text-label-lg text-on-primary-container shadow-card transition-all hover:bg-primary-fixed active:scale-[0.98]"
+            className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-primary-container text-label-lg font-bold text-on-primary-container shadow-soft transition-all hover:-translate-y-0.5 hover:bg-primary-fixed active:scale-[0.98]"
           >
             Get Started
             <ArrowRight size={20} />
@@ -128,7 +128,7 @@ export default function OnboardingPage() {
         {live && (
           <Link
             href={`/campaigns/${live.id}`}
-            className="mt-space-lg block rounded-3xl bg-surface-container-lowest p-space-md shadow-[0_4px_20px_rgba(17,17,17,0.04)] transition-shadow hover:shadow-card"
+            className="mt-space-lg block rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-card-hover"
           >
             <div className="mb-space-sm flex items-center justify-between">
               <span className="flex items-center gap-2">

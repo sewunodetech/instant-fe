@@ -98,3 +98,26 @@ export type UploadResult = {
   contentType: string;
   size: number;
 };
+
+export type WalletBalance = {
+  address: string;
+  symbol: string;
+  decimals: number;
+  /** Human-readable balance, e.g. "42.5". */
+  balance: string;
+  balanceRaw: string;
+  chainId: number;
+  tokenAddress: string;
+  /** Whether USDC_CONTRACT_ADDRESS is set on the server. */
+  configured: boolean;
+};
+
+export type WalletTransfer = {
+  hash: string;
+  direction: "in" | "out";
+  /** Signed human-readable amount (negative for outgoing). */
+  amount: number;
+  counterparty: string;
+  blockNumber: number;
+  logIndex: number;
+};

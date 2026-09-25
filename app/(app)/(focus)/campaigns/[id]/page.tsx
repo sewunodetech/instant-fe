@@ -78,10 +78,10 @@ export default async function CampaignDetailPage({ params }: PageProps<"/campaig
           </div>
         </div>
 
-        <section className="rounded-3xl bg-surface-container-lowest p-space-md shadow-sm">
+        <section className="rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft">
           <div className="mb-space-xs flex items-center justify-between gap-2">
-            <h2 className="text-headline-lg-mobile">{campaign.tag}</h2>
-            <span className="shrink-0 rounded-full bg-secondary-fixed px-2.5 py-0.5 text-label-sm text-on-secondary-fixed">
+            <h2 className="text-headline-lg-mobile font-extrabold tracking-tight">{campaign.tag}</h2>
+            <span className="shrink-0 rounded-full bg-secondary-fixed px-2.5 py-0.5 text-label-sm font-bold text-on-secondary-fixed">
               {campaign.kind}
             </span>
           </div>
@@ -91,7 +91,7 @@ export default async function CampaignDetailPage({ params }: PageProps<"/campaig
               <div key={s.label} className="flex flex-col items-center rounded-2xl bg-surface-container-low p-2.5 text-center">
                 <LucideIcon name={s.icon} size={20} className="mb-0.5 text-secondary" />
                 <dt className="order-last text-label-sm text-on-surface-variant">{s.label}</dt>
-                <dd className="text-headline-sm leading-tight tabular-nums">{s.value}</dd>
+                <dd className="text-headline-sm leading-tight font-extrabold tabular-nums">{s.value}</dd>
               </div>
             ))}
           </dl>

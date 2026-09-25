@@ -8,6 +8,8 @@ import type {
   DonationIntentResult,
   Paginated,
   UploadResult,
+  WalletBalance,
+  WalletTransfer,
 } from "@/lib/types";
 
 export class ApiClientError extends Error {
@@ -176,6 +178,14 @@ export function getPostDonations(postId: string, page = 1, limit = 20) {
   return apiFetchPaginated<ApiDonation>(
     `/api/posts/${postId}/backers?page=${page}&limit=${limit}`
   );
+}
+
+export function getWalletBalance() {
+  return apiFetch<WalletBalance>("/api/wallet/balance");
+}
+
+export function getWalletTransfers(limit = 20) {
+  return apiFetch<WalletTransfer[]>(`/api/wallet/transfers?limit=${limit}`);
 }
 
 export async function uploadFile(file: Blob | File, filename = "snap.jpg") {

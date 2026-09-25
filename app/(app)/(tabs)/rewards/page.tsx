@@ -51,7 +51,7 @@ export default function RewardsPage() {
           <Award size={15} fill="currentColor" />
           CAMPAIGN VICTOR
         </span>
-        <h1 className="text-headline-lg-mobile">Congratulations, {currentUser.name}!</h1>
+        <h1 className="text-headline-lg-mobile font-extrabold tracking-tight">Congratulations, {currentUser.name}!</h1>
         <p className="mt-0.5 text-on-surface-variant">
           Your snap took <span className="font-bold text-primary">{ordinal(pendingReward.place)} Place</span> in{" "}
           <Link href={`/campaigns/${campaign.id}/leaderboard`} className="hover:underline">
@@ -60,7 +60,7 @@ export default function RewardsPage() {
         </p>
       </div>
 
-      <section className="relative overflow-hidden rounded-3xl bg-surface-container-lowest p-space-md shadow-card">
+      <section className="relative overflow-hidden rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft ring-4 ring-primary-container/20">
         <div className="pointer-events-none absolute -top-12 -right-12 h-48 w-48 rounded-full bg-primary-container/25 blur-2xl" />
         <div className="pointer-events-none absolute -bottom-10 -left-10 h-44 w-44 rounded-full bg-secondary-fixed/30 blur-2xl" />
         <RewardConfetti />
@@ -88,10 +88,10 @@ export default function RewardsPage() {
         </div>
       </section>
 
-      <section className="rounded-3xl bg-surface-container-lowest p-space-md shadow-card">
+      <section className="rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft">
         <div className="mb-space-sm flex items-center justify-between pb-space-sm">
-          <h2 className="text-label-lg">Prize Breakdown</h2>
-          <span className="text-label-sm text-secondary">Base Network USDC</span>
+          <h2 className="text-label-lg font-extrabold">Prize Breakdown</h2>
+          <span className="text-label-sm text-secondary">BSC Testnet USDC</span>
         </div>
         <ul className="flex flex-col gap-2.5">
           {pendingReward.lines.map((line) => (

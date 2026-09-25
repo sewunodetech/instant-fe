@@ -6,7 +6,7 @@ export function NextChallengeBanner() {
   const c = upcomingCampaign;
 
   return (
-    <section className="relative w-full overflow-hidden rounded-3xl bg-secondary p-space-md text-on-secondary shadow-[0_8px_24px_rgba(0,86,198,0.22)]">
+    <section className="relative w-full overflow-hidden rounded-3xl border-2 border-white/15 bg-secondary p-space-md text-on-secondary shadow-[0_8px_24px_rgba(0,86,198,0.22)]">
       <div className="pointer-events-none absolute -right-6 -bottom-6 h-28 w-28 rounded-full bg-white/10 blur-xl" />
       <div className="relative z-10 flex items-start justify-between">
         <div>
@@ -14,7 +14,7 @@ export function NextChallengeBanner() {
             <Timer size={14} />
             Starts in {c.startsIn}
           </span>
-          <h2 className="text-headline-sm">{c.tag}</h2>
+          <h2 className="text-headline-sm font-extrabold tracking-tight">{c.tag}</h2>
           <p className="mt-0.5 text-body-sm text-secondary-fixed">
             ${c.poolUsdc} USDC Prize Pool • {c.theme}
           </p>

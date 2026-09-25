@@ -132,7 +132,7 @@ function CreateCampaignFlow() {
       <div className="flex items-center justify-between">
         <BackButton fallbackHref="/campaigns" />
         <div className="flex flex-col items-center">
-          <h1 className="text-headline-sm tracking-tight">{published ? "Published" : "New Campaign"}</h1>
+          <h1 className="text-headline-sm font-extrabold tracking-tight">{published ? "Published" : "New Campaign"}</h1>
           <p className="text-label-sm text-on-surface-variant">Create with AI · free to launch</p>
         </div>
         <Link
@@ -169,7 +169,7 @@ function CreateCampaignFlow() {
         })}
       </div>
 
-      <section className="relative overflow-hidden rounded-3xl bg-surface-container-lowest shadow-card">
+      <section className="relative overflow-hidden rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest shadow-soft">
         <div className="relative aspect-[16/9] w-full">
           <Image src={preview.cover} alt="" fill sizes="(max-width: 767px) 100vw, 720px" className="object-cover" priority />
           <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
@@ -198,13 +198,13 @@ function CreateCampaignFlow() {
       </section>
 
       {step === "brief" && (
-        <section className="rounded-3xl bg-surface-container-lowest p-space-md shadow-card">
+        <section className="rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft">
           <div className="mb-space-sm flex items-start gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-container">
-              <Sparkles size={20} className="text-on-primary-fixed" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#106df4] text-white shadow-sm">
+              <Sparkles size={20} />
             </div>
             <div>
-              <h2 className="text-label-lg">Describe your challenge</h2>
+              <h2 className="text-label-lg font-extrabold">Describe your challenge</h2>
               <p className="text-body-sm text-on-surface-variant">AI drafts name, pitch, cover, and rules.</p>
             </div>
           </div>
@@ -237,9 +237,9 @@ function CreateCampaignFlow() {
       )}
 
       {step === "style" && (
-        <section className="rounded-3xl bg-surface-container-lowest p-space-md shadow-card">
+        <section className="rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft">
           <div className="mb-space-sm flex items-center justify-between">
-            <h2 className="text-label-lg">Name &amp; pitch</h2>
+            <h2 className="text-label-lg font-extrabold">Name &amp; pitch</h2>
             <span className="flex items-center gap-1 rounded-full bg-tertiary-container/50 px-2 py-0.5 text-label-sm text-on-tertiary-container">
               <Check size={12} />
               AI ready
@@ -319,8 +319,8 @@ function CreateCampaignFlow() {
       )}
 
       {step === "rules" && (
-        <section className="rounded-3xl bg-surface-container-lowest p-space-md shadow-card">
-          <h2 className="mb-space-sm text-label-lg">Rules</h2>
+        <section className="rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft">
+          <h2 className="mb-space-sm text-label-lg font-extrabold">Rules</h2>
 
           <p className="mb-2 text-label-sm text-on-surface-variant">Duration</p>
           <div className="grid grid-cols-4 gap-space-xs">
@@ -371,7 +371,7 @@ function CreateCampaignFlow() {
 
           <div className="mt-space-md rounded-2xl bg-surface-container-low p-3">
             <div className="flex items-center gap-2 text-label-md">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-container">
+              <span className="flex h-8 w-8 items-center justify-center rounded-2xl bg-primary-container">
                 <User size={16} />
               </span>
               Host · @{currentUser.handle}
@@ -379,15 +379,15 @@ function CreateCampaignFlow() {
           </div>
 
           {published ? (
-            <div className="mt-space-md flex flex-col items-center gap-space-sm rounded-3xl bg-tertiary-container/40 p-space-md text-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-tertiary text-white">
+            <div className="mt-space-md flex flex-col items-center gap-space-sm rounded-3xl border-2 border-tertiary/20 bg-tertiary-container/40 p-space-md text-center shadow-soft">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-tertiary text-white shadow-sm">
                 <CircleCheck size={28} fill="currentColor" />
               </div>
-              <p className="text-headline-sm">Campaign live</p>
+              <p className="text-headline-sm font-extrabold tracking-tight">Campaign live</p>
               <p className="text-body-sm text-on-surface-variant">Creators can join and post snaps right away.</p>
               <Link
                 href="/campaigns"
-                className="rounded-full bg-on-surface px-5 py-2 text-label-md text-surface"
+                className="rounded-full bg-on-surface px-5 py-2.5 text-label-md font-bold text-surface shadow-sm transition-transform hover:-translate-y-0.5 active:scale-95"
               >
                 View in Explore
               </Link>

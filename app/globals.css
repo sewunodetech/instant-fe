@@ -194,11 +194,12 @@
   }
 }
 
-/* Responsive app shell: full-width on phones, centered wide column on desktop */
+/* Mobile-only app shell: full-width on phones, narrow centered phone column on
+   larger screens so the (app) experience always looks like a mobile app. */
 @utility app-shell {
   width: 100%;
   margin-inline: auto;
-  max-width: 100%;
+  max-width: 30rem; /* 480px — phone column */
 }
 
 @utility app-shell-pad {
@@ -206,26 +207,8 @@
 }
 
 @media (min-width: 640px) {
-  .app-shell {
-    max-width: 42rem; /* 672px */
-  }
   .app-shell-pad {
     padding-inline: 1rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .app-shell {
-    max-width: 56rem; /* 896px */
-  }
-  .app-shell-pad {
-    padding-inline: 1.5rem;
-  }
-}
-
-@media (min-width: 1280px) {
-  .app-shell {
-    max-width: 64rem; /* 1024px */
   }
 }
 

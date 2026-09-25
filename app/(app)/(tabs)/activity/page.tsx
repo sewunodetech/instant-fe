@@ -11,7 +11,6 @@ import { activityFeed, type ActivityKind } from "@/lib/mock-data";
 const kindMeta: Record<ActivityKind, { icon: string; className: string }> = {
   vote: { icon: "how_to_vote", className: "bg-secondary-fixed text-on-secondary-fixed" },
   support: { icon: "volunteer_activism", className: "bg-primary-container text-on-primary-fixed" },
-  comment: { icon: "mode_comment", className: "bg-surface-container text-on-surface-variant" },
   follow: { icon: "person_add", className: "bg-tertiary-container text-on-tertiary-container" },
   reward: { icon: "emoji_events", className: "bg-tertiary text-on-tertiary" },
   campaign: { icon: "campaign", className: "bg-error-container text-on-error-container" },
@@ -39,7 +38,7 @@ export default function ActivityPage() {
         <div className="flex items-center gap-2">
           <BackButton fallbackHref="/home" />
           <div>
-            <h1 className="text-headline-sm tracking-tight">Activity</h1>
+            <h1 className="text-headline-sm font-extrabold tracking-tight">Activity</h1>
             <p className="text-label-sm text-on-surface-variant">Votes, support &amp; campaign updates</p>
           </div>
         </div>
@@ -72,11 +71,11 @@ export default function ActivityPage() {
       </div>
 
       {items.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 rounded-3xl bg-surface-container-lowest p-8 text-center shadow-card">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-container">
+        <div className="flex flex-col items-center gap-2 rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-8 text-center shadow-soft">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-container">
             <BellOff size={24} className="text-on-surface-variant" />
           </div>
-          <p className="text-headline-sm">All clear</p>
+          <p className="text-headline-sm font-extrabold tracking-tight">All clear</p>
           <p className="max-w-[240px] text-body-sm text-on-surface-variant">New activity will show up here.</p>
         </div>
       ) : (
@@ -95,8 +94,10 @@ export default function ActivityPage() {
               <li key={item.id}>
                 <Link
                   href={href}
-                  className={`flex items-center gap-3 rounded-3xl p-3 transition-shadow hover:shadow-card ${
-                    item.unread ? "bg-surface-container-lowest shadow-sm ring-1 ring-primary-container/60" : "bg-surface-container-lowest shadow-sm"
+                  className={`flex items-center gap-3 rounded-3xl border-2 p-3 transition-all hover:-translate-y-0.5 hover:shadow-card-hover ${
+                    item.unread
+                      ? "border-primary-container bg-surface-container-lowest shadow-soft ring-4 ring-primary-container/15"
+                      : "border-on-surface/10 bg-surface-container-lowest shadow-soft"
                   }`}
                 >
                   <div className="relative shrink-0">
@@ -143,9 +144,9 @@ export default function ActivityPage() {
         </ul>
       )}
 
-      <div className="rounded-3xl bg-surface-container-lowest p-space-md shadow-card">
+      <div className="rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft">
         <div className="mb-space-sm flex items-center justify-between">
-          <h2 className="text-label-lg">Quick links</h2>
+          <h2 className="text-label-lg font-extrabold">Quick links</h2>
         </div>
         <div className="grid grid-cols-3 gap-space-xs">
           {[

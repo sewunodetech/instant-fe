@@ -7,15 +7,15 @@ export function LeaderboardTeaser({ campaign }: { campaign: Campaign }) {
   const { leader } = campaign;
 
   return (
-    <section className="rounded-3xl bg-surface-container-lowest p-space-md shadow-sm">
+    <section className="rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft">
       <div className="mb-space-sm flex items-center justify-between">
         <div className="flex items-center gap-space-xs">
-          <h3 className="text-headline-sm">Live Leaderboard</h3>
+          <h3 className="text-headline-sm font-extrabold tracking-tight">Live Leaderboard</h3>
           {campaign.live && <span className="h-2 w-2 rounded-full bg-tertiary" />}
         </div>
         <Link
           href={`/campaigns/${campaign.id}/leaderboard`}
-          className="flex items-center text-label-md text-secondary hover:underline"
+          className="flex items-center text-label-md font-bold text-secondary hover:underline"
         >
           View All <ChevronRight size={16} />
         </Link>

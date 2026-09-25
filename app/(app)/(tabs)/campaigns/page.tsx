@@ -47,10 +47,10 @@ export default function CampaignsPage() {
 
       <CampaignExplorer />
 
-      <aside className="relative mt-1 overflow-hidden rounded-3xl bg-gradient-to-r from-surface-container to-surface-container-low p-5 shadow-[0_2px_12px_rgba(17,17,17,0.04)]">
+      <aside className="relative mt-1 overflow-hidden rounded-3xl border-2 border-on-surface/10 bg-gradient-to-r from-surface-container to-surface-container-low p-5 shadow-soft ring-4 ring-[#f0b90b]/15">
         <div className="pointer-events-none absolute -top-3 -right-3 h-20 w-20 rounded-full bg-primary-container/20 blur-xl" />
         <div className="relative z-10 flex items-center gap-4">
-          <div className="flex h-13 w-13 shrink-0 items-center justify-center rounded-2xl bg-primary-container shadow-sm">
+          <div className="flex h-13 w-13 shrink-0 items-center justify-center rounded-2xl bg-[#f0b90b] text-white shadow-sm">
             <CrownDoodle />
           </div>
           <div className="min-w-0 flex-1">

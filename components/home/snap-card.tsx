@@ -10,7 +10,6 @@ import {
   Clock,
   HandHeart,
   Heart,
-  MessageCircle,
   Share2,
   Trophy,
   Vote,
@@ -18,6 +17,7 @@ import {
 } from "lucide-react";
 import { LucideIcon } from "@/components/lucide-icon";
 import type { Snap } from "@/lib/mock-data";
+import { Button } from "@base-ui/react/button";
 
 const supportOptions = [1, 5, 10];
 
@@ -130,23 +130,19 @@ export function SnapCard({
 
   const actions = (
     <div className="flex items-center gap-2">
-      <button className="flex items-center gap-1 p-1 text-on-surface-variant hover:text-on-surface">
-        <MessageCircle size={22} />
-        <span className="text-label-sm tabular-nums">{snap.comments}</span>
-      </button>
-      <button
+      <Button
         aria-label={saved ? "Unsave" : "Save"}
         aria-pressed={saved}
         onClick={() => setSaved((s) => !s)}
         className="p-1 text-on-surface-variant hover:text-on-surface"
       >
         <Bookmark size={22} fill={saved ? "currentColor" : "none"} />
-      </button>
+      </Button>
     </div>
   );
 
   return (
-    <article className="flex flex-col gap-3 rounded-3xl bg-surface-container-lowest p-3 shadow-md">
+    <article className="flex flex-col gap-3 rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-3 shadow-soft">
       <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-surface-container">
         <Image
           src={snap.image}

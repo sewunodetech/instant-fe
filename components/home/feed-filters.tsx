@@ -22,10 +22,10 @@ export function FeedFilters() {
             role="tab"
             aria-selected={selected}
             onClick={() => setActive(f.id)}
-            className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-label-md whitespace-nowrap transition-colors ${
+            className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-label-md font-bold whitespace-nowrap shadow-soft transition-all active:scale-95 ${
               selected
-                ? "bg-secondary text-on-secondary shadow-sm"
-                : "bg-surface-container-lowest text-on-surface-variant shadow-xs hover:bg-surface-container"
+                ? "bg-on-surface text-surface-container-lowest"
+                : "bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container"
             }`}
           >
             {f.id === "hot" && <Flame size={16} />}

@@ -30,7 +30,7 @@ export function RankingTabs({ creators, voters, ended }: Props) {
             role="tab"
             aria-selected={tab === t.id}
             onClick={() => setTab(t.id)}
-            className={`flex-1 rounded-full px-3 py-2 text-center text-label-md transition-all ${
+            className={`flex-1 rounded-full px-3 py-2 text-center text-label-md font-bold transition-all ${
               tab === t.id ? "bg-surface-container-lowest text-on-surface shadow-sm" : "text-on-surface-variant"
             }`}
           >
@@ -44,10 +44,10 @@ export function RankingTabs({ creators, voters, ended }: Props) {
           {creators.map((c) => (
             <li
               key={c.rank}
-              className="flex items-center justify-between gap-3 rounded-2xl bg-surface-container-lowest p-space-md shadow-[0_2px_12px_rgba(17,17,17,0.04)]"
+              className="flex items-center justify-between gap-3 rounded-2xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft"
             >
               <div className="flex min-w-0 items-center gap-3">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-surface-container text-label-md">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-surface-container text-label-md font-bold">
                   {c.rank}
                 </span>
                 <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-surface-container">
@@ -83,7 +83,7 @@ export function RankingTabs({ creators, voters, ended }: Props) {
             {voters.map((v) => (
               <li
                 key={v.rank}
-                className="flex items-center justify-between rounded-2xl bg-surface-container-lowest p-space-md shadow-[0_2px_12px_rgba(17,17,17,0.04)]"
+                className="flex items-center justify-between rounded-2xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft"
               >
                 <div className="flex items-center gap-3">
                   <span

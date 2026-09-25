@@ -14,7 +14,7 @@ const initials = [
 
 export function FeaturedCampaignCard({ campaign }: { campaign: Campaign }) {
   return (
-    <article className="relative overflow-hidden rounded-3xl bg-surface-container-lowest p-4 shadow-card transition-shadow hover:shadow-[0_8px_26px_rgba(17,17,17,0.09)]">
+    <article className="relative overflow-hidden rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-4 shadow-soft transition-all hover:-translate-y-1 hover:shadow-card-hover">
       <div className="relative h-56 w-full overflow-hidden rounded-[18px] bg-surface-container-high">
         <Image src={campaign.cover} alt="" fill priority sizes="(max-width: 767px) 100vw, 720px" className="object-cover" />
         <span className="absolute top-3 left-3 flex items-center gap-1 rounded-full bg-primary-container px-3 py-1.5 text-label-md shadow-md">
@@ -80,7 +80,7 @@ export function FeaturedCampaignCard({ campaign }: { campaign: Campaign }) {
 
 export function CampaignRowCard({ campaign }: { campaign: Campaign }) {
   return (
-    <article className="relative rounded-3xl bg-surface-container-lowest p-4 shadow-card transition-shadow hover:shadow-[0_6px_22px_rgba(17,17,17,0.08)]">
+    <article className="relative rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-4 shadow-soft transition-all hover:-translate-y-1 hover:shadow-card-hover">
       <div className="flex items-center gap-3.5">
         <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-[18px] bg-surface-container-high">
           <Image src={campaign.cover} alt="" fill sizes="96px" className="object-cover" />

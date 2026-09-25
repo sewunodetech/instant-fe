@@ -7,6 +7,7 @@ import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import {
   Aperture,
   Camera,
+  CameraOff,
   Check,
   ChevronRight,
   CircleCheck,
@@ -16,7 +17,6 @@ import {
   Loader2,
   MapPin,
   RefreshCw,
-  Tag,
   Video,
   Zap,
   ZapOff,
@@ -54,7 +54,6 @@ function CreateSnapFlow() {
   const [captured, setCaptured] = useState(false);
   const [capturedUrl, setCapturedUrl] = useState<string | null>(null);
   const [capturedBlob, setCapturedBlob] = useState<Blob | null>(null);
-  const [caption, setCaption] = useState("");
   const [location, setLocation] = useState("");
   const [live, setLive] = useState(true);
   const [posting, setPosting] = useState(false);
@@ -62,8 +61,13 @@ function CreateSnapFlow() {
   const [error, setError] = useState<string | null>(null);
   const [postedId, setPostedId] = useState<string | null>(null);
   const [cameraReady, setCameraReady] = useState(false);
+  const [cameraNonce, setCameraNonce] = useState(0);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  function retryCamera() {
+    setCameraNonce((n) => n + 1);
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -122,7 +126,7 @@ function CreateSnapFlow() {
       stream?.getTracks().forEach((t) => t.stop());
       setCameraReady(false);
     };
-  }, [captured]);
+  }, [captured, cameraNonce]);
 
   const campaign = useMemo(() => campaigns.find((c) => c.id === campaignId), [campaignId, campaigns]);
   const canPost = Boolean(captured && campaign && !posting && !done);
@@ -136,7 +140,6 @@ function CreateSnapFlow() {
     image: previewImage,
     imageAlt: captured ? "Captured snap preview" : "Camera ready",
     campaignId,
-    caption: caption || "Your moment...",
     location: location || undefined,
     campaign: {
       tag: campaign?.tag ?? "",
@@ -145,7 +148,6 @@ function CreateSnapFlow() {
     },
     rank: 1,
     votes: 0,
-    comments: 0,
     creator: {
       handle: currentUser.handle,
       name: currentUser.name,
@@ -205,25 +207,6 @@ function CreateSnapFlow() {
     setCaptured(true);
   }
 
-  function pickFileFallback() {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*";
-    input.onchange = async () => {
-      const file = input.files?.[0];
-      if (!file) return;
-      const url = URL.createObjectURL(file);
-      setCapturedBlob(file);
-      setCapturedUrl((prev) => {
-        if (prev) URL.revokeObjectURL(prev);
-        return url;
-      });
-      setError(null);
-      setCaptured(true);
-    };
-    input.click();
-  }
-
   function retake() {
     setCaptured(false);
     setDone(false);
@@ -247,7 +230,7 @@ function CreateSnapFlow() {
         imageUrl = uploaded.url;
       }
 
-      const created = await createPost(campaign.id, imageUrl, caption || undefined);
+      const created = await createPost(campaign.id, imageUrl);
       setPostedId(created.id);
       setDone(true);
       navigator.vibrate?.([25, 50, 25]);
@@ -264,8 +247,8 @@ function CreateSnapFlow() {
       <div className="flex items-center justify-between">
         <BackButton fallbackHref="/home" />
         <div className="flex flex-col items-center">
-          <h1 className="text-headline-sm tracking-tight">{done ? "Posted!" : "New Snap"}</h1>
-          <p className="text-label-sm text-on-surface-variant">Instant cam · no gallery</p>
+          <h1 className="text-headline-sm font-extrabold tracking-tight">{done ? "Posted!" : "New Snap"}</h1>
+          <p className="text-label-sm text-on-surface-variant">Instant cam · camera only</p>
         </div>
         <Link
           href="/campaigns"
@@ -276,10 +259,10 @@ function CreateSnapFlow() {
         </Link>
       </div>
 
-      <section className="rounded-3xl bg-surface-container-lowest p-space-md shadow-card">
+      <section className="rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft">
         <div className="mb-space-sm flex items-center justify-between">
-          <h2 className="text-label-lg">Campaign</h2>
-          <Link href="/campaigns" className="flex items-center text-label-sm text-secondary">
+          <h2 className="text-label-lg font-extrabold">Campaign</h2>
+          <Link href="/campaigns" className="flex items-center text-label-sm font-bold text-secondary">
             Explore <ChevronRight size={14} />
           </Link>
         </div>
@@ -339,18 +322,30 @@ function CreateSnapFlow() {
               priority
             />
           )}
-          {!captured && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/35 text-white backdrop-blur-[1px]">
+          {!captured && cameraReady && (
+            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/25 text-white">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/30">
                 <Camera size={32} />
               </div>
-              <p className="text-label-md">Tap shutter for an instant capture</p>
+              <p className="text-label-md">Tap the shutter for an instant capture</p>
+            </div>
+          )}
+          {!captured && !cameraReady && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/55 px-6 text-center text-white backdrop-blur-[1px]">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/30">
+                <CameraOff size={32} />
+              </div>
+              <p className="text-label-md">Enable your camera to snap</p>
+              <p className="max-w-[16rem] text-body-sm text-white/70">
+                instant.fun captures live moments only — no gallery uploads. Allow camera access, then try again.
+              </p>
               <button
                 type="button"
-                onClick={pickFileFallback}
-                className="mt-1 rounded-full bg-white/15 px-4 py-1.5 text-label-sm ring-1 ring-white/30 backdrop-blur-md"
+                onClick={retryCamera}
+                className="mt-1 flex items-center gap-1.5 rounded-full bg-white/15 px-4 py-2 text-label-sm ring-1 ring-white/30 backdrop-blur-md transition hover:bg-white/25"
               >
-                Or pick from gallery
+                <RefreshCw size={16} />
+                Try again
               </button>
             </div>
           )}
@@ -425,28 +420,8 @@ function CreateSnapFlow() {
         </div>
       </section>
 
-      <section className="rounded-3xl bg-surface-container-lowest p-space-md shadow-card">
-        <label className="mb-2 block text-label-lg" htmlFor="snap-caption">
-          Caption
-        </label>
-        <textarea
-          id="snap-caption"
-          value={caption}
-          onChange={(e) => setCaption(e.target.value)}
-          rows={3}
-          maxLength={220}
-          placeholder="Tell the story of this moment..."
-          className="w-full resize-none rounded-2xl bg-surface-container-low p-3 text-body-md outline-none ring-2 ring-transparent transition placeholder:text-on-surface-variant/60 focus:ring-secondary/40"
-        />
-        <div className="mt-1 flex items-center justify-between text-label-sm text-on-surface-variant">
-          <span>{caption.length}/220</span>
-          <span className="flex items-center gap-1">
-            <Tag size={14} />
-            {campaign?.tag}
-          </span>
-        </div>
-
-        <label className="mt-space-sm mb-2 block text-label-lg" htmlFor="snap-location">
+      <section className="rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft">
+        <label className="mb-2 block text-label-lg font-extrabold" htmlFor="snap-location">
           Location
         </label>
         <div className="relative">
@@ -485,11 +460,11 @@ function CreateSnapFlow() {
       </section>
 
       {done ? (
-        <div className="flex flex-col gap-space-sm rounded-3xl bg-tertiary-container/40 p-space-md text-center shadow-card">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-tertiary text-white">
+        <div className="flex flex-col gap-space-sm rounded-3xl border-2 border-tertiary/20 bg-tertiary-container/40 p-space-md text-center shadow-soft">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-tertiary text-white shadow-sm">
             <CircleCheck size={28} fill="currentColor" />
           </div>
-          <p className="text-headline-sm">Snap is live</p>
+          <p className="text-headline-sm font-extrabold tracking-tight">Snap is live</p>
           <p className="text-body-sm text-on-surface-variant">Community can vote free or support you with USDC.</p>
           {error && <p className="text-body-sm text-error">{error}</p>}
           <div className="mt-1 flex gap-2">

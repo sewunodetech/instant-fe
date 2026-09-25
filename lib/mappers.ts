@@ -89,9 +89,8 @@ export function mapApiPost(p: ApiPost, index = 0): MockSnap {
   return {
     id: p.id,
     image: p.imageUrl,
-    imageAlt: p.caption || "Community snap",
+    imageAlt: `Snap by @${handle}`,
     campaignId: p.campaignId,
-    caption: p.caption || "",
     campaign: {
       tag: campaignTag,
       poolUsdc: 100,
@@ -99,7 +98,6 @@ export function mapApiPost(p: ApiPost, index = 0): MockSnap {
     },
     rank: index + 1,
     votes: p.voteCount,
-    comments: 0,
     creator: {
       handle,
       name: creatorName(p.user),

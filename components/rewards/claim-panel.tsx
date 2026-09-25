@@ -28,7 +28,7 @@ export function ClaimPanel({ totalUsdc, wallet, shareText }: Props) {
 
   function claim() {
     if (status !== "idle") return;
-    // Mock payout. Replace with the Base USDC claim transaction once wired up.
+    // Mock payout. Replace with the BSC testnet USDC claim transaction once wired up.
     setStatus("claiming");
     burst();
     setTimeout(() => {
@@ -46,15 +46,15 @@ export function ClaimPanel({ totalUsdc, wallet, shareText }: Props) {
 
   return (
     <>
-      <section className="rounded-3xl bg-surface-container-lowest p-space-md shadow-card">
+      <section className="rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary-container text-[13px] font-black text-on-secondary-container shadow-sm">
-              {wallet.network.toUpperCase()}
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#106df4] text-[11px] font-black text-white shadow-sm">
+              {wallet.network.split(" ")[0].toUpperCase()}
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5">
-                <span className="text-label-lg">{wallet.address}</span>
+                <span className="text-label-lg font-bold">{wallet.address}</span>
                 <span className="h-2 w-2 rounded-full bg-tertiary" />
               </div>
               <span className="text-body-sm text-on-surface-variant">Connected Primary Wallet</span>
@@ -91,7 +91,7 @@ export function ClaimPanel({ totalUsdc, wallet, shareText }: Props) {
         </button>
         <p className="flex items-center justify-center gap-1.5 text-center text-body-sm text-on-surface-variant">
           <Zap size={16} fill="currentColor" className="text-tertiary" />
-          Instant payout • Powered by Base • No lockups or delays
+          Instant payout • Powered by BSC Testnet • No lockups or delays
         </p>
         <button
           onClick={share}
@@ -101,12 +101,12 @@ export function ClaimPanel({ totalUsdc, wallet, shareText }: Props) {
           {shared ? "Story Ready to Share!" : "Share Win to Instagram Story"}
         </button>
         <a
-          href="https://basescan.org"
+          href="https://testnet.bscscan.com"
           target="_blank"
           rel="noreferrer"
           className="inline-flex items-center justify-center gap-1 py-2 text-center text-label-sm text-on-surface-variant transition-colors hover:text-secondary"
         >
-          View Transaction Contract on BaseScan
+          View Transaction Contract on BscScan Testnet
           <ExternalLink size={14} />
         </a>
       </div>
@@ -122,7 +122,7 @@ export function ClaimPanel({ totalUsdc, wallet, shareText }: Props) {
         </div>
         <div className="flex min-w-0 flex-1 flex-col">
           <span className="text-label-md">{usd(totalUsdc)} USDC Dispatched!</span>
-          <span className="truncate text-body-sm text-inverse-on-surface/80">Transaction confirmed on Base</span>
+          <span className="truncate text-body-sm text-inverse-on-surface/80">Transaction confirmed on BSC Testnet</span>
         </div>
       </div>
     </>
