@@ -3,17 +3,17 @@ import { Heart } from "lucide-react";
 import type { Creator } from "@/lib/mock-data";
 
 const podium = {
-  2: { rankLabel: "Silver Rank", badge: "bg-surface-container-highest text-on-surface-variant", prize: "text-secondary" },
-  3: { rankLabel: "Bronze Rank", badge: "bg-primary-fixed-dim/40 text-on-primary-fixed-variant", prize: "text-tertiary" },
+  2: { rankLabel: "Silver Rank", badge: "bg-[#ff6b6b] text-white", ring: "ring-[#ff6b6b]/15 border-[#ff6b6b]/25", prize: "text-secondary" },
+  3: { rankLabel: "Bronze Rank", badge: "bg-[#106df4] text-white", ring: "ring-[#106df4]/15 border-[#106df4]/25", prize: "text-tertiary" },
 } as const;
 
 export function PodiumCard({ creator }: { creator: Creator }) {
   const style = podium[creator.rank as 2 | 3];
 
   return (
-    <div className="flex flex-col justify-between rounded-3xl bg-surface-container-lowest p-3.5 shadow-card">
+    <div className={`flex flex-col justify-between rounded-3xl border-2 bg-surface-container-lowest p-3.5 shadow-soft ring-4 ${style.ring}`}>
       <div className="mb-2 flex items-center justify-between">
-        <span className={`flex h-6 w-6 items-center justify-center rounded-full text-label-sm ${style.badge}`}>
+        <span className={`flex h-6 w-6 items-center justify-center rounded-full text-label-sm font-extrabold ${style.badge}`}>
           #{creator.rank}
         </span>
         <span className="flex items-center gap-0.5 text-label-sm text-on-surface-variant tabular-nums">

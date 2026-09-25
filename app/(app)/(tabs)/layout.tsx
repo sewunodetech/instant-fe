@@ -5,9 +5,11 @@ import { TopBar } from "@/components/layout/top-bar";
 export default function TabsLayout({ children }: LayoutProps<"/">) {
   return (
     <AuthGuard>
-      <div className="min-h-dvh w-full bg-surface">
+      <div className="min-h-dvh w-full bg-surface-dim">
         <TopBar />
-        <main className="app-shell app-shell-pad mx-auto flex min-h-dvh flex-col pt-16 pb-28 md:pb-12">{children}</main>
+        <main className="app-shell app-shell-pad mx-auto flex min-h-dvh flex-col bg-surface pt-16 pb-28 shadow-elevated">
+          {children}
+        </main>
         <BottomNav />
       </div>
     </AuthGuard>

@@ -58,10 +58,10 @@ export default function HomePage() {
         <JoinSnapBanner title="Got a Summer moment?" poolUsdc={250} />
 
         <div className="flex flex-col items-center justify-center gap-2 py-6 text-center">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container text-on-surface-variant">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#f0b90b] text-white shadow-sm">
             <Sparkles size={20} />
           </div>
-          <p className="text-headline-sm">You&apos;re completely caught up!</p>
+          <p className="text-headline-sm font-extrabold tracking-tight">You&apos;re completely caught up!</p>
           <p className="max-w-[260px] text-body-sm text-on-surface-variant">
             New snaps arrive spontaneously as creator countdown timers trigger.
           </p>

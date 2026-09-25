@@ -84,7 +84,7 @@ export function SupportPanel({
 
   const supportLabel =
     status === "confirming"
-      ? "Confirming on Base..."
+      ? "Confirming on BSC Testnet..."
       : status === "success"
         ? "Support sent!"
         : status === "error"
@@ -96,9 +96,9 @@ export function SupportPanel({
               : `Support ${amount} USDC · 100% to ${creatorName}`;
 
   return (
-    <section className="flex w-full flex-col gap-4 rounded-3xl bg-surface-container-lowest p-space-md shadow-card">
+    <section className="flex w-full flex-col gap-4 rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft">
       <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-fixed text-on-primary-fixed">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#ff6b6b] text-white shadow-sm">
           <Vote size={22} />
         </div>
         <div className="min-w-0 flex-1">
@@ -243,7 +243,7 @@ export function SupportPanel({
         </button>
         <p className="flex items-center justify-center gap-2 text-center text-body-sm text-on-surface-variant">
           <ShieldCheck size={14} className="text-secondary" />
-          Instant on Base · Balance:{" "}
+          Instant on BSC Testnet · Balance:{" "}
           <span className={`font-bold tabular-nums ${insufficient ? "text-error" : "text-on-surface"}`}>
             {usd(balance)} USDC
           </span>

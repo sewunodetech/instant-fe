@@ -35,11 +35,10 @@ export type Snap = {
   imageAlt: string;
   campaignId: string;
   campaign: { tag: string; poolUsdc: number; icon: string };
-  caption: string;
+  caption?: string;
   location?: string;
   rank: number;
   votes: number;
-  comments: number;
   creator: {
     handle: string;
     name: string;
@@ -59,7 +58,7 @@ export const currentUser = {
   name: "Maya",
   handle: "maya_beachlife",
   avatar: "/mock/avatar-me.jpg",
-  wallet: { network: "Base", address: "0x4a9...8e21" },
+  wallet: { network: "BSC Testnet", address: "0x4a9...8e21" },
   usdcBalance: 42.5,
   hasUnread: true,
   streakDays: 5,
@@ -286,7 +285,6 @@ export const feedSnaps: Snap[] = [
     campaign: { tag: "#SummerVibes", poolUsdc: 250, icon: "stars" },
     rank: 1,
     votes: 1420,
-    comments: 18,
     creator: {
       handle: "maya_beachlife",
       name: "Maya",
@@ -310,7 +308,6 @@ export const feedSnaps: Snap[] = [
     campaign: { tag: "#BestFriends", poolUsdc: 300, icon: "group" },
     rank: 4,
     votes: 198,
-    comments: 7,
     creator: { handle: "elena_glow", name: "Elena", initial: "E" },
     postedAgo: "45m ago",
   },
@@ -338,7 +335,7 @@ export function votesFor(usdc: number) {
   return usdc >= 10 ? Math.floor(usdc * 1.2) : Math.floor(usdc);
 }
 
-export type ActivityKind = "vote" | "support" | "comment" | "follow" | "reward" | "campaign";
+export type ActivityKind = "vote" | "support" | "follow" | "reward" | "campaign";
 
 export type ActivityItem = {
   id: string;
@@ -369,7 +366,7 @@ export const activityFeed: ActivityItem[] = [
     id: "a2",
     kind: "support",
     title: "You supported @elena_glow",
-    detail: "#BestFriends · 5 USDC",
+    detail: "#BestFriends Â· 5 USDC",
     timeAgo: "5h ago",
     amountUsdc: 5,
     snapId: "snap-2",
@@ -396,16 +393,6 @@ export const activityFeed: ActivityItem[] = [
     campaignId: "city-life",
   },
   {
-    id: "a5",
-    kind: "comment",
-    title: "New comment on your snap",
-    detail: "@alex_skater: “this light is unreal”",
-    timeAgo: "1d ago",
-    snapId: "snap-1",
-    handle: "alex_skater",
-    avatar: "/mock/leaderboard/avatar-2.jpg",
-  },
-  {
     id: "a6",
     kind: "follow",
     title: "New follower",
@@ -427,26 +414,6 @@ export const activityFeed: ActivityItem[] = [
   },
 ];
 
-export type TxKind = "in" | "out" | "reward" | "deposit";
-
-export type WalletTx = {
-  id: string;
-  kind: TxKind;
-  label: string;
-  note?: string;
-  amountUsdc: number;
-  timeAgo: string;
-  status: "confirmed" | "pending";
-};
-
-export const walletTxs: WalletTx[] = [
-  { id: "t1", kind: "reward", label: "Reward · #GoldenHour", note: "1st place claim", amountUsdc: 80, timeAgo: "2h ago", status: "confirmed" },
-  { id: "t2", kind: "out", label: "Support · @elena_glow", note: "#BestFriends", amountUsdc: -5, timeAgo: "5h ago", status: "confirmed" },
-  { id: "t3", kind: "in", label: "Support from @summer_scout", note: "#SummerVibes", amountUsdc: 10, timeAgo: "3d ago", status: "confirmed" },
-  { id: "t4", kind: "deposit", label: "Wallet top-up", note: "Base · USDC", amountUsdc: 50, timeAgo: "1w ago", status: "confirmed" },
-  { id: "t5", kind: "out", label: "Support · @urban.kai", note: "#CityLife", amountUsdc: -2, timeAgo: "1w ago", status: "confirmed" },
-];
-
 export const profileStats = {
   snaps: 48,
   followers: "2.4k",
@@ -466,7 +433,6 @@ export const profileSnaps: Snap[] = [
     campaign: { tag: "#SummerVibes", poolUsdc: 250, icon: "stars" },
     rank: 1,
     votes: 1420,
-    comments: 18,
     creator: { handle: "maya_beachlife", name: "Maya", initial: "M", verified: true },
     postedAgo: "2h ago",
     featured: true,
@@ -480,7 +446,6 @@ export const profileSnaps: Snap[] = [
     campaign: { tag: "#SummerVibes", poolUsdc: 250, icon: "stars" },
     rank: 3,
     votes: 860,
-    comments: 12,
     creator: { handle: "maya_beachlife", name: "Maya", initial: "M", verified: true },
     postedAgo: "2d ago",
   },
@@ -493,7 +458,6 @@ export const profileSnaps: Snap[] = [
     campaign: { tag: "#BestFriends", poolUsdc: 300, icon: "group" },
     rank: 2,
     votes: 640,
-    comments: 9,
     creator: { handle: "maya_beachlife", name: "Maya", initial: "M", verified: true },
     postedAgo: "5d ago",
   },
@@ -506,7 +470,6 @@ export const profileSnaps: Snap[] = [
     campaign: { tag: "#CityLife", poolUsdc: 150, icon: "location_city" },
     rank: 5,
     votes: 312,
-    comments: 4,
     creator: { handle: "maya_beachlife", name: "Maya", initial: "M", verified: true },
     postedAgo: "1w ago",
   },
@@ -519,7 +482,6 @@ export const profileSnaps: Snap[] = [
     campaign: { tag: "#FoodieMoment", poolUsdc: 100, icon: "restaurant" },
     rank: 4,
     votes: 288,
-    comments: 6,
     creator: { handle: "maya_beachlife", name: "Maya", initial: "M", verified: true },
     postedAgo: "1w ago",
   },
@@ -532,7 +494,6 @@ export const profileSnaps: Snap[] = [
     campaign: { tag: "#GoldenHour", poolUsdc: 250, icon: "wb_twilight" },
     rank: 1,
     votes: 1420,
-    comments: 22,
     creator: { handle: "maya_beachlife", name: "Maya", initial: "M", verified: true },
     postedAgo: "2w ago",
   },
@@ -568,6 +529,6 @@ export const pendingReward = {
     { label: "Base Creator 1st Prize", icon: "military_tech", tone: "primary", amountUsdc: 70 },
     { label: "Community Early-Bird Bonus", icon: "speed", tone: "secondary", amountUsdc: 5, bonus: true },
     { label: "5-Day Streak Multiplier (+10%)", icon: "local_fire_department", tone: "tertiary", amountUsdc: 5, bonus: true },
-    { label: "Network Gas Fee", note: "Sponsored by Base", icon: "local_gas_station", tone: "neutral", amountUsdc: 0 },
+    { label: "Network Gas Fee", note: "Sponsored by instant.fun", icon: "local_gas_station", tone: "neutral", amountUsdc: 0 },
   ] satisfies RewardLine[],
 };

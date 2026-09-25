@@ -14,7 +14,7 @@ export function CampaignStories({ campaigns }: { campaigns: Campaign[] }) {
     <section className="no-scrollbar flex items-center gap-space-sm overflow-x-auto scroll-smooth px-margin pt-space-md pb-space-sm sm:px-0">
       <Link
         href="/snap"
-        className="flex shrink-0 items-center gap-space-xs rounded-full bg-primary-container py-1.5 pr-space-md pl-space-xs text-on-primary-fixed shadow-sm transition-all hover:opacity-95 active:scale-95"
+        className="flex shrink-0 items-center gap-space-xs rounded-full border-2 border-on-surface/10 bg-primary-container py-1.5 pr-space-md pl-space-xs text-on-primary-fixed shadow-soft transition-all hover:opacity-95 active:scale-95"
       >
         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-surface text-primary shadow-xs">
           <ImagePlus size={18} />

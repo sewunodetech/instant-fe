@@ -70,7 +70,7 @@ export function CampaignDiscovery({ campaigns }: { campaigns: Campaign[] }) {
           </div>
         </>
       ) : (
-        <p className="rounded-3xl bg-surface-container-lowest p-6 text-center text-body-md text-on-surface-variant shadow-card">
+        <p className="rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-6 text-center text-body-md text-on-surface-variant shadow-soft">
           No campaigns match this filter right now.
         </p>
       )}

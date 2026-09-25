@@ -25,7 +25,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Bottom"
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-surface-container/60 bg-surface/90 pb-safe shadow-[0_-4px_24px_rgba(0,0,0,0.06)] backdrop-blur-xl md:hidden"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-surface-container/60 bg-surface/90 pb-safe shadow-[0_-4px_24px_rgba(0,0,0,0.06)] backdrop-blur-xl"
     >
       <div className="app-shell mx-auto">
         <div className="relative flex h-20 items-center justify-around px-space-xs">

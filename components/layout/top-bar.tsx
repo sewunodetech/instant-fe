@@ -2,31 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Bell, Camera, Compass, Home, User, type LucideIcon } from "lucide-react";
+import { Bell } from "lucide-react";
 import { UserAvatar } from "@/components/auth/user-avatar";
 import { currentUser } from "@/lib/mock-data";
 
-type NavItem = {
-  href: string;
-  label: string;
-  icon: LucideIcon;
-};
-
-const navItems: NavItem[] = [
-  { href: "/home", label: "Home", icon: Home },
-  { href: "/campaigns", label: "Explore", icon: Compass },
-  { href: "/snap", label: "Create", icon: Camera },
-  { href: "/activity", label: "Activity", icon: Bell },
-  { href: "/profile", label: "Profile", icon: User },
-];
-
 export function TopBar() {
-  const pathname = usePathname();
-
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-surface-container/60 bg-surface/85 pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)] backdrop-blur-xl">
-      <div className="app-shell mx-auto flex h-16 items-center justify-between gap-4 px-margin sm:px-4 lg:px-6">
+      <div className="app-shell mx-auto flex h-16 items-center justify-between gap-4 px-margin sm:px-4">
         <Link
           href="/home"
           aria-label="instant.fun home"
@@ -35,62 +18,11 @@ export function TopBar() {
           <Image src="/brand/logo.png" alt="instant.fun" width={120} height={32} priority className="h-8 w-auto" />
         </Link>
 
-        <nav aria-label="Primary" className="hidden min-w-0 flex-1 items-center justify-center gap-1 md:flex">
-          {navItems.map((item) => {
-            const active =
-              pathname === item.href ||
-              (item.href !== "/home" && pathname.startsWith(`${item.href}/`));
-            const isCreate = item.href === "/snap";
-            const ItemIcon = item.icon;
-
-            if (isCreate) {
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  aria-current={active ? "page" : undefined}
-                  className={`ml-1 flex h-10 items-center gap-1.5 rounded-full px-4 text-label-md shadow-sm transition-all hover:brightness-105 active:scale-95 ${
-                    active
-                      ? "bg-secondary-container text-white"
-                      : "bg-primary-container text-on-primary-fixed"
-                  }`}
-                >
-                  <ItemIcon size={18} />
-                  {item.label}
-                </Link>
-              );
-            }
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                aria-current={active ? "page" : undefined}
-                className={`flex h-10 items-center gap-1.5 rounded-full px-3.5 text-label-md transition-colors ${
-                  active
-                    ? "bg-primary-container/30 text-on-primary-container"
-                    : "text-on-surface-variant hover:bg-surface-container hover:text-on-surface"
-                }`}
-              >
-                <ItemIcon
-                  size={18}
-                  fill={active ? "currentColor" : "none"}
-                  className={active ? "text-primary" : ""}
-                />
-                {item.label}
-                {item.href === "/activity" && currentUser.hasUnread && !active && (
-                  <span className="ml-0.5 h-2 w-2 rounded-full bg-error" />
-                )}
-              </Link>
-            );
-          })}
-        </nav>
-
         <div className="flex shrink-0 items-center gap-space-xs">
           <Link
             href="/activity"
             aria-label="Notifications"
-            className="relative flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant transition-colors hover:bg-surface-container hover:text-on-surface md:hidden"
+            className="relative flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant transition-colors hover:bg-surface-container hover:text-on-surface"
           >
             <Bell size={24} />
             {currentUser.hasUnread && (

@@ -11,9 +11,9 @@ type Props = {
 
 export function ChampionCard({ champion, dividend, ended }: Props) {
   return (
-    <section className="relative w-full overflow-hidden rounded-3xl bg-surface-container-lowest p-space-md shadow-card">
+    <section className="relative w-full overflow-hidden rounded-3xl border-2 border-primary-container bg-surface-container-lowest p-space-md shadow-soft ring-4 ring-primary-container/15">
       <div className="mb-space-sm flex items-center justify-between">
-        <span className="flex items-center gap-1.5 rounded-full bg-primary-container px-3 py-1 text-label-sm text-on-primary-container">
+        <span className="flex items-center gap-1.5 rounded-full bg-primary-container px-3 py-1 text-label-sm font-extrabold text-on-primary-container">
           <Award size={16} fill="currentColor" />
           {ended ? "#1 Champion" : "#1 Leading"}
         </span>

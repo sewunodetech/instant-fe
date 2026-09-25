@@ -28,17 +28,17 @@ const steps = [
 
 export function HowItWorks() {
   return (
-    <section className="rounded-3xl bg-surface-container-lowest p-space-md shadow-sm">
+    <section className="rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft">
       <div className="mb-space-md flex items-center justify-between">
-        <h3 className="text-headline-sm">How it works</h3>
-        <button className="flex items-center gap-0.5 text-label-sm text-secondary">
+        <h3 className="text-headline-sm font-extrabold tracking-tight">How it works</h3>
+        <button className="flex items-center gap-0.5 text-label-sm font-bold text-secondary">
           Rules <ChevronRight size={14} />
         </button>
       </div>
       <ol className="flex flex-col gap-space-sm">
         {steps.map((step, i) => (
           <li key={step.title} className="flex items-start gap-space-md rounded-2xl bg-surface-container-low p-space-sm">
-            <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full shadow-sm ${step.iconBg}`}>
+            <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl shadow-sm ${step.iconBg}`}>
               <LucideIcon name={step.icon} size={22} filled={step.filled} />
             </div>
             <div className="min-w-0 flex-1">

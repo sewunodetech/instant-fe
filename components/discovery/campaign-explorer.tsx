@@ -30,7 +30,7 @@ export function CampaignExplorer() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[180px] items-center justify-center rounded-3xl bg-surface-container-lowest p-6 text-label-md text-on-surface-variant shadow-card">
+      <div className="flex min-h-[180px] items-center justify-center rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-6 text-label-md text-on-surface-variant shadow-soft">
         Loading campaigns...
       </div>
     );

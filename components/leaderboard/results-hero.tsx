@@ -24,7 +24,7 @@ export function ResultsHero({ campaign }: { campaign: Campaign }) {
           <BackButton fallbackHref={`/campaigns/${campaign.id}`} />
           <div className="min-w-0">
             <div className="flex items-center gap-1">
-              <h1 className="text-headline-sm">{ended ? "Winners & Results" : "Live Leaderboard"}</h1>
+              <h1 className="text-headline-sm font-extrabold tracking-tight">{ended ? "Winners & Results" : "Live Leaderboard"}</h1>
               {ended && <BadgeCheck size={18} fill="currentColor" className="text-secondary" />}
             </div>
             <div className="mt-0.5 flex items-center gap-1">
@@ -46,7 +46,7 @@ export function ResultsHero({ campaign }: { campaign: Campaign }) {
         )}
       </div>
 
-      <section className="relative flex w-full flex-col items-center overflow-hidden rounded-3xl bg-surface-container-lowest p-space-md text-center shadow-card">
+      <section className="relative flex w-full flex-col items-center overflow-hidden rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md text-center shadow-soft">
         <div className="pointer-events-none absolute -top-12 -left-12 h-32 w-32 rounded-full bg-primary-fixed/25 blur-2xl" />
         <div className="pointer-events-none absolute -right-10 -bottom-10 h-36 w-36 rounded-full bg-secondary-fixed/30 blur-2xl" />
 
@@ -72,7 +72,7 @@ export function ResultsHero({ campaign }: { campaign: Campaign }) {
             Live • {campaign.daysLeft} {campaign.daysLeft === 1 ? "day" : "days"} left
           </span>
         )}
-        <h2 className="text-headline-lg-mobile">{ended ? "Grand Champion Crowned" : "Race for the Crown"}</h2>
+        <h2 className="text-headline-lg-mobile font-extrabold tracking-tight">{ended ? "Grand Champion Crowned" : "Race for the Crown"}</h2>
         <p className="mt-1 max-w-xs text-body-sm text-on-surface-variant">
           {ended
             ? `Over ${campaign.votesCast.toLocaleString("en")} votes were cast by the community to decide the top creators.`
