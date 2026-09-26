@@ -1,36 +1,42 @@
-export interface PrepareDonationParams {
-  campaignId: string;
-  postId: string;
-  userId: string;
-  amount: string;
-  token: string;
-  chainId: number;
-}
-
+/** A contract call the client should send from the user's wallet. Amounts are in token units (decimal string). */
 export interface TransactionIntent {
+  chainId: number;
+  /** The wallet that must sign — the one linked to the user's account, or the indexer will not attribute it. */
+  from: string;
   contractAddress: string;
-  chainId: number;
-  method: string;
-  args: string[];
-  value: string;
-  token: string;
+  tokenAddress: string;
+  method: "support" | "fundEscrow" | "payout" | "payoutMany" | "refund";
+  args: (string | string[])[];
+  /** Tokens the contract will pull from the wallet; the client must approve at least this much first. */
+  approveAmount: string | null;
 }
 
-export interface BlockchainTransaction {
-  hash: string;
-  blockNumber: number;
-  status: "pending" | "confirmed" | "failed";
-  chainId: number;
-}
+export type InstantFunEvent =
+  | { name: "SupportSent"; logIndex: number; supporter: string; creator: string; postId: string; amount: bigint }
+  | { name: "EscrowFunded"; logIndex: number; campaignId: string; brand: string; amount: bigint; endsAt: bigint }
+  | {
+      name: "EscrowPaid";
+      logIndex: number;
+      campaignId: string;
+      brand: string;
+      creator: string;
+      postId: string;
+      amount: bigint;
+    }
+  | { name: "EscrowRefunded"; logIndex: number; campaignId: string; brand: string; amount: bigint };
 
-export interface BlockchainEvent {
-  eventName: string;
-  transactionHash: string;
-  blockNumber: number;
-  args: Record<string, unknown>;
-}
+export type InstantFunReceipt =
+  | { status: "pending"; hash: string }
+  | { status: "failed"; hash: string; blockNumber: number; from: string }
+  | {
+      status: "confirmed";
+      hash: string;
+      blockNumber: number;
+      from: string;
+      events: InstantFunEvent[];
+    };
 
 export interface BlockchainServiceInterface {
-  prepareDonationTransaction(params: PrepareDonationParams): Promise<TransactionIntent>;
-  getTransaction(hash: string): Promise<BlockchainTransaction | null>;
+  /** Reads the receipt from the configured chain and decodes only logs emitted by the InstantFun contract. */
+  getInstantFunReceipt(hash: string): Promise<InstantFunReceipt>;
 }

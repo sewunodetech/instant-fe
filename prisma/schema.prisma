@@ -24,56 +24,70 @@ model User {
   votes            Vote[]
   donations        Donation[]
   transactions     Transaction[]
-  campaignsCreated Campaign[] @relation("CampaignCreator")
+  campaignsCreated Campaign[]     @relation("CampaignCreator")
+  escrowPayouts    EscrowPayout[]
 
   @@index([walletAddress])
   @@index([privyId])
 }
 
 model Campaign {
-  id              String   @id @default(uuid())
-  title           String   @db.VarChar(200)
-  description     String?  @db.Text
-  category        String?  @db.VarChar(50)
+  id              String         @id @default(uuid())
+  title           String         @db.VarChar(200)
+  description     String?        @db.Text
+  category        String?        @db.VarChar(50)
   rules           Json?
-  coverImageUrl   String?
-  /// Total USDC awarded to the top 3 snaps (50% / 30% / 20%).
-  prizePool       Decimal  @default(0) @db.Decimal(20, 8)
-  maxPostsPerUser Int      @default(3)
+  maxPostsPerUser Int            @default(3)
   status          CampaignStatus @default(DRAFT)
+  type            CampaignType   @default(COMMUNITY)
+  creatorId       String?
+  brandName       String?        @db.VarChar(100)
+  coverImageUrl   String?
+  /// Total prize awarded to the top 3 snaps (50% / 30% / 20%).
+  prizePool       Decimal        @default(0) @db.Decimal(20, 8)
   startsAt        DateTime?
   endsAt          DateTime?
-  creatorId       String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
 
-  creator      User?    @relation("CampaignCreator", fields: [creatorId], references: [id], onDelete: SetNull)
-  posts        Post[]
-  donations    Donation[]
-  transactions Transaction[]
+  // Brand escrow (type = BRAND). Amounts mirror on-chain InstantFun events, in token units.
+  escrowStatus   EscrowStatus?
+  escrowBudget   Decimal?      @db.Decimal(20, 8)
+  escrowFunded   Decimal       @default(0) @db.Decimal(20, 8)
+  escrowPaidOut  Decimal       @default(0) @db.Decimal(20, 8)
+  escrowRefunded Decimal       @default(0) @db.Decimal(20, 8)
+
+  creator       User?          @relation("CampaignCreator", fields: [creatorId], references: [id], onDelete: SetNull)
+  posts         Post[]
+  donations     Donation[]
+  transactions  Transaction[]
+  escrowPayouts EscrowPayout[]
 
   @@index([status])
+  @@index([type])
+  @@index([creatorId])
   @@index([startsAt])
   @@index([endsAt])
-  @@index([creatorId])
 }
 
 model Post {
-  id            String   @id @default(uuid())
-  campaignId    String
-  userId        String
-  imageUrl      String
-  caption       String?  @db.VarChar(500)
-  voteCount     Int      @default(0)
-  donationCount Int      @default(0)
-  donationAmount Decimal  @default(0) @db.Decimal(20, 8)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id               String   @id @default(uuid())
+  campaignId       String
+  userId           String
+  imageUrl         String
+  caption          String?  @db.VarChar(500)
+  voteCount        Int      @default(0)
+  donationCount    Int      @default(0)
+  donationAmount   Decimal  @default(0) @db.Decimal(20, 8)
+  escrowPaidAmount Decimal  @default(0) @db.Decimal(20, 8)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
-  campaign  Campaign   @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  votes     Vote[]
-  donations Donation[]
+  campaign      Campaign       @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  votes         Vote[]
+  donations     Donation[]
+  escrowPayouts EscrowPayout[]
 
   @@unique([campaignId, userId, id])
   @@index([campaignId])
@@ -97,17 +111,17 @@ model Vote {
 }
 
 model Donation {
-  id              String        @id @default(uuid())
-  campaignId      String
-  postId          String
-  userId          String
-  amount          Decimal       @db.Decimal(20, 8)
-  token           String        @default("USDC") @db.VarChar(10)
-  status          DonationStatus @default(PENDING)
-  txHash          String?       @unique @db.VarChar(66)
-  blockNumber     BigInt?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  id          String         @id @default(uuid())
+  campaignId  String
+  postId      String
+  userId      String
+  amount      Decimal        @db.Decimal(20, 8)
+  token       String         @default("USDC") @db.VarChar(10)
+  status      DonationStatus @default(PENDING)
+  txHash      String?        @unique @db.VarChar(66)
+  blockNumber BigInt?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
 
   campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
   post     Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
@@ -118,6 +132,29 @@ model Donation {
   @@index([userId])
   @@index([txHash])
   @@index([status])
+}
+
+// One row per EscrowPaid event — a brand paying a creator out of a campaign escrow.
+model EscrowPayout {
+  id          String   @id @default(uuid())
+  campaignId  String
+  postId      String?
+  creatorId   String
+  amount      Decimal  @db.Decimal(20, 8)
+  token       String   @default("USDC") @db.VarChar(10)
+  txHash      String   @db.VarChar(66)
+  logIndex    Int
+  blockNumber BigInt
+  createdAt   DateTime @default(now())
+
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  post     Post?    @relation(fields: [postId], references: [id], onDelete: SetNull)
+  creator  User     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  @@unique([txHash, logIndex])
+  @@index([campaignId])
+  @@index([postId])
+  @@index([creatorId])
 }
 
 model Transaction {
@@ -151,6 +188,17 @@ enum CampaignStatus {
   ENDED
 }
 
+enum CampaignType {
+  COMMUNITY
+  BRAND
+}
+
+enum EscrowStatus {
+  AWAITING_DEPOSIT
+  FUNDED
+  CLOSED
+}
+
 enum DonationStatus {
   PENDING
   CONFIRMED
@@ -160,6 +208,9 @@ enum DonationStatus {
 enum TransactionType {
   DONATION
   CAMPAIGN_CREATION
+  ESCROW_DEPOSIT
+  ESCROW_PAYOUT
+  ESCROW_REFUND
 }
 
 enum TransactionStatus {

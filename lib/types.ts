@@ -1,3 +1,7 @@
+import type { TransactionIntent } from "@/lib/interfaces/blockchain.interface";
+
+export type { TransactionIntent };
+
 export type CampaignStatus = "DRAFT" | "ACTIVE" | "ENDED";
 
 export type PublicUser = {
@@ -40,6 +44,9 @@ export type CampaignStats = {
   votes: number;
 };
 
+export type CampaignType = "COMMUNITY" | "BRAND";
+export type EscrowStatus = "AWAITING_DEPOSIT" | "FUNDED" | "CLOSED";
+
 export type ApiCampaign = {
   id: string;
   title: string;
@@ -59,6 +66,14 @@ export type ApiCampaign = {
   topImageUrl: string | null;
   /** The signed-in viewer has posted at least one snap here. */
   joined: boolean;
+  type?: CampaignType;
+  creatorId?: string | null;
+  brandName?: string | null;
+  escrowStatus?: EscrowStatus | null;
+  escrowBudget?: string | number | null;
+  escrowFunded?: string | number;
+  escrowPaidOut?: string | number;
+  escrowRefunded?: string | number;
 };
 
 export type ApiPost = {
@@ -69,6 +84,7 @@ export type ApiPost = {
   voteCount: number;
   donationCount: number;
   donationAmount: number;
+  escrowPaidAmount?: string | number;
   createdAt: string;
   user: PublicUser;
   campaign: {
@@ -186,4 +202,21 @@ export type WalletTransfer = {
   counterparty: string;
   blockNumber: number;
   logIndex: number;
+};
+
+export type SyncResult =
+  | { status: "PENDING" | "FAILED"; txHash: string }
+  | { status: "CONFIRMED"; txHash: string; type: string; campaignId: string | null; alreadyProcessed: boolean };
+
+export type ApiEscrowPayout = {
+  id: string;
+  campaignId: string;
+  postId: string | null;
+  creatorId: string;
+  amount: string | number;
+  token: string;
+  txHash: string;
+  createdAt: string;
+  creator?: PublicUser | null;
+  post?: { id: string; imageUrl: string; caption: string | null } | null;
 };

@@ -57,10 +57,11 @@ export function mapApiCampaign(c: ApiCampaign, fallbackIndex = 0): MockCampaign 
   return {
     id: c.id,
     tag: toTag(c.title),
-    poolUsdc: 50 + (h % 11) * 25,
+    // Only brand campaigns have real money attached (their escrow); community campaigns have no pool.
+    poolUsdc: c.type === "BRAND" ? Number(c.escrowFunded ?? 0) : 0,
     daysLeft,
     dot: c.status === "ACTIVE" ? (daysLeft <= 3 ? "live" : "blue") : "muted",
-    kind: c.category || "Community Drop",
+    kind: c.type === "BRAND" && c.brandName ? `By ${c.brandName}` : c.category || "Community Drop",
     tagline: c.description?.split("\n")[0]?.slice(0, 80) || c.title,
     description: c.description || c.title,
     cover,
@@ -113,4 +114,4 @@ export function mapApiPost(p: ApiPost, index = 0): MockSnap {
 }
 
 export type { ApiCampaign, ApiPost, MockCampaign, MockSnap };
-export type { AppUser, AppUserWithStats, DonationIntentResult, Paginated, UploadResult } from "@/lib/types";
+export type { AppUser, AppUserWithStats, Paginated, UploadResult } from "@/lib/types";

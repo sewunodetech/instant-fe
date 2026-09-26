@@ -19,10 +19,18 @@ export interface ApiError {
   error: string;
 }
 
+/** Prisma returns BigInt for block numbers, which `Response.json` cannot serialize. */
+function json(body: unknown, init?: ResponseInit): Response {
+  return new Response(
+    JSON.stringify(body, (_key, value) => (typeof value === "bigint" ? value.toString() : value)),
+    { ...init, headers: { "Content-Type": "application/json", ...init?.headers } }
+  );
+}
+
 export function successResponse<T>(data: T, meta?: Record<string, unknown>): Response {
   const body: ApiResponse<T> = { data };
   if (meta) body.meta = meta;
-  return Response.json(body);
+  return json(body);
 }
 
 export function paginatedResponse<T>(
@@ -32,7 +40,7 @@ export function paginatedResponse<T>(
   limit: number,
   extraMeta?: Record<string, unknown>
 ): Response {
-  return Response.json({
+  return json({
     data,
     meta: {
       ...extraMeta,

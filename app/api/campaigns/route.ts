@@ -33,6 +33,7 @@ export async function POST(request: NextRequest) {
   try {
     const user = await getAuthenticatedUser(request);
     const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
+    const { type, brandName, escrowBudget } = body;
 
     const title = typeof body.title === "string" ? body.title.trim() : "";
     if (title.length < 3 || title.length > 60) return errorResponse(400, "Name must be 3–60 characters");
@@ -49,6 +50,17 @@ export async function POST(request: NextRequest) {
       .filter(Boolean);
     if (rules.length > 10 || rules.some((r) => r.length > 140)) {
       return errorResponse(400, "Up to 10 rules, 140 characters each");
+    }
+    if (type !== undefined && type !== "COMMUNITY" && type !== "BRAND") {
+      return errorResponse(400, "type must be COMMUNITY or BRAND");
+    }
+    if (type === "BRAND") {
+      if (typeof brandName !== "string" || brandName.trim().length < 2 || brandName.length > 100) {
+        return errorResponse(400, "brandName must be between 2 and 100 characters");
+      }
+      if (typeof escrowBudget !== "number" || escrowBudget < 1 || escrowBudget > 1_000_000) {
+        return errorResponse(400, "escrowBudget must be between 1 and 1,000,000 USDC");
+      }
     }
 
     const durationDays = Number(body.durationDays);
@@ -70,6 +82,9 @@ export async function POST(request: NextRequest) {
     if (coverImageUrl && !isAllowedImageUrl(coverImageUrl)) return errorResponse(400, "Invalid cover image");
 
     const campaign = await CampaignService.create(user.id, {
+      type,
+      brandName: type === "BRAND" ? (brandName as string).trim() : undefined,
+      escrowBudget: type === "BRAND" ? (escrowBudget as number) : undefined,
       title,
       description: description || undefined,
       category: category || undefined,

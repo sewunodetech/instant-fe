@@ -2,6 +2,7 @@ import { getAccessToken } from "@privy-io/react-auth";
 import type {
   ActivityItem,
   ApiCampaign,
+  ApiEscrowPayout,
   ApiPost,
   AppUser,
   AppUserWithStats,
@@ -11,6 +12,8 @@ import type {
   Paginated,
   PublicProfile,
   PublicUser,
+  SyncResult,
+  TransactionIntent,
   UploadResult,
   VoteResult,
   WalletBalance,
@@ -121,6 +124,9 @@ export const createCampaign = (data: {
   prizePool?: number;
   maxPostsPerUser?: number;
   durationDays: number;
+  type?: "COMMUNITY" | "BRAND";
+  brandName?: string;
+  escrowBudget?: number;
 }) => apiFetch<ApiCampaign>("/api/campaigns", { method: "POST", ...json(data) });
 export const updateCampaign = (
   id: string,
@@ -144,6 +150,40 @@ export const generateCampaignDraft = (prompt: string) =>
     "/api/ai/campaign/generate",
     { method: "POST", ...json({ prompt }) }
   );
+
+// Brand escrow
+export function fundEscrowIntent(campaignId: string, amount?: number) {
+  return apiFetch<{ transaction: TransactionIntent }>(`/api/campaigns/${campaignId}/escrow/fund`, {
+    method: "POST",
+    body: JSON.stringify(amount === undefined ? {} : { amount }),
+  });
+}
+
+export function payoutEscrowIntent(campaignId: string, items: { postId: string; amount: number }[]) {
+  return apiFetch<{ transaction: TransactionIntent }>(`/api/campaigns/${campaignId}/escrow/payouts`, {
+    method: "POST",
+    body: JSON.stringify({ items }),
+  });
+}
+
+export function refundEscrowIntent(campaignId: string) {
+  return apiFetch<{ transaction: TransactionIntent }>(`/api/campaigns/${campaignId}/escrow/refund`, {
+    method: "POST",
+  });
+}
+
+export function listEscrowPayouts(campaignId: string, page = 1, limit = 20) {
+  return apiFetchPaginated<ApiEscrowPayout>(
+    `/api/campaigns/${campaignId}/escrow/payouts?page=${page}&limit=${limit}`
+  );
+}
+
+export function syncTransaction(txHash: string, donationId?: string) {
+  return apiFetch<SyncResult>("/api/blockchain/index/sync", {
+    method: "POST",
+    body: JSON.stringify({ txHash, donationId }),
+  });
+}
 
 // Snaps
 export const listFeed = (params?: { sort?: "latest" | "top"; page?: number; limit?: number }) =>

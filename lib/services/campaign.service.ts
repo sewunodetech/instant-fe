@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { CampaignStatus, Prisma } from "@/lib/generated/prisma/client";
+import { CampaignStatus, CampaignType, EscrowStatus, Prisma } from "@/lib/generated/prisma/client";
 import { HttpError } from "@/lib/api-response";
 import { publicUserSelect, serializeCampaign } from "@/lib/serializers";
 import type { ApiCampaign, CampaignStats } from "@/lib/types";
@@ -25,7 +25,7 @@ export class CampaignService {
     const date = new Date(now);
     await prisma.$transaction([
       prisma.campaign.updateMany({
-        where: { status: CampaignStatus.DRAFT, startsAt: { lte: date } },
+        where: { status: CampaignStatus.DRAFT, startsAt: { lte: date }, NOT: { escrowStatus: EscrowStatus.AWAITING_DEPOSIT } },
         data: { status: CampaignStatus.ACTIVE },
       }),
       prisma.campaign.updateMany({
@@ -147,12 +147,23 @@ export class CampaignService {
       prizePool?: number;
       maxPostsPerUser?: number;
       durationDays: number;
+      type?: CampaignType;
+      brandName?: string;
+      escrowBudget?: number;
     }
   ) {
+    const isBrand = data.type === CampaignType.BRAND;
     const startsAt = new Date();
     const endsAt = new Date(startsAt.getTime() + data.durationDays * 86_400_000);
     const row = await prisma.campaign.create({
       data: {
+        type: data.type ?? CampaignType.COMMUNITY,
+        // Brand campaigns stay DRAFT until the escrow deposit is indexed (see ChainSyncService).
+        ...(isBrand && {
+          brandName: data.brandName,
+          escrowBudget: data.escrowBudget,
+          escrowStatus: EscrowStatus.AWAITING_DEPOSIT,
+        }),
         title: data.title,
         description: data.description,
         category: data.category,
@@ -160,7 +171,7 @@ export class CampaignService {
         coverImageUrl: data.coverImageUrl,
         prizePool: data.prizePool ?? 0,
         maxPostsPerUser: data.maxPostsPerUser ?? 3,
-        status: CampaignStatus.ACTIVE,
+        status: isBrand ? CampaignStatus.DRAFT : CampaignStatus.ACTIVE,
         startsAt,
         endsAt,
         creatorId,
@@ -209,6 +220,9 @@ export class CampaignService {
     }
 
     let endsAt: Date | undefined;
+    if (extendDays && campaign.type === CampaignType.BRAND && campaign.escrowStatus !== EscrowStatus.AWAITING_DEPOSIT) {
+      throw new HttpError(400, "A funded brand campaign's end date is set on-chain; top up the escrow to extend it");
+    }
     if (extendDays) {
       const base = campaign.endsAt && campaign.endsAt > new Date() ? campaign.endsAt : new Date();
       endsAt = new Date(base.getTime() + extendDays * 86_400_000);
