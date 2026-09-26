@@ -102,10 +102,10 @@ export function isUserRejection(error: unknown) {
 export function walletErrorMessage(error: unknown) {
   const message = error instanceof Error ? error.message : String(error);
   if (/insufficient funds|gas/i.test(message)) {
-    return "Not enough gas. Add a little BNB to your wallet to pay network fees.";
+    return "Not enough BNB to cover this amount plus the network fee.";
   }
   if (/transfer amount exceeds balance|exceeds balance/i.test(message)) {
-    return "Not enough USDC in your wallet.";
+    return "Not enough balance in your wallet.";
   }
   return message.length > 140 ? "Transaction failed. Please try again." : message;
 }

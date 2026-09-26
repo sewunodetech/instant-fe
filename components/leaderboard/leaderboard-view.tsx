@@ -12,8 +12,9 @@ import { BackButton } from "@/components/layout/back-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/state";
 import { getLeaderboard } from "@/lib/api-client";
-import { ordinal, usdc } from "@/lib/format";
+import { ordinal } from "@/lib/format";
 import { useApi } from "@/lib/use-api";
+import { coin } from "@/lib/currency";
 
 export function LeaderboardView({ id }: { id: string }) {
   const board = useApi(() => getLeaderboard(id), [id]);
@@ -66,7 +67,7 @@ export function LeaderboardView({ id }: { id: string }) {
             </p>
             <p className="text-body-sm opacity-80">
               {myEntry.prize > 0
-                ? `${ended ? "Prize" : "On track for"}: ${usdc(myEntry.prize)} USDC`
+                ? `${ended ? "Prize" : "On track for"}: ${coin(myEntry.prize)}`
                 : ended
                   ? "Thanks for playing — join the next one!"
                   : "Share your snap to climb into the top 3."}

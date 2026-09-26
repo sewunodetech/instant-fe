@@ -10,8 +10,9 @@ import { useVote } from "@/components/snap/use-vote";
 import { AnimatedHeart, RollingCount } from "@/components/ui/animated-heart";
 import { rankPill } from "@/components/ui/rank";
 import { RemoteImage } from "@/components/ui/remote-image";
-import { campaignTag, handleOf, profileKey, timeAgo, usdc } from "@/lib/format";
+import { campaignTag, handleOf, profileKey, timeAgo } from "@/lib/format";
 import type { ApiPost } from "@/lib/types";
+import { coin } from "@/lib/currency";
 
 export function SnapCard({ post, priority }: { post: ApiPost; priority?: boolean }) {
   const router = useRouter();
@@ -49,7 +50,7 @@ export function SnapCard({ post, priority }: { post: ApiPost; priority?: boolean
               <>
                 <span className="text-xs text-on-surface-variant/50">•</span>
                 <span className="text-label-sm font-bold whitespace-nowrap text-secondary">
-                  {usdc(post.campaign.prizePool)} USDC
+                  {coin(post.campaign.prizePool)}
                 </span>
               </>
             )}

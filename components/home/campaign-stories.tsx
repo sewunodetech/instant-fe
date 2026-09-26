@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { CircleCheck, ImagePlus } from "lucide-react";
-import { campaignTag, endsWithinHours, timeLeft, usdc } from "@/lib/format";
+import { campaignTag, endsWithinHours, timeLeft } from "@/lib/format";
 import type { ApiCampaign } from "@/lib/types";
+import { coin } from "@/lib/currency";
 
 export function CampaignStories({ campaigns }: { campaigns: ApiCampaign[] }) {
   return (
@@ -39,7 +40,7 @@ export function CampaignStories({ campaigns }: { campaigns: ApiCampaign[] }) {
                 {c.joined && <CircleCheck size={13} className="text-tertiary" aria-label="Joined" />}
               </span>
               <span className={`text-[10px] font-bold ${urgent ? "text-error" : "text-on-surface-variant"}`}>
-                {c.prizePool > 0 ? `${usdc(c.prizePool)} USDC • ` : ""}
+                {c.prizePool > 0 ? `${coin(c.prizePool)} • ` : ""}
                 {timeLeft(c.endsAt) ?? "Live"}
               </span>
             </span>

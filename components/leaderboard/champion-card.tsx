@@ -2,9 +2,10 @@ import Link from "next/link";
 import { Award, Heart } from "lucide-react";
 import { Avatar } from "@/components/auth/user-avatar";
 import { Shine } from "@/components/ui/motion-kit";
-import { handleOf, profileKey, usdc } from "@/lib/format";
+import { handleOf, profileKey } from "@/lib/format";
 import type { LeaderboardEntry } from "@/lib/types";
 import { RemoteImage } from "@/components/ui/remote-image";
+import { coin } from "@/lib/currency";
 
 export function ChampionCard({ entry, ended }: { entry: LeaderboardEntry; ended: boolean }) {
   const { post } = entry;
@@ -39,7 +40,7 @@ export function ChampionCard({ entry, ended }: { entry: LeaderboardEntry; ended:
           {entry.prize > 0 && (
             <div>
               <span className="block text-label-sm text-on-surface-variant">{ended ? "Prize" : "On track for"}</span>
-              <span className="text-headline-sm font-extrabold text-tertiary tabular-nums">+{usdc(entry.prize)} USDC</span>
+              <span className="text-headline-sm font-extrabold text-tertiary tabular-nums">+{coin(entry.prize)}</span>
             </div>
           )}
         </div>

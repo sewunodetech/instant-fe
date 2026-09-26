@@ -119,8 +119,11 @@ export type ActivityItem = {
 };
 
 export type DonationTransfer = {
+  /** "native" = plain BNB transfer; "token" = ERC-20 (USDC) transfer. */
+  kind: "native" | "token";
   to: string;
-  tokenAddress: string;
+  /** Only for kind "token". */
+  tokenAddress: string | null;
   decimals: number;
   chainId: number;
   amountRaw: string;
@@ -169,8 +172,10 @@ export type WalletBalance = {
   nativeSymbol: string;
   chainId: number;
   tokenAddress: string;
-  /** Whether USDC_CONTRACT_ADDRESS is set on the server. */
+  /** Whether the reward coin can be used (always true for native BNB). */
   configured: boolean;
+  /** False when the chain couldn't be reached — the zeros are placeholders. */
+  onchainAvailable: boolean;
 };
 
 export type WalletTransfer = {

@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { CampaignService } from "@/lib/services/campaign.service";
 import { isAllowedImageUrl } from "@/lib/services/user.service";
 import { getAuthenticatedUser, getOptionalUser } from "@/lib/auth";
+import { COIN, MAX_PRIZE_POOL } from "@/lib/currency";
 import { errorResponse, handleApiError, successResponse } from "@/lib/api-response";
 
 export async function GET(request: NextRequest, { params }: RouteContext<"/api/campaigns/[id]">) {
@@ -60,8 +61,8 @@ export async function PATCH(request: NextRequest, { params }: RouteContext<"/api
     }
     if (body.prizePool !== undefined) {
       const prizePool = Number(body.prizePool);
-      if (!Number.isFinite(prizePool) || prizePool < 0 || prizePool > 100_000) {
-        return errorResponse(400, "Prize pool must be between 0 and 100,000 USDC");
+      if (!Number.isFinite(prizePool) || prizePool < 0 || prizePool > MAX_PRIZE_POOL) {
+        return errorResponse(400, `Prize pool must be between 0 and ${MAX_PRIZE_POOL.toLocaleString("en")} ${COIN}`);
       }
       data.prizePool = prizePool;
     }

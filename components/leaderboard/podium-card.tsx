@@ -2,8 +2,9 @@ import Link from "next/link";
 import { Heart } from "lucide-react";
 import { Avatar } from "@/components/auth/user-avatar";
 import { RemoteImage } from "@/components/ui/remote-image";
-import { handleOf, usdc } from "@/lib/format";
+import { handleOf } from "@/lib/format";
 import type { LeaderboardEntry } from "@/lib/types";
+import { amount } from "@/lib/currency";
 
 const podium = {
   2: { rankLabel: "2nd place · Silver", badge: "bg-silver text-on-silver", prize: "text-on-silver" },
@@ -41,7 +42,7 @@ export function PodiumCard({ entry }: { entry: LeaderboardEntry }) {
       {entry.prize > 0 && (
         <div className="flex items-center justify-between rounded-xl bg-surface-container-low px-2 py-1.5">
           <span className="text-label-sm text-on-surface-variant">Prize</span>
-          <span className={`text-label-lg font-extrabold tabular-nums ${style.prize}`}>+{usdc(entry.prize)}</span>
+          <span className={`text-label-lg font-extrabold tabular-nums ${style.prize}`}>+{amount(entry.prize)}</span>
         </div>
       )}
     </Link>

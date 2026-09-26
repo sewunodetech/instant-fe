@@ -10,9 +10,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorState } from "@/components/ui/state";
 import { errorMessage, getCampaign, updateCampaign, uploadFile } from "@/lib/api-client";
 import { compressImage } from "@/lib/image";
-import { timeLeft, usdc } from "@/lib/format";
+import { timeLeft } from "@/lib/format";
 import { useApi } from "@/lib/use-api";
 import type { ApiCampaign } from "@/lib/types";
+import { AMOUNT_STEP, COIN, coin } from "@/lib/currency";
 
 const CATEGORIES = ["lifestyle", "food", "travel", "fashion", "pets", "sports", "art", "nature", "city", "friends"];
 const EXTEND = [0, 1, 3, 7];
@@ -280,13 +281,14 @@ function EditForm({ campaign }: { campaign: ApiCampaign }) {
         </div>
 
         <label className="flex flex-col gap-1">
-          <span className="text-label-sm text-on-surface-variant">Prize pool (USDC)</span>
+          <span className="text-label-sm text-on-surface-variant">Prize pool ({COIN})</span>
           <div className="relative">
             <Trophy size={18} className="absolute top-1/2 left-3.5 -translate-y-1/2 text-tertiary" />
             <input
               inputMode="decimal"
               type="number"
               min={campaign.prizePool}
+              step={AMOUNT_STEP}
               value={prizePool}
               onChange={(e) => setPrizePool(e.target.value)}
               placeholder="0"
@@ -295,7 +297,7 @@ function EditForm({ campaign }: { campaign: ApiCampaign }) {
             />
           </div>
           {prizeTooLow && (
-            <span className="text-body-sm text-error">Can&apos;t go below the current {usdc(campaign.prizePool)} USDC.</span>
+            <span className="text-body-sm text-error">Can&apos;t go below the current {coin(campaign.prizePool)}.</span>
           )}
         </label>
       </section>

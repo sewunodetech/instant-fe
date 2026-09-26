@@ -108,7 +108,7 @@ export function LandingHero() {
             className="mt-4 max-w-xl text-base leading-relaxed font-medium text-balance text-on-surface-variant sm:text-lg"
           >
             Shoot live in 2 minutes. The community votes. Winners split a real{" "}
-            <span className="font-bold text-secondary">USDC</span> prize pool on{" "}
+            <span className="font-bold text-bnb">BNB</span> prize pool on{" "}
             <span className="font-bold text-bnb">BNB Chain</span>.
           </motion.p>
         </div>

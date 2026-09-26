@@ -157,7 +157,7 @@ export const unvotePost = (id: string) => apiFetch<VoteResult>(`/api/posts/${id}
 export const listPostVoters = (id: string, page = 1, limit = 20) =>
   apiFetchPaginated<{ id: string; createdAt: string; user: PublicUser }>(`/api/posts/${id}/votes${qs({ page, limit })}`);
 
-// Support (USDC transfer signed in the user's wallet, verified server-side)
+// Support (BNB/USDC transfer signed in the user's wallet, verified server-side)
 export const createSupportIntent = (postId: string, amount: number) =>
   apiFetch<DonationIntent>(`/api/posts/${postId}/back`, { method: "POST", ...json({ amount }) });
 export const confirmSupport = (donationId: string, txHash: string) =>

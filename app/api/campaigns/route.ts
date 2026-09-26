@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { getAuthenticatedUser, getOptionalUser } from "@/lib/auth";
 import { CampaignService, type CampaignFilter } from "@/lib/services/campaign.service";
 import { isAllowedImageUrl } from "@/lib/services/user.service";
+import { COIN, MAX_PRIZE_POOL } from "@/lib/currency";
 import { errorResponse, handleApiError, paginatedResponse, successResponse } from "@/lib/api-response";
 import { parsePagination } from "@/lib/pagination";
 
@@ -56,8 +57,8 @@ export async function POST(request: NextRequest) {
     }
 
     const prizePool = body.prizePool === undefined ? 0 : Number(body.prizePool);
-    if (!Number.isFinite(prizePool) || prizePool < 0 || prizePool > 100_000) {
-      return errorResponse(400, "Prize pool must be between 0 and 100,000 USDC");
+    if (!Number.isFinite(prizePool) || prizePool < 0 || prizePool > MAX_PRIZE_POOL) {
+      return errorResponse(400, `Prize pool must be between 0 and ${MAX_PRIZE_POOL.toLocaleString("en")} ${COIN}`);
     }
 
     const maxPostsPerUser = body.maxPostsPerUser === undefined ? 3 : Number(body.maxPostsPerUser);

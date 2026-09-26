@@ -10,9 +10,10 @@ import { RemoteImage } from "@/components/ui/remote-image";
 import { ListRowSkeleton } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/state";
 import { getMyActivity } from "@/lib/api-client";
-import { campaignTag, handleOf, ordinal, timeAgo, usdc } from "@/lib/format";
+import { campaignTag, handleOf, ordinal, timeAgo } from "@/lib/format";
 import { useApi } from "@/lib/use-api";
 import type { ActivityItem, ActivityKind } from "@/lib/types";
+import { coin } from "@/lib/currency";
 
 const kindMeta: Record<ActivityKind, { icon: LucideIcon; className: string }> = {
   vote: { icon: Heart, className: "bg-vote-container text-vote" },
@@ -44,13 +45,13 @@ function describe(item: ActivityItem) {
     case "vote":
       return { title: `${who} voted your snap`, detail: tag };
     case "support_in":
-      return { title: `${who} sent you ${usdc(item.amount ?? 0)} USDC`, detail: tag };
+      return { title: `${who} sent you ${coin(item.amount ?? 0)}`, detail: tag };
     case "support_out":
-      return { title: `You supported ${who}`, detail: `${usdc(item.amount ?? 0)} USDC · ${tag}` };
+      return { title: `You supported ${who}`, detail: `${coin(item.amount ?? 0)} · ${tag}` };
     case "win":
       return {
         title: `You placed ${ordinal(item.rank ?? 0)} in ${tag}!`,
-        detail: item.prize ? `Prize: ${usdc(item.prize)} USDC` : "Winners announced",
+        detail: item.prize ? `Prize: ${coin(item.prize)}` : "Winners announced",
       };
     case "campaign_end":
       return { title: `Your campaign ${tag} ended`, detail: "Winners are announced — see results" };

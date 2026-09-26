@@ -4,8 +4,9 @@ import Link from "next/link";
 import { ArrowRight, Camera, CircleCheck, Crown, Hourglass, Tag, Trophy, Users } from "lucide-react";
 import { useAuth } from "@/components/providers/auth-provider";
 import { CampaignCover } from "@/components/campaign/campaign-cover";
-import { campaignTag, compactNumber, timeLeft, usdc } from "@/lib/format";
+import { campaignTag, compactNumber, timeLeft } from "@/lib/format";
 import type { ApiCampaign } from "@/lib/types";
+import { coin } from "@/lib/currency";
 
 // Cards use a stretched detail link; the action link sits above it with z-10.
 
@@ -81,7 +82,7 @@ export function FeaturedCampaignCard({ campaign }: { campaign: ApiCampaign }) {
         {campaign.prizePool > 0 && (
           <span className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-surface-container-lowest/90 px-3 py-1.5 text-label-sm shadow-md backdrop-blur-md">
             <Trophy size={15} className="text-secondary" />
-            {usdc(campaign.prizePool)} USDC
+            {coin(campaign.prizePool)}
           </span>
         )}
         {live && (
@@ -139,7 +140,7 @@ export function CampaignRowCard({ campaign }: { campaign: ApiCampaign }) {
                 {campaignTag(campaign.title)}
               </Link>
               {campaign.prizePool > 0 && (
-                <span className="shrink-0 text-label-sm text-tertiary">{usdc(campaign.prizePool)} USDC</span>
+                <span className="shrink-0 text-label-sm text-tertiary">{coin(campaign.prizePool)}</span>
               )}
             </div>
             <p className="mt-1 line-clamp-1 text-body-sm text-on-surface-variant">

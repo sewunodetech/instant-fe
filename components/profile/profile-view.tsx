@@ -11,7 +11,8 @@ import { RemoteImage } from "@/components/ui/remote-image";
 import { CampaignCardSkeleton, GridSkeleton, Skeleton } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/state";
 import { listUserCampaigns, listUserPosts } from "@/lib/api-client";
-import { compactNumber, handleOf, nameOf, shortAddress, usdc } from "@/lib/format";
+import { compactNumber, handleOf, nameOf, shortAddress } from "@/lib/format";
+import { amount, roundAmount } from "@/lib/currency";
 import { useApi } from "@/lib/use-api";
 import type { PublicProfile } from "@/lib/types";
 
@@ -47,7 +48,7 @@ export function ProfileView({
         { label: "Snaps", value: profile.stats.snaps, format: compactNumber },
         { label: "Votes", value: profile.stats.votesReceived, format: compactNumber },
         { label: "Wins", value: profile.stats.wins, format: compactNumber },
-        { label: "Tips", value: profile.stats.supportReceived, format: usdc },
+        { label: "Tips", value: profile.stats.supportReceived, format: amount },
       ]
     : [];
 
@@ -98,7 +99,7 @@ export function ProfileView({
           {stats.map((s) => (
             <div key={s.label} className="flex flex-col items-center rounded-2xl bg-surface-container-low p-2">
               <dd className="text-label-lg font-extrabold">
-                <CountUp value={s.value} format={(n) => s.format(s.label === "Tips" ? Math.round(n * 100) / 100 : Math.round(n))} />
+                <CountUp value={s.value} format={(n) => s.format(s.label === "Tips" ? roundAmount(n) : Math.round(n))} />
               </dd>
               <dt className="mt-0.5 text-[10px] text-on-surface-variant">{s.label}</dt>
             </div>

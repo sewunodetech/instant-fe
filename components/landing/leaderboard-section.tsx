@@ -17,11 +17,11 @@ const podiumTheme: Record<number, { card: string; badge: string; score: string }
 
 // More recent winners for the payout table.
 const recentWinners = [
-  { handle: "@noah_frames", campaign: "#CityLife", payout: "+18.00 USDC" },
-  { handle: "@sora_snaps", campaign: "#CampusVibes", payout: "+15.50 USDC" },
-  { handle: "@lia_golden", campaign: "#SummerVibes", payout: "+12.00 USDC" },
-  { handle: "@dev_candid", campaign: "#CityLife", payout: "+9.75 USDC" },
-  { handle: "@mika_live", campaign: "#BestFriends", payout: "+8.20 USDC" },
+  { handle: "@noah_frames", campaign: "#CityLife", payout: "+0.036 BNB" },
+  { handle: "@sora_snaps", campaign: "#CampusVibes", payout: "+0.031 BNB" },
+  { handle: "@lia_golden", campaign: "#SummerVibes", payout: "+0.024 BNB" },
+  { handle: "@dev_candid", campaign: "#CityLife", payout: "+0.02 BNB" },
+  { handle: "@mika_live", campaign: "#BestFriends", payout: "+0.016 BNB" },
 ];
 
 export function LeaderboardSection() {
@@ -45,7 +45,7 @@ export function LeaderboardSection() {
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-pretty text-on-surface-variant sm:text-lg">
             When a campaign ends, the most-voted snaps win the pool. Here are the creators
-            who took home USDC from the latest drops.
+            who took home BNB from the latest drops.
           </p>
           <span className="mt-4 inline-flex items-center gap-2 rounded-full border-2 border-on-surface/10 bg-surface-container-lowest px-4 py-1.5 text-body-sm font-bold text-on-surface shadow-soft">
             <span className="relative flex size-2">

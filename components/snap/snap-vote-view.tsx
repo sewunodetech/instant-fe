@@ -14,9 +14,10 @@ import { useVote } from "@/components/snap/use-vote";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorState } from "@/components/ui/state";
 import { deletePost, errorMessage, getPost, listPostVoters } from "@/lib/api-client";
-import { campaignTag, handleOf, nameOf, profileKey, usdc } from "@/lib/format";
+import { campaignTag, handleOf, nameOf, profileKey } from "@/lib/format";
 import { useApi } from "@/lib/use-api";
 import type { ApiPost } from "@/lib/types";
+import { coin } from "@/lib/currency";
 
 export function SnapDetail({ id }: { id: string }) {
   const post = useApi(() => getPost(id), [id]);
@@ -96,7 +97,7 @@ function SnapDetailLoaded({ post: initial }: { post: ApiPost }) {
           {post.donationAmount > 0 && (
             <p className="flex items-center gap-1.5 px-1 text-body-sm text-on-surface-variant">
               <HandHeart size={16} className="text-secondary" />
-              {usdc(post.donationAmount)} USDC from {post.donationCount}{" "}
+              {coin(post.donationAmount)} from {post.donationCount}{" "}
               {post.donationCount === 1 ? "supporter" : "supporters"}
             </p>
           )}

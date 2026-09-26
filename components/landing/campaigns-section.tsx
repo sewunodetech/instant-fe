@@ -28,7 +28,7 @@ export function CampaignsSection() {
               Live drops you can join now
             </h2>
             <p className="mt-4 text-base text-pretty text-on-surface-variant sm:text-lg">
-              Each campaign has a real USDC prize pool. Enter free, snap live, and if the
+              Each campaign has a real BNB prize pool. Enter free, snap live, and if the
               community crowns your moment — the pool is yours.
             </p>
           </div>

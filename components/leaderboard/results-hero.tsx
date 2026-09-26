@@ -6,8 +6,9 @@ import { BadgeCheck, PartyPopper, Sparkle, Trophy } from "lucide-react";
 import { ConfettiLayer, prefersReducedMotion, useConfetti } from "@/components/confetti";
 import { BackButton } from "@/components/layout/back-button";
 import { CountUp, easeOut, LiveCountdown } from "@/components/ui/motion-kit";
-import { campaignTag, usdc } from "@/lib/format";
+import { campaignTag } from "@/lib/format";
 import type { ApiCampaign } from "@/lib/types";
+import { coin } from "@/lib/currency";
 
 const SPARKLES = [
   { x: -54, y: -18, size: 14, delay: 0 },
@@ -82,7 +83,7 @@ export function ResultsHero({ campaign, hasWinner }: { campaign: ApiCampaign; ha
                 {campaignTag(campaign.title)}
               </span>
               {campaign.prizePool > 0 && (
-                <span className="shrink-0 text-body-sm text-on-surface-variant">• {usdc(campaign.prizePool)} USDC</span>
+                <span className="shrink-0 text-body-sm text-on-surface-variant">• {coin(campaign.prizePool)}</span>
               )}
             </div>
           </div>

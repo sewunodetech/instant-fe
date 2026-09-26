@@ -6,7 +6,8 @@ import { ImagePlus, Loader2, Plus, Rocket, Sparkles, Trophy, X } from "lucide-re
 import { ScreenHeader } from "@/components/layout/screen-header";
 import { createCampaign, errorMessage, generateCampaignDraft, uploadFile } from "@/lib/api-client";
 import { compressImage } from "@/lib/image";
-import { campaignTag, usdc } from "@/lib/format";
+import { campaignTag } from "@/lib/format";
+import { AMOUNT_STEP, COIN, amount, roundAmount } from "@/lib/currency";
 
 const CATEGORIES = ["lifestyle", "food", "travel", "fashion", "pets", "sports", "art", "nature", "city", "friends"];
 const DURATIONS = [1, 3, 7, 14];
@@ -283,13 +284,14 @@ export default function CreateCampaignPage() {
         </div>
 
         <label className="flex flex-col gap-1">
-          <span className="text-label-sm text-on-surface-variant">Prize pool (USDC, optional)</span>
+          <span className="text-label-sm text-on-surface-variant">Prize pool ({COIN}, optional)</span>
           <div className="relative">
             <Trophy size={18} className="absolute top-1/2 left-3.5 -translate-y-1/2 text-tertiary" />
             <input
               inputMode="decimal"
               type="number"
               min={0}
+              step={AMOUNT_STEP}
               value={prizePool}
               onChange={(e) => setPrizePool(e.target.value)}
               placeholder="0"
@@ -299,7 +301,7 @@ export default function CreateCampaignPage() {
         </label>
         {prize > 0 && (
           <p className="rounded-2xl bg-surface-container-low px-3 py-2 text-body-sm text-on-surface-variant">
-            Winners get {PRIZE_SPLIT.map((s) => `${usdc(Math.round(prize * s * 100) / 100)}`).join(" / ")} USDC. As host you
+            Winners get {PRIZE_SPLIT.map((s) => `${amount(roundAmount(prize * s))}`).join(" / ")} {COIN}. As host you
             send prizes to the winners&apos; wallets after the campaign ends.
           </p>
         )}

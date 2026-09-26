@@ -32,7 +32,7 @@ export function CommunitySection() {
             Join the instant.fun community
           </h2>
           <p className={cn(sectionLead, "mx-auto max-w-lg text-[#0b3b66]/70")}>
-            Get drop alerts, swap tips with creators, and stay first in line for new USDC
+            Get drop alerts, swap tips with creators, and stay first in line for new BNB
             campaigns.
           </p>
 

@@ -16,8 +16,9 @@ import { RemoteImage } from "@/components/ui/remote-image";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorState } from "@/components/ui/state";
 import { endCampaign, errorMessage, getLeaderboard } from "@/lib/api-client";
-import { campaignTag, compactNumber, handleOf, nameOf, profileKey, timeLeft, usdc } from "@/lib/format";
+import { campaignTag, compactNumber, handleOf, nameOf, profileKey, timeLeft } from "@/lib/format";
 import { useApi } from "@/lib/use-api";
+import { coin } from "@/lib/currency";
 
 export function CampaignDetail({ id }: { id: string }) {
   const { user } = useAuth();
@@ -125,7 +126,7 @@ export function CampaignDetail({ id }: { id: string }) {
             {campaign.prizePool > 0 ? (
               <span className="relative flex items-center gap-1.5 overflow-hidden rounded-full bg-gold px-3 py-1.5 text-label-md font-bold text-on-gold">
                 <Shine />
-                <Trophy size={15} /> {usdc(campaign.prizePool)} USDC prize
+                <Trophy size={15} /> {coin(campaign.prizePool)} prize
               </span>
             ) : (
               <span />
@@ -226,7 +227,7 @@ export function CampaignDetail({ id }: { id: string }) {
                     </div>
                     {e.prize > 0 && (
                       <span className="shrink-0 text-label-md font-extrabold text-tertiary tabular-nums">
-                        +{usdc(e.prize)} USDC
+                        +{coin(e.prize)}
                       </span>
                     )}
                   </Link>
