@@ -18,6 +18,7 @@ type UserRow = {
   displayName: string | null;
   avatarUrl: string | null;
   bio: string | null;
+  isPrivate: boolean;
 };
 
 export function toAppUser(u: UserRow): AppUser {
@@ -29,6 +30,7 @@ export function toAppUser(u: UserRow): AppUser {
     displayName: u.displayName,
     avatarUrl: u.avatarUrl,
     bio: u.bio,
+    isPrivate: u.isPrivate,
   };
 }
 
@@ -51,6 +53,16 @@ export class UserService {
     return prisma.user.findUnique({ where: { username: key.toLowerCase() } });
   }
 
+  /**
+   * Resolves a profile for a viewer. A private profile is `restricted` for
+   * everyone except its owner: identity is visible, stats and lists aren't.
+   */
+  static async resolveForViewer(handle: string, viewerId?: string | null) {
+    const user = await this.findByHandle(handle);
+    if (!user) return null;
+    return { user, restricted: user.isPrivate && user.id !== viewerId };
+  }
+
   static async getStats(userId: string): Promise<UserStats> {
     const [snaps, joined, created, totals, podiums] = await Promise.all([
       prisma.post.count({ where: { userId } }),
@@ -71,9 +83,20 @@ export class UserService {
 
   static async update(
     userId: string,
-    input: { username?: unknown; displayName?: unknown; avatarUrl?: unknown; bio?: unknown }
+    input: { username?: unknown; displayName?: unknown; avatarUrl?: unknown; bio?: unknown; isPrivate?: unknown }
   ) {
-    const data: { username?: string; displayName?: string | null; avatarUrl?: string | null; bio?: string | null } = {};
+    const data: {
+      username?: string;
+      displayName?: string | null;
+      avatarUrl?: string | null;
+      bio?: string | null;
+      isPrivate?: boolean;
+    } = {};
+
+    if (input.isPrivate !== undefined) {
+      if (typeof input.isPrivate !== "boolean") throw new HttpError(400, "isPrivate must be true or false");
+      data.isPrivate = input.isPrivate;
+    }
 
     if (input.username !== undefined) {
       if (typeof input.username !== "string") throw new HttpError(400, "Username must be text");

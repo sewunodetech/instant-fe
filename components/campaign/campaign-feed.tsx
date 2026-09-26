@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { Camera, Vote } from "lucide-react";
+import { Camera, Heart } from "lucide-react";
+import { rankPill } from "@/components/ui/rank";
 import { RemoteImage } from "@/components/ui/remote-image";
 import { GridSkeleton } from "@/components/ui/skeleton";
 import { ErrorState, LoadMore } from "@/components/ui/state";
@@ -139,13 +140,13 @@ export function CampaignFeed({
                   className="object-cover transition-transform group-hover:scale-105"
                 />
                 {post.rank && post.rank <= 3 && (
-                  <span className="absolute top-1 left-1 rounded-full bg-primary-container px-1.5 text-[10px] font-bold text-on-primary-container">
+                  <span className={`absolute top-1 left-1 rounded-full px-1.5 text-[10px] font-bold ${rankPill(post.rank)}`}>
                     #{post.rank}
                   </span>
                 )}
                 <span className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-gradient-to-t from-black/60 to-transparent p-1.5 pt-4 text-[10px] font-bold text-white">
                   <span className="flex items-center gap-0.5">
-                    <Vote size={11} />
+                    <Heart size={11} fill="currentColor" />
                     {compactNumber(post.voteCount)}
                   </span>
                   <span className="truncate">@{handleOf(post.user)}</span>

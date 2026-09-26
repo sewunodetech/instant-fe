@@ -9,7 +9,9 @@ const IS_MAINNET = CHAIN_ID === 56;
 export const EXPLORER_URL = IS_MAINNET ? "https://bscscan.com" : "https://testnet.bscscan.com";
 export const NETWORK_NAME = IS_MAINNET ? "BNB Chain" : "BSC Testnet";
 export const NATIVE_SYMBOL = IS_MAINNET ? "BNB" : "tBNB";
-export const FAUCET_URL = IS_MAINNET ? null : "https://www.bnbchain.org/en/testnet-faucet";
+export const FAUCET_URL = IS_MAINNET ? null : "https://www.bnbchain.org/id-ID/testnet-faucet";
+/** Telegram bot that drips testnet BNB — backup when the web faucet is rate-limited. */
+export const FAUCET_TELEGRAM_URL = IS_MAINNET ? null : "https://t.me/faucet_trade_bot";
 
 export const appChain = {
   id: CHAIN_ID,

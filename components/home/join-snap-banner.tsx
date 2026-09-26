@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { Camera } from "lucide-react";
-import { campaignTag, usdc } from "@/lib/format";
+import { campaignTag } from "@/lib/format";
 import type { ApiCampaign } from "@/lib/types";
+import { coin } from "@/lib/currency";
 
 export function JoinSnapBanner({ campaign }: { campaign: ApiCampaign }) {
   return (
@@ -16,14 +17,14 @@ export function JoinSnapBanner({ campaign }: { campaign: ApiCampaign }) {
           </span>
           <span className="text-body-sm opacity-90">
             {campaign.prizePool > 0
-              ? `Snap now & compete for ${usdc(campaign.prizePool)} USDC.`
+              ? `Snap now & compete for ${coin(campaign.prizePool)}.`
               : "Snap now & climb the leaderboard."}
           </span>
         </div>
       </div>
       <Link
         href={`/snap?campaign=${campaign.id}`}
-        className="shrink-0 rounded-full bg-on-surface px-4 py-2.5 text-label-sm font-bold text-surface shadow-sm transition-transform hover:-translate-y-0.5 active:scale-95"
+        className="shrink-0 rounded-full bg-surface-container-lowest px-4 py-2.5 text-label-sm font-bold text-secondary shadow-sm transition-transform hover:-translate-y-0.5 active:scale-95"
       >
         Join
       </Link>

@@ -5,7 +5,7 @@ import { DonationService } from "@/lib/services/donation.service";
 
 /**
  * POST /api/posts/:id/back { amount }
- * Creates a pending support and returns the USDC transfer the client signs.
+ * Creates a pending support and returns the transfer (BNB or USDC) the client signs.
  */
 export async function POST(request: NextRequest, { params }: RouteContext<"/api/posts/[id]/back">) {
   try {

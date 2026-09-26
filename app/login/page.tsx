@@ -110,7 +110,7 @@ function LoginContent() {
         <p className="mx-auto mt-3 max-w-xs text-base leading-relaxed font-medium text-balance text-on-surface-variant">
           {claiming
             ? "This is how the community finds, tags and votes for you."
-            : "Join photo challenges, get voted, win real USDC prizes."}
+            : "Join photo challenges, get voted, win crypto prizes on BNB Chain."}
         </p>
       </motion.div>
 

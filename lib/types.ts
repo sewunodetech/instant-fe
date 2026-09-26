@@ -11,6 +11,7 @@ export type PublicUser = {
 export type AppUser = PublicUser & {
   privyId: string | null;
   bio: string | null;
+  isPrivate: boolean;
 };
 
 export type UserStats = {
@@ -27,7 +28,10 @@ export type AppUserWithStats = AppUser & { stats?: UserStats | null };
 export type PublicProfile = PublicUser & {
   bio: string | null;
   createdAt: string;
-  stats: UserStats;
+  isPrivate: boolean;
+  /** Private profile viewed by someone else: stats and lists are hidden. */
+  restricted: boolean;
+  stats: UserStats | null;
 };
 
 export type CampaignStats = {
@@ -53,6 +57,8 @@ export type ApiCampaign = {
   stats: CampaignStats;
   /** Top snap image, used as a cover when the host didn't upload one. */
   topImageUrl: string | null;
+  /** The signed-in viewer has posted at least one snap here. */
+  joined: boolean;
 };
 
 export type ApiPost = {
@@ -113,8 +119,11 @@ export type ActivityItem = {
 };
 
 export type DonationTransfer = {
+  /** "native" = plain BNB transfer; "token" = ERC-20 (USDC) transfer. */
+  kind: "native" | "token";
   to: string;
-  tokenAddress: string;
+  /** Only for kind "token". */
+  tokenAddress: string | null;
   decimals: number;
   chainId: number;
   amountRaw: string;
@@ -163,8 +172,10 @@ export type WalletBalance = {
   nativeSymbol: string;
   chainId: number;
   tokenAddress: string;
-  /** Whether USDC_CONTRACT_ADDRESS is set on the server. */
+  /** Whether the reward coin can be used (always true for native BNB). */
   configured: boolean;
+  /** False when the chain couldn't be reached — the zeros are placeholders. */
+  onchainAvailable: boolean;
 };
 
 export type WalletTransfer = {

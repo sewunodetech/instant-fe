@@ -2,14 +2,17 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Camera, Compass, Megaphone, Trophy, Vote, Wallet } from "lucide-react";
+import { Camera, Compass, Heart, Lock, Megaphone, Trophy, Wallet } from "lucide-react";
 import { Avatar } from "@/components/auth/user-avatar";
 import { CampaignRowCard } from "@/components/discovery/campaign-cards";
+import { rankPill } from "@/components/ui/rank";
+import { CountUp } from "@/components/ui/motion-kit";
 import { RemoteImage } from "@/components/ui/remote-image";
 import { CampaignCardSkeleton, GridSkeleton, Skeleton } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/state";
 import { listUserCampaigns, listUserPosts } from "@/lib/api-client";
-import { compactNumber, handleOf, nameOf, shortAddress, usdc } from "@/lib/format";
+import { compactNumber, handleOf, nameOf, shortAddress } from "@/lib/format";
+import { amount, roundAmount } from "@/lib/currency";
 import { useApi } from "@/lib/use-api";
 import type { PublicProfile } from "@/lib/types";
 
@@ -31,18 +34,41 @@ export function ProfileView({
 }) {
   const [tab, setTab] = useState<TabId>("snaps");
   const key = profile.id;
-  const posts = useApi(() => listUserPosts(key, 1, 60), [key]);
+  const locked = profile.restricted;
+  const posts = useApi(locked ? null : () => listUserPosts(key, 1, 60), [key, locked]);
   const campaigns = useApi(
-    tab === "snaps" ? null : () => listUserCampaigns(key, tab === "hosted" ? "hosted" : "joined").then((r) => r.data),
-    [key, tab]
+    locked || tab === "snaps"
+      ? null
+      : () => listUserCampaigns(key, tab === "hosted" ? "hosted" : "joined").then((r) => r.data),
+    [key, tab, locked]
   );
 
-  const stats = [
-    { label: "Snaps", value: compactNumber(profile.stats.snaps) },
-    { label: "Votes", value: compactNumber(profile.stats.votesReceived) },
-    { label: "Wins", value: compactNumber(profile.stats.wins) },
-    { label: "Tips", value: usdc(profile.stats.supportReceived) },
-  ];
+  const stats = profile.stats
+    ? [
+        { label: "Snaps", value: profile.stats.snaps, format: compactNumber },
+        { label: "Votes", value: profile.stats.votesReceived, format: compactNumber },
+        { label: "Wins", value: profile.stats.wins, format: compactNumber },
+        { label: "Tips", value: profile.stats.supportReceived, format: amount },
+      ]
+    : [];
+
+  if (locked) {
+    return (
+      <div className="flex flex-col gap-4 px-4 pt-2">
+        <section className="flex flex-col items-center rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-lg text-center shadow-soft">
+          <Avatar user={profile} size={88} className="ring-3 ring-secondary-container" />
+          <h1 className="mt-3 text-headline-sm font-extrabold tracking-tight">{nameOf(profile)}</h1>
+          <p className="text-body-sm text-on-surface-variant">@{handleOf(profile)}</p>
+        </section>
+        <EmptyState
+          icon={<Lock size={24} />}
+          title="This account is private"
+          body="Their snaps still show up inside the campaigns they join, so you can vote on them there."
+          action={{ label: "Explore campaigns", href: "/campaigns" }}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-4 px-4 pt-2">
@@ -50,7 +76,14 @@ export function ProfileView({
         <div className="flex items-start gap-space-md">
           <Avatar user={profile} size={80} className="ring-3 ring-secondary-container" />
           <div className="min-w-0 flex-1">
-            <h1 className="truncate text-headline-sm font-extrabold tracking-tight">{nameOf(profile)}</h1>
+            <h1 className="flex items-center gap-1.5 text-headline-sm font-extrabold tracking-tight">
+              <span className="truncate">{nameOf(profile)}</span>
+              {isMe && profile.isPrivate && (
+                <span className="flex shrink-0 items-center gap-1 rounded-full bg-surface-container px-2 py-0.5 text-[11px] font-bold text-on-surface-variant">
+                  <Lock size={11} /> Private
+                </span>
+              )}
+            </h1>
             <p className="truncate text-body-sm text-on-surface-variant">@{handleOf(profile)}</p>
             {profile.walletAddress && (
               <p className="mt-1 flex items-center gap-1 text-label-sm text-on-surface-variant">
@@ -65,7 +98,9 @@ export function ProfileView({
         <dl className="mt-space-md grid grid-cols-4 gap-space-xs">
           {stats.map((s) => (
             <div key={s.label} className="flex flex-col items-center rounded-2xl bg-surface-container-low p-2">
-              <dd className="text-label-lg font-extrabold tabular-nums">{s.value}</dd>
+              <dd className="text-label-lg font-extrabold">
+                <CountUp value={s.value} format={(n) => s.format(s.label === "Tips" ? roundAmount(n) : Math.round(n))} />
+              </dd>
               <dt className="mt-0.5 text-[10px] text-on-surface-variant">{s.label}</dt>
             </div>
           ))}
@@ -108,7 +143,7 @@ export function ProfileView({
             action={isMe ? { label: "Post a snap", href: "/snap" } : undefined}
           />
         ) : (
-          <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-4">
+          <div className="grid grid-cols-3 gap-1.5">
             {posts.data.data.map((post) => (
               <Link
                 key={post.id}
@@ -123,14 +158,14 @@ export function ProfileView({
                   className="object-cover transition-transform group-hover:scale-105"
                 />
                 {post.campaign.status === "ENDED" && post.rank && post.rank <= 3 && (
-                  <span className="absolute top-1 left-1 flex items-center gap-0.5 rounded-full bg-primary-container px-1.5 text-[10px] font-bold text-on-primary-container">
+                  <span className={`absolute top-1 left-1 flex items-center gap-0.5 rounded-full px-1.5 text-[10px] font-bold ${rankPill(post.rank)}`}>
                     <Trophy size={10} />
                     {post.rank}
                   </span>
                 )}
                 <span className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/60 to-transparent p-1.5 pt-4 text-[10px] font-bold text-white">
                   <span className="flex items-center gap-0.5">
-                    <Vote size={11} />
+                    <Heart size={11} fill="currentColor" />
                     {compactNumber(post.voteCount)}
                   </span>
                   {post.rank && <span>#{post.rank}</span>}

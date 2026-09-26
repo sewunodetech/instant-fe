@@ -95,6 +95,7 @@ export class PostService {
     const created = await prisma.$transaction(async (tx) => {
       const campaign = await tx.campaign.findUnique({ where: { id: campaignId } });
       if (!campaign) throw new HttpError(404, "Campaign not found");
+      if (campaign.creatorId === userId) throw new HttpError(403, "Hosts can't enter their own campaign");
       if (campaign.status !== CampaignStatus.ACTIVE) throw new HttpError(400, "This campaign is not accepting snaps");
       if (campaign.endsAt && new Date() > campaign.endsAt) throw new HttpError(400, "This campaign has ended");
 
@@ -123,15 +124,15 @@ export class PostService {
 
   static async remainingSnaps(campaignId: string, userId: string) {
     const [campaign, used] = await Promise.all([
-      prisma.campaign.findUnique({ where: { id: campaignId }, select: { maxPostsPerUser: true } }),
+      prisma.campaign.findUnique({ where: { id: campaignId }, select: { maxPostsPerUser: true, creatorId: true } }),
       prisma.post.count({ where: { campaignId, userId } }),
     ]);
-    if (!campaign) return 0;
+    if (!campaign || campaign.creatorId === userId) return 0;
     return Math.max(0, campaign.maxPostsPerUser - used);
   }
 
   static async leaderboard(campaignId: string, viewerId?: string | null): Promise<Leaderboard | null> {
-    const campaign = await CampaignService.getById(campaignId);
+    const campaign = await CampaignService.getById(campaignId, viewerId);
     if (!campaign) return null;
 
     const [rows, voterGroups] = await Promise.all([

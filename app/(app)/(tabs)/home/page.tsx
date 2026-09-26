@@ -3,12 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { Camera, Flame, Sparkles, Wallet, Zap } from "lucide-react";
+import { Camera, Clock, Flame, Sparkles, Wallet } from "lucide-react";
 import { UserAvatar } from "@/components/auth/user-avatar";
+import { useAuth } from "@/components/providers/auth-provider";
 import { headerIconButton } from "@/components/layout/screen-header";
 import { CampaignStories } from "@/components/home/campaign-stories";
 import { JoinSnapBanner } from "@/components/home/join-snap-banner";
 import { SnapCard } from "@/components/home/snap-card";
+import { Reveal } from "@/components/ui/motion-kit";
 import { FeedSkeleton, StoriesSkeleton } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState, LoadMore } from "@/components/ui/state";
 import { errorMessage, listCampaigns, listFeed } from "@/lib/api-client";
@@ -17,12 +19,13 @@ import type { ApiPost } from "@/lib/types";
 
 const PAGE_SIZE = 10;
 const sorts = [
-  { id: "latest", label: "Latest", icon: Zap },
+  { id: "latest", label: "Latest", icon: Clock },
   { id: "top", label: "Top", icon: Flame },
 ] as const;
 type Sort = (typeof sorts)[number]["id"];
 
 export default function HomePage() {
+  const { user } = useAuth();
   const campaigns = useApi(() => listCampaigns({ status: "active", limit: 12 }).then((r) => r.data), []);
 
   const [sort, setSort] = useState<Sort>("latest");
@@ -78,7 +81,8 @@ export default function HomePage() {
     );
   };
 
-  const featured = campaigns.data?.[0];
+  // Nudge toward a campaign you can still enter (not hosting, not joined yet).
+  const featured = campaigns.data?.find((c) => c.creator?.id !== user?.id && !c.joined);
 
   return (
     <>
@@ -136,7 +140,9 @@ export default function HomePage() {
         ) : (
           <div className="flex flex-col gap-space-md">
             {posts.map((post, i) => (
-              <SnapCard key={post.id} post={post} priority={i === 0} />
+              <Reveal key={post.id}>
+                <SnapCard post={post} priority={i === 0} />
+              </Reveal>
             ))}
             {error && <ErrorState message={error} onRetry={loadMore} />}
             {hasMore && !error && <LoadMore onClick={loadMore} loading={loadingMore} />}
@@ -147,7 +153,7 @@ export default function HomePage() {
 
         {!loading && posts.length > 0 && !hasMore && (
           <div className="flex flex-col items-center justify-center gap-2 py-6 text-center">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-secondary-container text-on-secondary shadow-sm">
+            <div className="animate-float flex h-10 w-10 items-center justify-center rounded-2xl bg-secondary-container text-on-secondary shadow-sm">
               <Sparkles size={20} />
             </div>
             <p className="text-headline-sm font-extrabold tracking-tight">You&apos;re all caught up!</p>

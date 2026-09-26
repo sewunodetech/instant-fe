@@ -1,14 +1,15 @@
 import Link from "next/link";
-import { ImagePlus } from "lucide-react";
-import { campaignTag, endsWithinHours, timeLeft, usdc } from "@/lib/format";
+import { CircleCheck, ImagePlus } from "lucide-react";
+import { campaignTag, endsWithinHours, timeLeft } from "@/lib/format";
 import type { ApiCampaign } from "@/lib/types";
+import { coin } from "@/lib/currency";
 
 export function CampaignStories({ campaigns }: { campaigns: ApiCampaign[] }) {
   return (
     <section className="no-scrollbar flex items-center gap-space-sm overflow-x-auto scroll-smooth px-4 pt-3 pb-1">
       <Link
         href="/snap"
-        className="flex shrink-0 items-center gap-space-xs rounded-full border-2 border-on-surface/10 bg-secondary py-1.5 pr-space-md pl-space-xs text-on-secondary shadow-soft transition-all hover:opacity-95 active:scale-95"
+        className="flex shrink-0 items-center gap-space-xs rounded-full border-2 border-on-surface/10 bg-secondary-container py-1.5 pr-space-md pl-space-xs text-on-secondary shadow-soft transition-all hover:opacity-95 active:scale-95"
       >
         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-surface text-secondary shadow-xs">
           <ImagePlus size={18} />
@@ -34,9 +35,12 @@ export function CampaignStories({ campaigns }: { campaigns: ApiCampaign[] }) {
               <span className={`relative inline-flex h-2.5 w-2.5 rounded-full ${urgent ? "bg-error" : "bg-tertiary"}`} />
             </span>
             <span className="flex flex-col">
-              <span className="text-label-md">{campaignTag(c.title)}</span>
+              <span className="flex items-center gap-1 text-label-md">
+                {campaignTag(c.title)}
+                {c.joined && <CircleCheck size={13} className="text-tertiary" aria-label="Joined" />}
+              </span>
               <span className={`text-[10px] font-bold ${urgent ? "text-error" : "text-on-surface-variant"}`}>
-                {c.prizePool > 0 ? `${usdc(c.prizePool)} USDC • ` : ""}
+                {c.prizePool > 0 ? `${coin(c.prizePool)} • ` : ""}
                 {timeLeft(c.endsAt) ?? "Live"}
               </span>
             </span>

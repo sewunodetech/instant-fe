@@ -97,7 +97,7 @@ const json = (body: unknown): RequestInit => ({ body: JSON.stringify(body) });
 export const verifyPrivyToken = (privyToken: string) =>
   apiFetch<{ user: AppUser }>("/api/auth/verify", { method: "POST", ...json({ privyToken }) });
 export const fetchMe = () => apiFetch<AppUserWithStats>("/api/users/me");
-export const patchMe = (data: Partial<Pick<AppUser, "username" | "displayName" | "avatarUrl" | "bio">>) =>
+export const patchMe = (data: Partial<Pick<AppUser, "username" | "displayName" | "avatarUrl" | "bio" | "isPrivate">>) =>
   apiFetch<AppUser>("/api/users/me", { method: "PATCH", ...json(data) });
 export const getMyActivity = () => apiFetch<ActivityItem[]>("/api/users/me/activity");
 
@@ -122,7 +122,20 @@ export const createCampaign = (data: {
   maxPostsPerUser?: number;
   durationDays: number;
 }) => apiFetch<ApiCampaign>("/api/campaigns", { method: "POST", ...json(data) });
-export const endCampaign = (id: string) => apiFetch<ApiCampaign>(`/api/campaigns/${id}/end`, { method: "POST" });
+export const updateCampaign = (
+  id: string,
+  data: {
+    title?: string;
+    description?: string | null;
+    category?: string | null;
+    rules?: string[];
+    coverImageUrl?: string | null;
+    prizePool?: number;
+    maxPostsPerUser?: number;
+    extendDays?: number;
+  }
+) => apiFetch<ApiCampaign>(`/api/campaigns/${id}`, { method: "PATCH", ...json(data) });
+export const endCampaign =(id: string) => apiFetch<ApiCampaign>(`/api/campaigns/${id}/end`, { method: "POST" });
 export const getLeaderboard = (id: string) => apiFetch<Leaderboard>(`/api/campaigns/${id}/leaderboard`);
 export const listCampaignPosts = (id: string, params?: { sort?: "latest" | "top"; page?: number; limit?: number }) =>
   apiFetchPaginated<ApiPost, { remainingSnaps: number | null }>(`/api/campaigns/${id}/posts${qs({ ...params })}`);
@@ -144,7 +157,7 @@ export const unvotePost = (id: string) => apiFetch<VoteResult>(`/api/posts/${id}
 export const listPostVoters = (id: string, page = 1, limit = 20) =>
   apiFetchPaginated<{ id: string; createdAt: string; user: PublicUser }>(`/api/posts/${id}/votes${qs({ page, limit })}`);
 
-// Support (USDC transfer signed in the user's wallet, verified server-side)
+// Support (BNB/USDC transfer signed in the user's wallet, verified server-side)
 export const createSupportIntent = (postId: string, amount: number) =>
   apiFetch<DonationIntent>(`/api/posts/${postId}/back`, { method: "POST", ...json({ amount }) });
 export const confirmSupport = (donationId: string, txHash: string) =>

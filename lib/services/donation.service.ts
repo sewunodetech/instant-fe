@@ -5,23 +5,29 @@ import { HttpError } from "@/lib/api-response";
 import { ChainService } from "@/lib/services/chain.service";
 import { publicUserSelect, toNumber } from "@/lib/serializers";
 import type { DonationConfirmResult, DonationIntent } from "@/lib/types";
+import { COIN, IS_NATIVE, MAX_SUPPORT, MIN_SUPPORT, amount as fmt } from "@/lib/currency";
 
-const MIN_SUPPORT = 0.1;
-const MAX_SUPPORT = 10_000;
 const TX_HASH_RE = /^0x[a-fA-F0-9]{64}$/;
+
+/** Raw on-chain units for a support amount (wei for BNB, token units for USDC). */
+async function toRaw(value: number, token: string) {
+  if (token !== "USDC") return ethers.parseEther(value.toFixed(8));
+  const decimals = await ChainService.getTokenDecimals();
+  return ethers.parseUnits(value.toFixed(Math.min(decimals, 6)), decimals);
+}
 
 /**
  * Support ("tip") flow without a smart contract: the supporter signs a plain
- * USDC transfer to the creator's wallet from their Privy wallet, then the
- * server verifies the transfer on-chain before counting it.
+ * transfer (BNB by default, or USDC) to the creator's wallet from their Privy
+ * wallet, then the server verifies it on-chain before counting it.
  */
 export class DonationService {
   static async createIntent(userId: string, postId: string, amount: number): Promise<DonationIntent> {
     if (!Number.isFinite(amount) || amount < MIN_SUPPORT) {
-      throw new HttpError(400, `Minimum support is ${MIN_SUPPORT} USDC`);
+      throw new HttpError(400, `Minimum support is ${fmt(MIN_SUPPORT)} ${COIN}`);
     }
-    if (amount > MAX_SUPPORT) throw new HttpError(400, `Maximum support is ${MAX_SUPPORT.toLocaleString("en")} USDC`);
-    if (!ChainService.isConfigured) throw new HttpError(503, "USDC support isn't available yet");
+    if (amount > MAX_SUPPORT) throw new HttpError(400, `Maximum support is ${fmt(MAX_SUPPORT)} ${COIN}`);
+    if (!IS_NATIVE && !ChainService.isConfigured) throw new HttpError(503, "USDC support isn't available yet");
 
     const [post, supporter] = await Promise.all([
       prisma.post.findUnique({
@@ -36,8 +42,9 @@ export class DonationService {
     if (!post.user.walletAddress) throw new HttpError(400, "This creator hasn't set up a wallet yet");
     if (!supporter?.walletAddress) throw new HttpError(400, "Your wallet isn't ready yet — reopen the app and try again");
 
-    const decimals = await ChainService.getTokenDecimals();
-    const amountRaw = ethers.parseUnits(amount.toFixed(Math.min(decimals, 6)), decimals);
+    const token = IS_NATIVE ? COIN : "USDC";
+    const amountRaw = await toRaw(amount, token);
+    const decimals = IS_NATIVE ? 18 : await ChainService.getTokenDecimals();
 
     const donation = await prisma.donation.create({
       data: {
@@ -45,7 +52,7 @@ export class DonationService {
         postId,
         userId,
         amount,
-        token: "USDC",
+        token,
         status: DonationStatus.PENDING,
       },
     });
@@ -53,8 +60,9 @@ export class DonationService {
     return {
       donation: { id: donation.id, amount, status: donation.status },
       transfer: {
+        kind: IS_NATIVE ? "native" : "token",
         to: ethers.getAddress(post.user.walletAddress),
-        tokenAddress: ChainService.tokenAddress,
+        tokenAddress: IS_NATIVE ? null : ChainService.tokenAddress,
         decimals,
         chainId: ChainService.chainId,
         amountRaw: amountRaw.toString(),
@@ -95,9 +103,12 @@ export class DonationService {
     const to = donation.post.user.walletAddress;
     if (!from || !to) throw new HttpError(400, "Wallet missing for this support");
 
-    const decimals = await ChainService.getTokenDecimals();
-    const minAmountRaw = ethers.parseUnits(toNumber(donation.amount).toFixed(Math.min(decimals, 6)), decimals);
-    const check = await ChainService.verifyUsdcTransfer({ hash: txHash, from, to, minAmountRaw });
+    // Verify with the coin recorded on the donation, so switching config never breaks old intents.
+    const minRaw = await toRaw(toNumber(donation.amount), donation.token);
+    const check =
+      donation.token === "USDC"
+        ? await ChainService.verifyUsdcTransfer({ hash: txHash, from, to, minAmountRaw: minRaw })
+        : await ChainService.verifyNativeTransfer({ hash: txHash, from, to, minWei: minRaw });
 
     if (check.status === "pending") return { status: "PENDING" };
     if (check.status === "failed") {

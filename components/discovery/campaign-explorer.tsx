@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Compass, Flame, Hourglass, LayoutGrid, Trophy, type LucideIcon } from "lucide-react";
 import { CampaignRowCard, FeaturedCampaignCard } from "@/components/discovery/campaign-cards";
+import { Stagger, StaggerItem } from "@/components/ui/motion-kit";
 import { CampaignCardSkeleton } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/state";
 import { listCampaigns } from "@/lib/api-client";
@@ -71,12 +72,16 @@ export function CampaignExplorer() {
       ) : query.error ? (
         <ErrorState message={query.error} onRetry={query.reload} />
       ) : featured ? (
-        <div className="flex flex-col gap-3">
-          <FeaturedCampaignCard campaign={featured} />
+        <Stagger key={filter} className="flex flex-col gap-3">
+          <StaggerItem>
+            <FeaturedCampaignCard campaign={featured} />
+          </StaggerItem>
           {rest.map((c) => (
-            <CampaignRowCard key={c.id} campaign={c} />
+            <StaggerItem key={c.id}>
+              <CampaignRowCard campaign={c} />
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
       ) : (
         <EmptyState
           icon={<Compass size={24} />}

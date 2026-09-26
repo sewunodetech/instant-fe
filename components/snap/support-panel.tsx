@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { CircleCheck, ExternalLink, HandHeart, Loader2, ShieldCheck, Wallet } from "lucide-react";
+import { motion } from "motion/react";
+import { ExternalLink, HandHeart, Loader2, ShieldCheck, Wallet } from "lucide-react";
+import { SuccessBurst } from "@/components/ui/success-burst";
 import {
   cancelSupport,
   confirmSupport,
@@ -11,17 +13,16 @@ import {
   getWalletBalance,
 } from "@/lib/api-client";
 import { NETWORK_NAME, txUrl } from "@/lib/chain";
-import { usdc } from "@/lib/format";
+import { FaucetLinks } from "@/components/ui/faucet-links";
 import { useApi } from "@/lib/use-api";
 import { isUserRejection, useAppWallet, walletErrorMessage } from "@/lib/wallet";
 import type { ApiPost } from "@/lib/types";
-
-const TIERS = [1, 5, 10, 25];
+import { AMOUNT_STEP, COIN, IS_NATIVE, MIN_SUPPORT, SUPPORT_TIERS, amount as fmt, coin } from "@/lib/currency";
 type Status = "idle" | "preparing" | "signing" | "confirming" | "success" | "error";
 
 /**
- * Tip a creator in USDC. No contract yet: the supporter signs a direct token
- * transfer to the creator's wallet and the server verifies it on-chain.
+ * Tip a creator in BNB (or USDC, per config). No contract yet: the supporter
+ * signs a direct transfer to the creator's wallet and the server verifies it on-chain.
  */
 export function SupportPanel({
   post,
@@ -41,12 +42,14 @@ export function SupportPanel({
   const [txHash, setTxHash] = useState<string | null>(null);
 
   const value = custom ? Number(custom) : (amount ?? 0);
-  const available = Number(balance.data?.balance ?? 0);
-  const hasGas = Number(balance.data?.nativeBalance ?? 0) > 0;
-  const configured = balance.data?.configured ?? true;
-  const insufficient = balance.data ? value > available : false;
+  const native = Number(balance.data?.nativeBalance ?? 0);
+  const available = IS_NATIVE ? native : Number(balance.data?.balance ?? 0);
+  const hasGas = native > 0;
+  const configured = IS_NATIVE || (balance.data?.configured ?? true);
+  // Only block on balance when we actually read it from the chain.
+  const insufficient = balance.data?.onchainAvailable ? value > available : false;
   const busy = status === "preparing" || status === "signing" || status === "confirming";
-  const canSend = !busy && value >= 0.1 && !insufficient && configured && Boolean(wallet.address);
+  const canSend = !busy && value >= MIN_SUPPORT && !insufficient && configured && Boolean(wallet.address);
 
   async function support() {
     if (!canSend) return;
@@ -61,12 +64,17 @@ export function SupportPanel({
       setStatus("signing");
       let hash: string;
       try {
-        hash = await wallet.sendToken({
-          tokenAddress: intent.transfer.tokenAddress,
-          to: intent.transfer.to,
-          amountRaw: BigInt(intent.transfer.amountRaw),
-          description: `Support ${creatorName} with ${usdc(value)} USDC`,
-        });
+        const { transfer } = intent;
+        const description = `Support ${creatorName} with ${coin(value)}`;
+        hash =
+          transfer.kind === "native" || !transfer.tokenAddress
+            ? await wallet.sendNative({ to: transfer.to, amountWei: BigInt(transfer.amountRaw), description })
+            : await wallet.sendToken({
+                tokenAddress: transfer.tokenAddress,
+                to: transfer.to,
+                amountRaw: BigInt(transfer.amountRaw),
+                description,
+              });
       } catch (e) {
         void cancelSupport(intent.donation.id).catch(() => {});
         if (isUserRejection(e)) {
@@ -107,10 +115,10 @@ export function SupportPanel({
         ? "Confirm in your wallet…"
         : status === "confirming"
           ? `Confirming on ${NETWORK_NAME}…`
-          : value >= 0.1
+          : value >= MIN_SUPPORT
             ? insufficient
-              ? "Not enough USDC"
-              : `Send ${usdc(value)} USDC to ${creatorName}`
+              ? `Not enough ${COIN}`
+              : `Send ${coin(value)} to ${creatorName}`
             : "Choose an amount";
 
   return (
@@ -125,14 +133,26 @@ export function SupportPanel({
         <div className="min-w-0 flex-1">
           <h2 className="text-headline-sm font-extrabold tracking-tight">Support the creator</h2>
           <p className="mt-0.5 text-body-sm text-on-surface-variant">
-            Send USDC straight to {creatorName}&apos;s wallet. 100% goes to them — no platform fee.
+            Send {COIN} straight to {creatorName}&apos;s wallet. 100% goes to them — no platform fee.
           </p>
         </div>
       </div>
 
       {status === "success" ? (
-        <div className="flex flex-col items-center gap-2 rounded-2xl bg-tertiary-container/40 p-4 text-center">
-          <CircleCheck size={32} fill="currentColor" className="text-tertiary" />
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative flex flex-col items-center gap-2 overflow-hidden rounded-2xl bg-secondary-fixed/60 p-4 text-center"
+        >
+          <SuccessBurst />
+          <motion.span
+            initial={{ scale: 0.3, rotate: -15 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: "spring", stiffness: 420, damping: 12 }}
+            className="flex h-14 w-14 items-center justify-center rounded-full bg-secondary-container text-on-secondary shadow-pop-blue"
+          >
+            <HandHeart size={28} fill="currentColor" />
+          </motion.span>
           <p className="text-label-lg">Support sent — thank you!</p>
           {message && <p className="text-body-sm text-on-surface-variant">{message}</p>}
           {txHash && (
@@ -148,11 +168,11 @@ export function SupportPanel({
           <button type="button" onClick={() => setStatus("idle")} className="text-label-sm text-on-surface-variant underline">
             Send more
           </button>
-        </div>
+        </motion.div>
       ) : (
         <>
           <div className="grid grid-cols-4 gap-2">
-            {TIERS.map((tier) => {
+            {SUPPORT_TIERS.map((tier) => {
               const active = !custom && amount === tier;
               return (
                 <button
@@ -168,7 +188,7 @@ export function SupportPanel({
                     active ? "bg-secondary-fixed font-extrabold text-secondary shadow-sm" : "bg-surface-container"
                   }`}
                 >
-                  {tier}
+                  {fmt(tier)}
                 </button>
               );
             })}
@@ -177,8 +197,8 @@ export function SupportPanel({
             <input
               inputMode="decimal"
               type="number"
-              min={0.1}
-              step="0.1"
+              min={MIN_SUPPORT}
+              step={AMOUNT_STEP}
               value={custom}
               disabled={busy}
               onChange={(e) => {
@@ -186,10 +206,10 @@ export function SupportPanel({
                 setAmount(null);
               }}
               placeholder="Custom amount"
-              aria-label="Custom USDC amount"
+              aria-label={`Custom ${COIN} amount`}
               className="w-full min-w-0 bg-transparent text-body-md outline-none"
             />
-            <span className="text-label-md text-on-surface-variant">USDC</span>
+            <span className="text-label-md text-on-surface-variant">{COIN}</span>
           </label>
 
           {(message || balance.error) && (
@@ -202,7 +222,8 @@ export function SupportPanel({
               USDC support isn&apos;t enabled on this network yet.
             </p>
           )}
-          {configured && balance.data && !hasGas && (
+          {IS_NATIVE && balance.data?.onchainAvailable && !hasGas && <FaucetLinks title={`Your wallet is empty — claim free ${COIN}`} />}
+          {configured && balance.data && !hasGas && !IS_NATIVE && (
             <p className="rounded-2xl bg-surface-container px-3 py-2 text-body-sm text-on-surface-variant">
               Your wallet needs a little {balance.data.nativeSymbol} for network fees.{" "}
               <Link href="/wallet" className="font-bold text-secondary">
@@ -230,7 +251,7 @@ export function SupportPanel({
         <Wallet size={14} className="text-secondary" />
         Balance:{" "}
         <span className={`font-bold tabular-nums ${insufficient ? "text-error" : "text-on-surface"}`}>
-          {balance.loading ? "…" : `${usdc(available)} USDC`}
+          {balance.loading ? "…" : `${coin(available)}`}
         </span>
         <ShieldCheck size={14} className="text-secondary" />
         {NETWORK_NAME}

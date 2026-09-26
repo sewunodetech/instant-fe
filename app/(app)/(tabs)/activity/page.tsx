@@ -2,23 +2,25 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { BellOff, Flag, HandHeart, Trophy, Vote, type LucideIcon } from "lucide-react";
+import { BellOff, Flag, HandHeart, Heart, Trophy, type LucideIcon } from "lucide-react";
 import { Avatar } from "@/components/auth/user-avatar";
 import { ScreenHeader } from "@/components/layout/screen-header";
+import { Stagger, StaggerItem } from "@/components/ui/motion-kit";
 import { RemoteImage } from "@/components/ui/remote-image";
 import { ListRowSkeleton } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/state";
 import { getMyActivity } from "@/lib/api-client";
-import { campaignTag, handleOf, ordinal, timeAgo, usdc } from "@/lib/format";
+import { campaignTag, handleOf, ordinal, timeAgo } from "@/lib/format";
 import { useApi } from "@/lib/use-api";
 import type { ActivityItem, ActivityKind } from "@/lib/types";
+import { coin } from "@/lib/currency";
 
 const kindMeta: Record<ActivityKind, { icon: LucideIcon; className: string }> = {
-  vote: { icon: Vote, className: "bg-secondary-fixed text-on-secondary-fixed" },
+  vote: { icon: Heart, className: "bg-vote-container text-vote" },
   support_in: { icon: HandHeart, className: "bg-tertiary-container text-on-tertiary-container" },
   support_out: { icon: HandHeart, className: "bg-secondary-container text-on-secondary" },
   win: { icon: Trophy, className: "bg-primary-container text-on-primary-container" },
-  campaign_end: { icon: Flag, className: "bg-error-container text-on-error-container" },
+  campaign_end: { icon: Flag, className: "bg-secondary-fixed text-on-secondary-fixed" },
 };
 
 const filters = [
@@ -43,13 +45,13 @@ function describe(item: ActivityItem) {
     case "vote":
       return { title: `${who} voted your snap`, detail: tag };
     case "support_in":
-      return { title: `${who} sent you ${usdc(item.amount ?? 0)} USDC`, detail: tag };
+      return { title: `${who} sent you ${coin(item.amount ?? 0)}`, detail: tag };
     case "support_out":
-      return { title: `You supported ${who}`, detail: `${usdc(item.amount ?? 0)} USDC · ${tag}` };
+      return { title: `You supported ${who}`, detail: `${coin(item.amount ?? 0)} · ${tag}` };
     case "win":
       return {
         title: `You placed ${ordinal(item.rank ?? 0)} in ${tag}!`,
-        detail: item.prize ? `Prize: ${usdc(item.prize)} USDC` : "Winners announced",
+        detail: item.prize ? `Prize: ${coin(item.prize)}` : "Winners announced",
       };
     case "campaign_end":
       return { title: `Your campaign ${tag} ended`, detail: "Winners are announced — see results" };
@@ -102,13 +104,13 @@ export default function ActivityPage() {
           action={{ label: "Explore campaigns", href: "/campaigns" }}
         />
       ) : (
-        <ul className="flex flex-col gap-space-sm">
+        <Stagger className="flex flex-col gap-space-sm">
           {items.map((item) => {
             const meta = kindMeta[item.kind];
             const Icon = meta.icon;
             const { title, detail } = describe(item);
             return (
-              <li key={item.id}>
+              <StaggerItem key={item.id}>
                 <Link
                   href={hrefFor(item)}
                   className={`flex items-center gap-3 rounded-3xl border-2 bg-surface-container-lowest p-3 shadow-soft transition-all active:scale-[0.99] ${
@@ -142,10 +144,10 @@ export default function ActivityPage() {
                     </div>
                   )}
                 </Link>
-              </li>
+              </StaggerItem>
             );
           })}
-        </ul>
+        </Stagger>
       )}
     </div>
     </>

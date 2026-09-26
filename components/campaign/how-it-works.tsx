@@ -1,5 +1,7 @@
 import { Camera, Heart, Trophy } from "lucide-react";
-import { ordinal, usdc } from "@/lib/format";
+import { rankPill } from "@/components/ui/rank";
+import { ordinal } from "@/lib/format";
+import { COIN, amount, roundAmount } from "@/lib/currency";
 
 const steps = [
   {
@@ -12,7 +14,7 @@ const steps = [
     icon: Heart,
     iconBg: "bg-tertiary-fixed text-on-tertiary-fixed",
     title: "Get voted",
-    body: "Everyone gets one free vote per snap. Supporters can also tip you USDC directly.",
+    body: "Everyone gets one free vote per snap. Supporters can also tip you crypto directly.",
   },
   {
     icon: Trophy,
@@ -57,12 +59,12 @@ export function HowItWorks({
       {prizePool > 0 && (
         <div className="mt-space-md grid grid-cols-3 gap-space-xs">
           {prizeSplit.map((share, i) => (
-            <div key={i} className="flex flex-col items-center rounded-2xl bg-surface-container-low p-2.5 text-center">
-              <span className="text-label-sm text-on-surface-variant">{ordinal(i + 1)}</span>
-              <span className="text-label-lg font-extrabold text-tertiary tabular-nums">
-                {usdc(Math.round(prizePool * share * 100) / 100)}
+            <div key={i} className={`flex flex-col items-center rounded-2xl p-2.5 text-center ${rankPill(i + 1)}`}>
+              <span className="text-label-sm opacity-80">{ordinal(i + 1)}</span>
+              <span className="text-label-lg font-extrabold tabular-nums">
+                {amount(roundAmount(prizePool * share))}
               </span>
-              <span className="text-[10px] text-on-surface-variant">USDC</span>
+              <span className="text-[10px] opacity-80">{COIN}</span>
             </div>
           ))}
         </div>

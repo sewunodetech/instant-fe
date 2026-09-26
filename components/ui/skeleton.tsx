@@ -1,7 +1,7 @@
 /** Loading placeholders shaped like the content they stand in for. */
 
 export function Skeleton({ className = "" }: { className?: string }) {
-  return <div aria-hidden className={`animate-pulse rounded-2xl bg-surface-container ${className}`} />;
+  return <div aria-hidden className={`skeleton-shimmer rounded-2xl ${className}`} />;
 }
 
 function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {

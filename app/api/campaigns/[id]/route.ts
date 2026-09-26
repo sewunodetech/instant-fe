@@ -1,13 +1,15 @@
 import { NextRequest } from "next/server";
 import { CampaignService } from "@/lib/services/campaign.service";
 import { isAllowedImageUrl } from "@/lib/services/user.service";
-import { getAuthenticatedUser } from "@/lib/auth";
+import { getAuthenticatedUser, getOptionalUser } from "@/lib/auth";
+import { COIN, MAX_PRIZE_POOL } from "@/lib/currency";
 import { errorResponse, handleApiError, successResponse } from "@/lib/api-response";
 
-export async function GET(_request: NextRequest, { params }: RouteContext<"/api/campaigns/[id]">) {
+export async function GET(request: NextRequest, { params }: RouteContext<"/api/campaigns/[id]">) {
   try {
     const { id } = await params;
-    const campaign = await CampaignService.getById(id);
+    const viewer = await getOptionalUser(request);
+    const campaign = await CampaignService.getById(id, viewer?.id);
     if (!campaign) return errorResponse(404, "Campaign not found");
     return successResponse(campaign);
   } catch (error) {
@@ -15,29 +17,64 @@ export async function GET(_request: NextRequest, { params }: RouteContext<"/api/
   }
 }
 
-/** PATCH /api/campaigns/:id — host edits the brief while the campaign is live. */
+/**
+ * PATCH /api/campaigns/:id — host edits a live campaign.
+ * Prize pool and snaps-per-creator can only go up; `extendDays` pushes the end date out.
+ */
 export async function PATCH(request: NextRequest, { params }: RouteContext<"/api/campaigns/[id]">) {
   try {
     const user = await getAuthenticatedUser(request);
     const { id } = await params;
     const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
-    const data: { description?: string; rules?: string[]; coverImageUrl?: string | null } = {};
+    const data: Parameters<typeof CampaignService.update>[2] = {};
 
+    if (body.title !== undefined) {
+      const title = typeof body.title === "string" ? body.title.trim() : "";
+      if (title.length < 3 || title.length > 60) return errorResponse(400, "Name must be 3–60 characters");
+      data.title = title;
+    }
     if (body.description !== undefined) {
-      if (typeof body.description !== "string" || body.description.length > 2000) {
+      if (body.description !== null && (typeof body.description !== "string" || body.description.length > 2000)) {
         return errorResponse(400, "Description must be at most 2000 characters");
       }
-      data.description = body.description.trim();
+      data.description = typeof body.description === "string" ? body.description.trim() || null : null;
+    }
+    if (body.category !== undefined) {
+      data.category = typeof body.category === "string" ? body.category.trim().slice(0, 50) || null : null;
     }
     if (body.rules !== undefined) {
       if (!Array.isArray(body.rules)) return errorResponse(400, "Rules must be a list");
-      data.rules = body.rules.filter((r): r is string => typeof r === "string" && r.trim().length > 0).slice(0, 10);
+      const rules = body.rules
+        .filter((r): r is string => typeof r === "string")
+        .map((r) => r.trim())
+        .filter(Boolean);
+      if (rules.length > 10 || rules.some((r) => r.length > 140)) {
+        return errorResponse(400, "Up to 10 rules, 140 characters each");
+      }
+      data.rules = rules;
     }
     if (body.coverImageUrl !== undefined) {
       if (body.coverImageUrl !== null && (typeof body.coverImageUrl !== "string" || !isAllowedImageUrl(body.coverImageUrl))) {
         return errorResponse(400, "Invalid cover image");
       }
       data.coverImageUrl = body.coverImageUrl as string | null;
+    }
+    if (body.prizePool !== undefined) {
+      const prizePool = Number(body.prizePool);
+      if (!Number.isFinite(prizePool) || prizePool < 0 || prizePool > MAX_PRIZE_POOL) {
+        return errorResponse(400, `Prize pool must be between 0 and ${MAX_PRIZE_POOL.toLocaleString("en")} ${COIN}`);
+      }
+      data.prizePool = prizePool;
+    }
+    if (body.maxPostsPerUser !== undefined) {
+      const max = Number(body.maxPostsPerUser);
+      if (!Number.isInteger(max) || max < 1 || max > 10) return errorResponse(400, "Snaps per creator must be 1–10");
+      data.maxPostsPerUser = max;
+    }
+    if (body.extendDays !== undefined && body.extendDays !== 0) {
+      const days = Number(body.extendDays);
+      if (!Number.isInteger(days) || days < 1 || days > 14) return errorResponse(400, "Extend by 1–14 days");
+      data.extendDays = days;
     }
 
     return successResponse(await CampaignService.update(id, user.id, data));

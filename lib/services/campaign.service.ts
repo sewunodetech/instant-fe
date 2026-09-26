@@ -75,10 +75,22 @@ export class CampaignService {
     return { stats, topImages };
   }
 
-  static async serializeMany(rows: CampaignWithCreator[]): Promise<ApiCampaign[]> {
-    const { stats, topImages } = await this.statsFor(rows.map((r) => r.id));
+  /** Campaign ids (from `ids`) the viewer has posted in. */
+  static async joinedSet(viewerId: string | null | undefined, ids: string[]) {
+    if (!viewerId || ids.length === 0) return new Set<string>();
+    const rows = await prisma.post.findMany({
+      where: { userId: viewerId, campaignId: { in: ids } },
+      select: { campaignId: true },
+      distinct: ["campaignId"],
+    });
+    return new Set(rows.map((r) => r.campaignId));
+  }
+
+  static async serializeMany(rows: CampaignWithCreator[], viewerId?: string | null): Promise<ApiCampaign[]> {
+    const ids = rows.map((r) => r.id);
+    const [{ stats, topImages }, joined] = await Promise.all([this.statsFor(ids), this.joinedSet(viewerId, ids)]);
     return rows.map((r) =>
-      serializeCampaign(r, { stats: stats.get(r.id), topImageUrl: topImages.get(r.id) ?? null })
+      serializeCampaign(r, { stats: stats.get(r.id), topImageUrl: topImages.get(r.id) ?? null, joined: joined.has(r.id) })
     );
   }
 
@@ -87,14 +99,20 @@ export class CampaignService {
     return prisma.campaign.findUnique({ where: { id }, include: campaignInclude });
   }
 
-  static async getById(id: string): Promise<ApiCampaign | null> {
+  static async getById(id: string, viewerId?: string | null): Promise<ApiCampaign | null> {
     const row = await this.findRaw(id);
     if (!row) return null;
-    const [campaign] = await this.serializeMany([row]);
+    const [campaign] = await this.serializeMany([row], viewerId);
     return campaign;
   }
 
-  static async list(filter: CampaignFilter = "active", page = 1, limit = 20, category?: string) {
+  static async list(
+    filter: CampaignFilter = "active",
+    page = 1,
+    limit = 20,
+    category?: string,
+    viewerId?: string | null
+  ) {
     await this.syncStatuses();
     const where: Prisma.CampaignWhereInput = {};
     if (filter === "active") where.status = CampaignStatus.ACTIVE;
@@ -115,7 +133,7 @@ export class CampaignService {
       }),
       prisma.campaign.count({ where }),
     ]);
-    return { campaigns: await this.serializeMany(rows), total };
+    return { campaigns: await this.serializeMany(rows, viewerId), total };
   }
 
   static async create(
@@ -160,14 +178,50 @@ export class CampaignService {
     return campaign;
   }
 
+  /**
+   * Host edits a live campaign. The brief can change freely; anything that
+   * affects entrants can only move in their favour (more prize, more time,
+   * more snaps) so nobody's entry is invalidated mid-campaign.
+   */
   static async update(
     id: string,
     userId: string,
-    data: { description?: string; rules?: string[]; coverImageUrl?: string | null }
+    data: {
+      title?: string;
+      description?: string | null;
+      category?: string | null;
+      rules?: string[];
+      coverImageUrl?: string | null;
+      prizePool?: number;
+      maxPostsPerUser?: number;
+      extendDays?: number;
+    }
   ) {
     const campaign = await this.assertCreator(id, userId);
     if (campaign.status === CampaignStatus.ENDED) throw new HttpError(400, "Campaign has ended");
-    const row = await prisma.campaign.update({ where: { id }, data, include: campaignInclude });
+
+    const { extendDays, ...fields } = data;
+    if (fields.prizePool !== undefined && fields.prizePool < Number(campaign.prizePool)) {
+      throw new HttpError(400, "The prize pool can only be increased");
+    }
+    if (fields.maxPostsPerUser !== undefined && fields.maxPostsPerUser < campaign.maxPostsPerUser) {
+      throw new HttpError(400, "Snaps per creator can only be increased");
+    }
+
+    let endsAt: Date | undefined;
+    if (extendDays) {
+      const base = campaign.endsAt && campaign.endsAt > new Date() ? campaign.endsAt : new Date();
+      endsAt = new Date(base.getTime() + extendDays * 86_400_000);
+      if (endsAt.getTime() - Date.now() > 30 * 86_400_000) {
+        throw new HttpError(400, "A campaign can run at most 30 days from now");
+      }
+    }
+
+    const row = await prisma.campaign.update({
+      where: { id },
+      data: { ...fields, ...(endsAt ? { endsAt } : {}) },
+      include: campaignInclude,
+    });
     const [serialized] = await this.serializeMany([row]);
     return serialized;
   }
@@ -186,7 +240,7 @@ export class CampaignService {
   }
 
   /** Campaigns a user has posted in, newest first. */
-  static async joinedBy(userId: string, page = 1, limit = 20) {
+  static async joinedBy(userId: string, page = 1, limit = 20, viewerId?: string | null) {
     await this.syncStatuses();
     const where: Prisma.CampaignWhereInput = { posts: { some: { userId } } };
     const [rows, total] = await Promise.all([
@@ -199,11 +253,11 @@ export class CampaignService {
       }),
       prisma.campaign.count({ where }),
     ]);
-    return { campaigns: await this.serializeMany(rows), total };
+    return { campaigns: await this.serializeMany(rows, viewerId), total };
   }
 
   /** Campaigns a user hosts, newest first. */
-  static async hostedBy(userId: string, page = 1, limit = 20) {
+  static async hostedBy(userId: string, page = 1, limit = 20, viewerId?: string | null) {
     await this.syncStatuses();
     const where: Prisma.CampaignWhereInput = { creatorId: userId };
     const [rows, total] = await Promise.all([
@@ -216,6 +270,6 @@ export class CampaignService {
       }),
       prisma.campaign.count({ where }),
     ]);
-    return { campaigns: await this.serializeMany(rows), total };
+    return { campaigns: await this.serializeMany(rows, viewerId), total };
   }
 }

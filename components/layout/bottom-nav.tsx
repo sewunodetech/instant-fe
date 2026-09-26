@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { motion } from "motion/react";
 import { Bell, Camera, Compass, House, UserRound, type LucideIcon } from "lucide-react";
 
 type Tab = { href: string; label: string; icon: LucideIcon; match?: string[] };
@@ -25,8 +26,16 @@ function TabLink({ tab, active }: { tab: Tab; active: boolean }) {
     <Link
       href={tab.href}
       aria-current={active ? "page" : undefined}
-      className="group flex h-14 flex-1 flex-col items-center justify-center gap-0.5 rounded-2xl transition-colors active:bg-on-surface/5"
+      className="group relative isolate flex h-14 flex-1 flex-col items-center justify-center gap-0.5 rounded-2xl transition-colors active:bg-on-surface/5"
     >
+      {active && (
+        <motion.span
+          layoutId="nav-active"
+          aria-hidden
+          className="absolute inset-x-2 inset-y-1.5 -z-10 rounded-2xl bg-secondary-container/12"
+          transition={{ type: "spring", stiffness: 480, damping: 34 }}
+        />
+      )}
       <Icon
         size={24}
         strokeWidth={active ? 2.4 : 2}
@@ -61,8 +70,11 @@ export function BottomNav() {
             href="/snap"
             aria-label="Post a snap"
             aria-current={snapActive ? "page" : undefined}
-            className="relative -mt-7 flex h-16 w-16 items-center justify-center rounded-full bg-secondary-container text-on-secondary shadow-shutter ring-[5px] ring-surface transition-transform active:scale-90"
+            className="relative isolate -mt-7 flex h-16 w-16 items-center justify-center rounded-full bg-secondary-container text-on-secondary shadow-shutter ring-[5px] ring-surface transition-transform active:scale-90"
           >
+            {!snapActive && (
+              <span aria-hidden className="animate-ping-soft absolute inset-0 -z-10 rounded-full bg-secondary-container" />
+            )}
             <span aria-hidden className="absolute inset-1.5 rounded-full border-2 border-white/35" />
             <Camera size={26} strokeWidth={2.4} />
           </Link>

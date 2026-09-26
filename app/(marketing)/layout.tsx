@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "instant.fun — The Spontaneous Photo Arena | Win USDC on BNB Chain",
+  title: "instant.fun — The Spontaneous Photo Arena | Win BNB on BNB Chain",
   description:
-    "The spontaneous photo arena. Real moments, candid feeds, and gasless community USDC rewards on BNB Chain.",
+    "The spontaneous photo arena. Real moments, candid feeds, free community votes, and BNB prize pools on BNB Chain.",
 };
 
 export default function MarketingLayout({ children }: LayoutProps<"/">) {

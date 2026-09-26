@@ -48,7 +48,7 @@ export function WhatIsSection() {
           </h2>
           <p className={cn(sectionLead, "mx-auto max-w-lg")}>
             instant.fun turns unedited, in-the-moment snaps into a game. Enter a live
-            drop, get backed by the community, and win a real USDC prize pool.
+            drop, get backed by the community, and win a real BNB prize pool.
           </p>
         </FadeIn>
 

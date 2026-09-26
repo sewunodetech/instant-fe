@@ -4,19 +4,18 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import {
-  Camera,
   CameraOff,
   Check,
   ChevronRight,
-  CircleCheck,
   Compass,
-  ImageUp,
   Loader2,
   RefreshCw,
+  Send,
   SwitchCamera,
-  Zap,
 } from "lucide-react";
 import { headerIconButton, ScreenHeader } from "@/components/layout/screen-header";
+import { PostedCelebration } from "@/components/snap/posted-celebration";
+import { useAuth } from "@/components/providers/auth-provider";
 import { CampaignCover } from "@/components/campaign/campaign-cover";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/state";
@@ -37,15 +36,21 @@ type Facing = "environment" | "user";
 
 function CreateSnapFlow() {
   const campaignParam = useSearchParams().get("campaign");
+  const { user } = useAuth();
   const campaigns = useApi(() => listCampaigns({ status: "active", limit: 50 }).then((r) => r.data), []);
+  // You can't enter a campaign you host.
+  const joinable = useMemo(
+    () => (campaigns.data ?? []).filter((c) => c.creator?.id !== user?.id),
+    [campaigns.data, user?.id]
+  );
   const [picked, setPicked] = useState<string | null>(campaignParam);
 
   const campaignId = useMemo(() => {
-    const list = campaigns.data ?? [];
+    const list = joinable;
     if (picked && list.some((c) => c.id === picked)) return picked;
     return list[0]?.id ?? null;
-  }, [picked, campaigns.data]);
-  const campaign = campaigns.data?.find((c) => c.id === campaignId);
+  }, [picked, joinable]);
+  const campaign = joinable.find((c) => c.id === campaignId);
 
   const remaining = useApi(
     campaignId ? () => listCampaignPosts(campaignId, { limit: 1 }).then((r) => r.meta.remainingSnaps) : null,
@@ -62,7 +67,6 @@ function CreateSnapFlow() {
   const [error, setError] = useState<string | null>(null);
   const [postedId, setPostedId] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const fileRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (photo) return;
@@ -121,16 +125,6 @@ function CreateSnapFlow() {
     }
   }
 
-  async function onFile(file: File | undefined) {
-    if (!file) return;
-    try {
-      const blob = await compressImage(file);
-      setPhoto({ blob, url: URL.createObjectURL(blob) });
-      setError(null);
-    } catch {
-      setError("That image couldn't be read. Try another photo.");
-    }
-  }
 
   // Reset camera flags whenever we (re)open the stream.
   function restartCamera(update: () => void) {
@@ -162,34 +156,8 @@ function CreateSnapFlow() {
     }
   }
 
-  if (postedId && campaign) {
-    return (
-      <div className="flex flex-col gap-space-md px-space-md pt-6 pb-8 sm:px-0">
-        <div className="flex flex-col items-center gap-space-sm rounded-3xl border-2 border-tertiary/20 bg-tertiary-container/40 p-space-lg text-center shadow-soft">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-tertiary text-white shadow-sm">
-            <CircleCheck size={32} fill="currentColor" />
-          </div>
-          <p className="text-headline-sm font-extrabold tracking-tight">Your snap is live!</p>
-          <p className="text-body-sm text-on-surface-variant">
-            Share it so friends can vote. Top 3 in {campaignTag(campaign.title)} win.
-          </p>
-          <div className="mt-1 flex w-full gap-2">
-            <Link
-              href={`/campaigns/${campaign.id}`}
-              className="flex h-12 flex-1 items-center justify-center rounded-full bg-surface-container-lowest text-label-md shadow-sm"
-            >
-              Campaign
-            </Link>
-            <Link
-              href={`/snaps/${postedId}`}
-              className="flex h-12 flex-1 items-center justify-center rounded-full bg-secondary text-label-md text-white shadow-sm"
-            >
-              View snap
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
+  if (postedId && campaign && photo) {
+    return <PostedCelebration postId={postedId} campaign={campaign} photoUrl={photo.url} caption={caption.trim()} />;
   }
 
   const noSnapsLeft = remaining.data === 0;
@@ -223,7 +191,7 @@ function CreateSnapFlow() {
           </div>
         ) : campaigns.error ? (
           <ErrorState message={campaigns.error} onRetry={campaigns.reload} />
-        ) : !campaigns.data?.length ? (
+        ) : !joinable.length ? (
           <EmptyState
             icon={<Compass size={24} />}
             title="No live campaigns"
@@ -233,7 +201,7 @@ function CreateSnapFlow() {
         ) : (
           <>
             <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
-              {campaigns.data.map((c) => {
+              {joinable.map((c) => {
                 const active = c.id === campaignId;
                 return (
                   <button
@@ -250,7 +218,7 @@ function CreateSnapFlow() {
                       {campaignTag(c.title)}
                     </span>
                     {active && (
-                      <span className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-secondary text-white">
+                      <span className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-secondary-container text-on-secondary">
                         <Check size={12} />
                       </span>
                     )}
@@ -293,28 +261,19 @@ function CreateSnapFlow() {
                   <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/30">
                     <CameraOff size={32} />
                   </div>
-                  <p className="text-label-md">Camera unavailable</p>
+                  <p className="text-label-md">Camera access needed</p>
                   <p className="max-w-[16rem] text-body-sm text-white/70">
-                    Allow camera access in your browser settings, or take a photo with your phone camera.
+                    Snaps are captured live — no gallery uploads. Allow camera access for this site in your browser
+                    settings, then retry.
                   </p>
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => restartCamera(() => setCameraNonce((n) => n + 1))}
-                      className="flex items-center gap-1.5 rounded-full bg-white/15 px-4 py-2 text-label-sm ring-1 ring-white/30"
-                    >
-                      <RefreshCw size={16} />
-                      Retry
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => fileRef.current?.click()}
-                      className="flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-label-sm text-inverse-surface"
-                    >
-                      <Camera size={16} />
-                      Take photo
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => restartCamera(() => setCameraNonce((n) => n + 1))}
+                    className="flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-label-sm text-inverse-surface"
+                  >
+                    <RefreshCw size={16} />
+                    Retry camera
+                  </button>
                 </>
               ) : (
                 <Loader2 size={32} className="animate-spin text-white/70" />
@@ -324,15 +283,9 @@ function CreateSnapFlow() {
         </div>
 
         <div className="flex items-center justify-between gap-4 border-t border-white/10 bg-black/60 px-6 py-4">
-          <button
-            type="button"
-            aria-label="Use phone camera"
-            onClick={() => fileRef.current?.click()}
-            disabled={Boolean(photo)}
-            className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white disabled:opacity-0"
-          >
-            <ImageUp size={20} />
-          </button>
+          <span aria-hidden className="flex h-11 w-11 items-center justify-center text-[10px] font-bold text-white/60 uppercase">
+            Live
+          </span>
           {!photo ? (
             <button
               type="button"
@@ -364,17 +317,6 @@ function CreateSnapFlow() {
             <SwitchCamera size={20} />
           </button>
         </div>
-        <input
-          ref={fileRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          capture="environment"
-          className="hidden"
-          onChange={(e) => {
-            void onFile(e.target.files?.[0]);
-            e.target.value = "";
-          }}
-        />
       </section>
 
       <section className="rounded-3xl border-2 border-on-surface/10 bg-surface-container-lowest p-space-md shadow-soft">
@@ -409,7 +351,7 @@ function CreateSnapFlow() {
         disabled={!canPost}
         className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-secondary-container text-headline-sm text-on-secondary shadow-shutter transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {posting ? <Loader2 size={24} className="animate-spin" /> : <Zap size={24} />}
+        {posting ? <Loader2 size={24} className="animate-spin" /> : <Send size={22} />}
         <span>{posting ? "Posting…" : photo ? "Post to campaign" : "Capture first"}</span>
       </button>
     </div>

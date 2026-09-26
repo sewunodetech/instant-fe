@@ -62,7 +62,7 @@ export function RankingTabs({ entries, voters }: { entries: LeaderboardEntry[]; 
                     </span>
                   </div>
                   {e.post.hasVoted && (
-                    <span className="shrink-0 rounded-full bg-tertiary-container/60 px-2 py-0.5 text-label-sm text-on-tertiary-container">
+                    <span className="shrink-0 rounded-full bg-vote-container px-2 py-0.5 text-label-sm text-on-vote-container">
                       Voted
                     </span>
                   )}
