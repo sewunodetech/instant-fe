@@ -1,3 +1,9 @@
 out/
 cache/
 broadcast/
+
+# remotion demo video (video/)
+/video/node_modules
+/video/out
+/video/public/audio
+/video/public/img

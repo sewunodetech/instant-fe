@@ -1,0 +1,23 @@
+{
+  "name": "instant-fun-demo-video",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Remotion demo video for instant.fun",
+  "scripts": {
+    "assets": "bash scripts/generate-assets.sh",
+    "dev": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts InstantFunDemo out/instant-fun-demo.mp4"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.529",
+    "@remotion/google-fonts": "4.0.529",
+    "@remotion/transitions": "4.0.529",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "remotion": "4.0.529"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "typescript": "^5"
+  }
+}
