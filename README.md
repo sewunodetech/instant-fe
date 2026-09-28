@@ -20,7 +20,7 @@ vote for their favorites for free, and tip creators directly on **BNB Chain**.
 ## How it works
 
 ```mermaid
-%%{init: {'theme':'base', 'themeVariables': {'fontSize':'14px', 'lineColor':'#1c1b1b', 'edgeLabelBackground':'#ffffff'}}}%%
+%%{init: {'theme':'base', 'themeVariables': {'fontSize':'14px', 'lineColor':'#8b8b8b', 'edgeLabelBackground':'#ffffff'}}}%%
 flowchart LR
     A["⚡ <b>Join</b><br/>pick a live campaign"]
     B["📸 <b>Snap</b><br/>live camera,<br/>2-minute window"]
@@ -52,7 +52,7 @@ investment, or an entry fee. See [`PRD.md`](PRD.md) for the full product spec.
 ## Architecture
 
 ```mermaid
-%%{init: {'theme':'base', 'themeVariables': {'fontSize':'14px', 'lineColor':'#1c1b1b', 'edgeLabelBackground':'#ffffff'}}}%%
+%%{init: {'theme':'base', 'themeVariables': {'fontSize':'14px', 'lineColor':'#8b8b8b', 'edgeLabelBackground':'#ffffff'}}}%%
 flowchart LR
     subgraph CLIENT["📱 Client (PWA)"]
         direction TB
@@ -113,23 +113,23 @@ The backend never trusts amounts sent by the client: it reads them from on-chain
 `contracts/src/InstantFun.sol` handles all money. Details are in [`contracts/README.md`](contracts/README.md).
 
 ```mermaid
-%%{init: {'theme':'base', 'themeVariables': {'fontSize':'14px', 'actorBkg':'#ffe000', 'actorBorder':'#1c1b1b', 'actorTextColor':'#1c1b1b', 'signalColor':'#1c1b1b', 'signalTextColor':'#1c1b1b', 'noteBkgColor':'#d9e2ff', 'noteBorderColor':'#106df4', 'noteTextColor':'#001945', 'activationBkgColor':'#71fb96', 'activationBorderColor':'#006d32'}}}%%
+%%{init: {'theme':'base', 'themeVariables': {'fontSize':'14px', 'actorBkg':'#ffe000', 'actorBorder':'#1c1b1b', 'actorTextColor':'#1c1b1b', 'actorLineColor':'#8b8b8b', 'signalColor':'#8b8b8b', 'sequenceNumberColor':'#ffffff', 'signalTextColor':'#1c1b1b', 'noteBkgColor':'#d9e2ff', 'noteBorderColor':'#106df4', 'noteTextColor':'#001945', 'activationBkgColor':'#71fb96', 'activationBorderColor':'#006d32'}}}%%
 sequenceDiagram
     autonumber
-    actor S as Supporter
-    actor B as Brand
+    participant S as 🙋 Supporter
+    participant B as 🏢 Brand
     participant C as InstantFun.sol
-    actor K as Creator
+    participant K as 📸 Creator
     participant API as Backend
 
-    rect rgba(255, 61, 104, 0.12)
+    rect rgb(255, 228, 234)
         Note over S,K: Support = direct tip
         S->>C: support(creator, postId, amount)
         C->>K: transfer (contract never holds it)
         C-->>API: SupportSent → indexed
     end
 
-    rect rgba(16, 109, 244, 0.12)
+    rect rgb(232, 240, 255)
         Note over B,K: Brand campaign escrow
         B->>C: fundEscrow(campaignId, amount, endsAt)
         activate C
@@ -147,7 +147,7 @@ sequenceDiagram
 ## Data model
 
 ```mermaid
-%%{init: {'theme':'base', 'themeVariables': {'fontSize':'14px', 'primaryColor':'#ffe000', 'primaryBorderColor':'#1c1b1b', 'primaryTextColor':'#1c1b1b', 'lineColor':'#1c1b1b', 'tertiaryColor':'#fcf9f8'}}}%%
+%%{init: {'theme':'base', 'themeVariables': {'fontSize':'14px', 'primaryColor':'#ffe000', 'primaryBorderColor':'#1c1b1b', 'primaryTextColor':'#1c1b1b', 'lineColor':'#8b8b8b', 'tertiaryColor':'#fcf9f8', 'relationLabelBackground':'#ffffff', 'relationLabelColor':'#1c1b1b'}}}%%
 erDiagram
     User ||--o{ Campaign : creates
     User ||--o{ Post : snaps
